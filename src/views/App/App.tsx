@@ -1,25 +1,55 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-09 17:41:45
+ * @LastEditTime: 2021-10-11 14:06:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
 import React, { useState } from "react";
-import { Layout, Menu } from "antd";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined } from "@ant-design/icons";
+import { Layout, Menu, Avatar, Dropdown } from "antd";
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
+
+// 引入api
+import { logout } from "../../api/login/login";
+
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
-function App() {
+function App(props:any) {
   const [collapsed, setCollapsed] = useState(false);
   // 变换展开模式
   const toggle = () => {
     setCollapsed(!collapsed);
   };
+
+  /**
+   * @description: 退出方法
+   * @param {*} void
+   * @return {*}
+   */
+  const clickLogOut = (): void => {
+    logout().then(() => {
+      // 如果退出成功那么就调用 三个删除 localstorage
+      window.localStorage.removeItem("ruoyi_token");
+      window.localStorage.removeItem("ruoyi_role");
+      window.localStorage.removeItem("ruoyi_user");
+      // 跳转回登录页面
+      props.history.replace('/login')
+    })
+  };
+
+  // menu 下选菜单
+  const menu = (
+    <Menu>
+      <Menu.Item key="PersonalCenter">个人中心</Menu.Item>
+      <Menu.Item key="LogOut" onClick={clickLogOut}>
+        退出登录
+      </Menu.Item>
+    </Menu>
+  );
   return (
     <div className="App">
       <Layout>
@@ -57,6 +87,14 @@ function App() {
               className: "trigger",
               onClick: toggle,
             })}
+            <div className="rightheader">
+              <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
+                <div>
+                  <Avatar shape="square" icon={<UserOutlined />} />
+                  <CaretDownOutlined className="righticondown" />
+                </div>
+              </Dropdown>
+            </div>
           </Header>
           <Content
             className="site-layout-background"

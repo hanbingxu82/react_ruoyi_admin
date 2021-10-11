@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 09:30:58
- * @LastEditTime: 2021-10-11 10:35:11
+ * @LastEditTime: 2021-10-11 14:56:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/login/index.tsx
@@ -13,9 +13,16 @@ import "./index.less";
 
 import { login, getInfo, getCodeImg } from "../../api/login/login";
 import bgUrl from "../../assets/images/loginbg.png";
-
-const Login = () => {
+interface Ilogin {
+  username: string;
+  password: string;
+  code: string;
+  uuid: string;
+}
+let uuid = "";
+const Login = (props:any) => {
   const [codeUrl, setCodeUrl] = useState("");
+
   /**
    * @description: 副作用
    * @param {*}
@@ -24,15 +31,39 @@ const Login = () => {
   useEffect(() => {
     getCodeUrl();
   }, []);
+  /**
+   * @description: 获取验证码函数方法
+   * @param {*}
+   * @return {*}
+   */
   const getCodeUrl = () => {
     getCodeImg().then((res: any) => {
+      uuid = res.uuid;
       setCodeUrl("data:image/gif;base64," + res.img);
     });
   };
 
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-  };
+  /**
+   * @description: 校验成功 登录方法
+   * @param {any} values
+   * @return {*}
+   */
+  const onFinish = (values: Ilogin) => {
+    values.uuid = uuid;
+    login(values.username, values.password, values.code, values.uuid).then((res: any) => {
+      // 存token 查用户信息 跳转首页
+      window.localStorage.setItem("ruoyi_token", res.token);
+      getInfo().then((userRes:any)=>{
+        // 存入角色信息
+        window.localStorage.setItem("ruoyi_role", userRes.role);
+        window.localStorage.setItem("ruoyi_user", userRes.user);
+        props.replace('/index')
+      })
+    }).catch(err=>{
+      // 如果reject 那么就重新刷新验证码
+      getCodeUrl()
+    })
+  }
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);

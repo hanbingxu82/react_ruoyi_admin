@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-11 09:19:31
+ * @LastEditTime: 2021-10-11 15:20:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
@@ -12,6 +12,10 @@ import axios from "axios";
 // import { getToken } from '@/utils/auth'
 import errorCode from "./errorCode";
 // import router from '@/router'
+import React from "react";
+import { Modal, message } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+const { confirm } = Modal;
 
 function getToken() {
   return window.localStorage.getItem("ruoyi_token");
@@ -21,13 +25,13 @@ function getToken() {
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL: 'http://localhost:8080/',
+  baseURL: "http://localhost:8080/",
   // 超时
   timeout: 20000,
 });
 // request拦截器
 service.interceptors.request.use(
-    config => {
+  (config) => {
     // 是否需要设置 token
     // const isToken = (config.headers || {}).isToken === false
     const isToken = false;
@@ -76,32 +80,49 @@ service.interceptors.response.use(
     // 获取错误信息
     const msg = (errorCode as any)[code] || res.data.msg || errorCode["default"];
     if (code === 401) {
-    //   MessageBox.confirm("登录状态已过期，您可以继续留在该页面，或者重新登录", "系统提示", {
-    //     confirmButtonText: "重新登录",
-    //     cancelButtonText: "取消",
-    //     type: "warning",
-    //   })
-    //     .then(() => {
-    //       //   store.dispatch('LogOut').then(() => {
-    //       //     // location.href = '/index';
-    //       //     // 2021-09-17 路由跳转问题
-    //       //     router.push('/login')
-    //       //   })
-    //     })
-    //     .catch(() => {
-    //       //   router.push('/login')
-    //     });
+      confirm({
+        title: "系统提示",
+        content: "登录状态已过期，您可以继续留在该页面，或者重新登录?",
+        icon: React.createElement(ExclamationCircleOutlined),
+        okText: "确认",
+        centered: true,
+        cancelText: "取消",
+        onOk() {
+          location.href = '/login';
+        },
+        onCancel() {
+          console.log("Cancel");
+        },
+      });
+      //   MessageBox.confirm("登录状态已过期，您可以继续留在该页面，或者重新登录", "系统提示", {
+      //     confirmButtonText: "重新登录",
+      //     cancelButtonText: "取消",
+      //     type: "warning",
+      //   })
+      //     .then(() => {
+      //       //   store.dispatch('LogOut').then(() => {
+      //       //     // location.href = '/index';
+      //       //     // 2021-09-17 路由跳转问题
+      //       //     router.push('/login')
+      //       //   })
+      //     })
+      //     .catch(() => {
+      //       //   router.push('/login')
+      
+      //     });
       return Promise.reject();
     } else if (code === 500) {
-    //   Message({
-    //     message: msg,
-    //     type: "error",
-    //   });
-      return Promise.reject(new Error(msg));
+      message.error(msg);
+      //   Message({
+      //     message: msg,
+      //     type: "error",
+      //   });
+      // return Promise.reject(new Error(msg));
+      return Promise.reject(msg);
     } else if (code !== 200) {
-    //   Notification.error({
-    //     title: msg,
-    //   });
+      //   Notification.error({
+      //     title: msg,
+      //   });
       return Promise.reject("error");
     } else {
       return res.data;
