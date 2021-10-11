@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-09 11:23:59
+ * @LastEditTime: 2021-10-09 14:53:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/index.tsx
@@ -17,7 +17,7 @@ ReactDOM.render(
   // <React.StrictMode> 关闭严格模式
     <HashRouter>
       <Switch>
-        {routers.map((v) => (
+        {routers.routers.map((v) => (
           <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
         ))}
       </Switch>
