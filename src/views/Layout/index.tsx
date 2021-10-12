@@ -1,15 +1,35 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 14:03:48
- * @LastEditTime: 2021-10-11 09:20:54
+ * @LastEditTime: 2021-10-11 17:30:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: /use-hooks/src/views/Home/index.ts
+ * @FilePath: /use-hooks/src/views/Layout/index.ts
  */
 // import react from "react";
-
-function Home() {
-    return (<div>小仙安娜在努力</div>)
+import { connect } from "react-redux";
+//从redux中引入一个方法用于将actionCreators中的方法进行绑定 就是用  dispatch({actions暴露方法})
+import { bindActionCreators } from "redux";
+import actions from "../../store/actions";
+function Layout(props: any) {
+  console.log(props);
+  const { number } = props;
+  const add = () => {
+    props.add(1);
+  };
+  const del = () => {
+    props.del(1);
+  };
+  return (
+    <div>
+      <div>{number}</div>
+      <button onClick={add}>+1</button>
+      <button onClick={del}>-1</button>
+    </div>
+  );
 }
-
-export default Home;
+const mapStateToProps = (state: any) => ({
+  number: state.number,
+});
+const mapDispatchToProps = (dispatch: any) => bindActionCreators(actions, dispatch);
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-10-11 09:44:13
+ * @LastEditTime: 2021-10-11 16:40:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -60,7 +60,7 @@ const routers = [
  */
 const subRouters = [
   {
-    path: "/layout/index",
+    path: "/index/layout",
     exact: true,
     component: Layout,
   },

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-11 14:06:37
+ * @LastEditTime: 2021-10-12 08:41:32
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -12,13 +12,14 @@ import { Layout, Menu, Avatar, Dropdown } from "antd";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
-
-// 引入api
-import { logout } from "../../api/login/login";
+import { connect } from "react-redux";
+//从redux中引入一个方法用于将actionCreators中的方法进行绑定 就是用  dispatch({actions暴露方法})
+import { bindActionCreators } from "redux";
+import actions from "../../store/actions";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
-function App(props:any) {
+function App(props: any) {
   const [collapsed, setCollapsed] = useState(false);
   // 变换展开模式
   const toggle = () => {
@@ -31,14 +32,15 @@ function App(props:any) {
    * @return {*}
    */
   const clickLogOut = (): void => {
-    logout().then(() => {
-      // 如果退出成功那么就调用 三个删除 localstorage
-      window.localStorage.removeItem("ruoyi_token");
-      window.localStorage.removeItem("ruoyi_role");
-      window.localStorage.removeItem("ruoyi_user");
-      // 跳转回登录页面
-      props.history.replace('/login')
-    })
+    // logout().then(() => {
+    //   // 如果退出成功那么就调用 三个删除 localstorage
+    //   window.localStorage.removeItem("ruoyi_token");
+    //   window.localStorage.removeItem("ruoyi_role");
+    //   window.localStorage.removeItem("ruoyi_user");
+    //   // 跳转回登录页面
+    //   props.history.replace('/login')
+    // })
+    props.getLogout(props);
   };
 
   // menu 下选菜单
@@ -59,7 +61,7 @@ function App(props:any) {
           </div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
             <Menu.Item key="1" icon={<AppstoreOutlined />}>
-              <NavLink style={{ textDecoration: "none" }} to="/layout/index">
+              <NavLink style={{ textDecoration: "none" }} to="/index/layout">
                 首页
               </NavLink>
             </Menu.Item>
@@ -113,5 +115,8 @@ function App(props:any) {
     </div>
   );
 }
-
-export default App;
+const mapDispatchToProps = (dispatch: any) => bindActionCreators(actions, dispatch);
+export default connect(
+  (state: any) => state,
+  (dispatch: any) => mapDispatchToProps
+)(App);

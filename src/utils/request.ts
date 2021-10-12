@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-11 15:20:32
+ * @LastEditTime: 2021-10-12 10:02:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
@@ -13,8 +13,11 @@ import axios from "axios";
 import errorCode from "./errorCode";
 // import router from '@/router'
 import React from "react";
+
+import { createHashHistory } from "history";
 import { Modal, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+const customHash = createHashHistory();
 const { confirm } = Modal;
 
 function getToken() {
@@ -88,28 +91,13 @@ service.interceptors.response.use(
         centered: true,
         cancelText: "取消",
         onOk() {
-          location.href = '/login';
+          // 跳转路由首页
+          customHash.push("/login");
         },
         onCancel() {
           console.log("Cancel");
         },
       });
-      //   MessageBox.confirm("登录状态已过期，您可以继续留在该页面，或者重新登录", "系统提示", {
-      //     confirmButtonText: "重新登录",
-      //     cancelButtonText: "取消",
-      //     type: "warning",
-      //   })
-      //     .then(() => {
-      //       //   store.dispatch('LogOut').then(() => {
-      //       //     // location.href = '/index';
-      //       //     // 2021-09-17 路由跳转问题
-      //       //     router.push('/login')
-      //       //   })
-      //     })
-      //     .catch(() => {
-      //       //   router.push('/login')
-      
-      //     });
       return Promise.reject();
     } else if (code === 500) {
       message.error(msg);
@@ -120,6 +108,7 @@ service.interceptors.response.use(
       // return Promise.reject(new Error(msg));
       return Promise.reject(msg);
     } else if (code !== 200) {
+      message.error(msg);
       //   Notification.error({
       //     title: msg,
       //   });
@@ -138,6 +127,7 @@ service.interceptors.response.use(
     } else if (message.includes("Request failed with status code")) {
       message = "系统接口" + message.substr(message.length - 3) + "异常";
     }
+    message.error(message);
     // Message({
     //   message: message,
     //   type: "error",
