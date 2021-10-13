@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:37:13
- * @LastEditTime: 2021-10-11 09:20:15
+ * @LastEditTime: 2021-10-13 15:13:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/ruoyi.js
@@ -13,3 +13,4 @@ export function praseStrEmpty(str) {
 	}
 	return str;
 }
+

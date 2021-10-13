@@ -16,7 +16,7 @@
     "@types/react-router-dom": "^5.3.1",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
-    "antd": "^4.16.13",
+    "antd": "^4.17.0-alpha.5",
     "axios": "^0.22.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.0",
@@ -96,7 +96,8 @@
     "rules": {
       "no-undef": "off",
       "no-restricted-globals": "off",
-      "no-unused-vars": "off"
+      "no-unused-vars": "off",
+      "jsx-a11y/anchor-is-valid": "off"
     }
   },
   "browserslist": {

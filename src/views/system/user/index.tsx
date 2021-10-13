@@ -1,17 +1,19 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:33
- * @LastEditTime: 2021-10-13 11:43:12
+ * @LastEditTime: 2021-10-13 17:12:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/user/index.tsx
  */
 import React, { useState, useEffect, useRef } from "react";
 import "./index.less";
-import { listUser } from "../../../api/system/user";
-import { Tree, Input, Row, Col, Form, Button, Select, DatePicker, Tooltip, Table, Space, Switch } from "antd";
-import { SearchOutlined, SyncOutlined, AppstoreOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import { listUser, getUser } from "../../../api/system/user";
+import { Tree, Input, Row, Col, Form, Button, Select, DatePicker, Tooltip, Table, Space, Switch, Modal, Radio, TreeSelect } from "antd";
+import { SearchOutlined, SyncOutlined, AppstoreOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined } from "@ant-design/icons";
 import { treeselect } from "../../../api/system/dept";
+import { getDicts } from "../../../api/global";
+import moment from "moment";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -32,16 +34,50 @@ const getParentKey = (id: any, tree: string | any[]): any => {
       }
     }
   }
-  console.log(parentKey);
   return parentKey;
 };
 
 function User() {
+  /**
+   * @description: 是否第一次加载组件
+   * @param {*}
+   * @return {*}
+   */
   const initComponent = useRef(true);
+  /**
+   * @description: 搜索条件
+   * @param {*}
+   * @return {*}
+   */
   const [queryParams, setQueryParams] = useState({
     pageNum: 1,
     pageSize: 10,
+    deptId: "",
+    userName: "",
+    phonenumber: "",
+    status: "",
+    params: {
+      beginTime: "",
+      endTime: "",
+    },
   });
+  // 搜索form 实例
+  const [queryForm] = Form.useForm();
+  const [visible, setVisible] = useState(false);
+  const [visibleTitle, setVisibleTitle] = useState("添加用户");
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  // 用户form字段
+  const [userForm, setUserForm] = useState({
+    deptId: "",
+  });
+  const [userFormModel] = Form.useForm();
+  const [dicts, setDicts] = useState({
+    sys_normal_disable: [],
+    sys_user_sex: [],
+    postOptions: [],
+    roleOptions: [],
+  });
+
   const [treeList, setTreeList] = useState([]);
   const [total, setTotal] = useState(0);
   const [expandedKeys, setExpandedKeys] = useState([]);
@@ -63,7 +99,7 @@ function User() {
         return null;
       })
       .filter((item, i, self) => item && self.indexOf(item) === i);
-      console.log(value)
+    console.log(value);
     setExpandedKeys(expandedKeys);
     setSearchValue(value);
     setAutoExpandParent(true);
@@ -98,13 +134,57 @@ function User() {
     if (initComponent.current) return;
     // 监听queryParams变化
     getList();
-  }, [queryParams.pageNum, queryParams.pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [queryParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // 副作用生命周期
   useEffect(() => {
     initComponent.current = false;
+    getDicts("sys_normal_disable").then((response) => {
+      setDicts((data) => {
+        data.sys_normal_disable = response.data;
+        return data;
+      });
+    });
+    getDicts("sys_user_sex").then((response) => {
+      setDicts((data) => {
+        data.sys_user_sex = response.data;
+        return data;
+      });
+    });
+    getUser("").then((response: any) => {
+      setDicts((data) => {
+        data.postOptions = response.posts;
+        data.roleOptions = response.roles;
+        return data;
+      });
+    });
     getList();
     getOtherList();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * @description: 点击增加修改事件
+   * @param {*}
+   * @return {*}
+   */
+  const showModal = (titleName: string) => {
+    setVisibleTitle(titleName);
+    setVisible(true);
+  };
+
+  const handleOk = () => {
+    console.log(userFormModel.getFieldsValue());
+    setConfirmLoading(true);
+    setTimeout(() => {
+      setVisible(false);
+      setConfirmLoading(false);
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
   /**
    * @description: 获取其他数据
    * @param {*}
@@ -141,6 +221,17 @@ function User() {
   };
 
   /**
+   * @description: selectTree变更事件
+   * @param {any} value
+   * @return {*}
+   */
+  const onSelectTreeChange = (value: any) => {
+    setUserForm((data) => {
+      data.deptId = value;
+      return { ...data };
+    });
+  };
+  /**
    * @description: 表格复选框选择事件
    * @param {any} selectedRowKeys
    * @return {*}
@@ -154,16 +245,39 @@ function User() {
     onChange: onSelectChange,
   };
   /**
-   * @description:
+   * @description:table 选框变更事件
    * @param {*}
    * @return {*}
    */
   const onTableSwitchChange = () => {};
-  const onFinish = (data: any) => {
-    console.log(data);
+  /**
+   * @description: 搜索条件搜索事件
+   * @param {any} form
+   * @return {*}
+   */
+  const onQueryFinish = (form: any) => {
+    setQueryParams((data) => {
+      data.phonenumber = form.phonenumber;
+      data.userName = form.userName;
+      data.status = form.status;
+      if (form.time) {
+        data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
+        data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
+      } else {
+        data.params.beginTime = "";
+        data.params.endTime = "";
+      }
+      return { ...data };
+    });
   };
-  const onFinishFailed = (data: any) => {
-    console.log(data);
+  /**
+   * @description: 搜索条件重置事件
+   * @param {*}
+   * @return {*}
+   */
+  const onResetQuery = () => {
+    queryForm.resetFields();
+    onQueryFinish({});
   };
   // 回调函数，切换下一页
   const changePage = (current: any) => {
@@ -193,40 +307,51 @@ function User() {
     onShowSizeChange: (current: any, pageSize: any) => changePageSize(pageSize, current),
     onChange: (current: any) => changePage(current),
   };
+  /**
+   * @description: tree 树点击事件
+   * @param {*}
+   * @return {*}
+   */
+  const onTreeClick = (selectedKeys: any, e: any) => {
+    setQueryParams((data) => {
+      data.deptId = selectedKeys[0];
+      return { ...data };
+    });
+  };
   return (
     <div className="User">
       <Row>
         {/* 左侧树条件区域 */}
         <Col span={6}>
           <Search style={{ marginBottom: 8 }} placeholder="请输入部门名称" onChange={onChange} />
-          {treeList.length && <Tree onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent treeData={loop(treeList)} />}
+          {treeList.length && <Tree onSelect={onTreeClick} onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} treeData={loop(treeList)} />}
         </Col>
         {/* 右侧内容展示区域 */}
         <Col span={17} offset={1}>
-          <Form name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onFinish} onFinishFailed={onFinishFailed} autoComplete="off">
+          <Form form={queryForm} name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
             <Row>
               <Col span={8}>
-                <Form.Item label="用户名称" name="username">
+                <Form.Item label="用户名称" name="userName">
                   <Input placeholder="请输入用户名称" />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="手机号码" name="password">
+                <Form.Item label="手机号码" name="phonenumber">
                   <Input placeholder="请输入用户名称" />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="状态" name="状态">
+                <Form.Item label="状态" name="status">
                   <Select placeholder="请输入状态" allowClear>
-                    <Option value="male">启用</Option>
-                    <Option value="female">停用</Option>
+                    <Option value="0">启用</Option>
+                    <Option value="1">停用</Option>
                   </Select>
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col span={8}>
-                <Form.Item label="创建时间" name="创建时间">
+                <Form.Item label="创建时间" name="time">
                   <RangePicker format={dateFormat} />
                 </Form.Item>
               </Col>
@@ -235,7 +360,7 @@ function User() {
                   <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     搜索
                   </Button>
-                  <Button style={{ marginLeft: 20 }} icon={<SyncOutlined />}>
+                  <Button style={{ marginLeft: 20 }} onClick={onResetQuery} icon={<SyncOutlined />}>
                     重置
                   </Button>
                 </Form.Item>
@@ -245,7 +370,13 @@ function User() {
           {/* 搜索条区域 */}
           <Row>
             <Col span={2} style={{ marginRight: 20 }}>
-              <Button icon={<PlusOutlined />} type="primary">
+              <Button
+                icon={<PlusOutlined />}
+                type="primary"
+                onClick={() => {
+                  showModal("添加用户");
+                }}
+              >
                 新增
               </Button>
             </Col>
@@ -289,13 +420,127 @@ function User() {
                 title="操作"
                 render={(text, row: any) => (
                   <Space size="middle">
-                    <a href="/">Invite </a>
-                    <a href="/">Delete</a>
+                    <a>
+                      <EditOutlined />
+                      修改
+                    </a>
+                    <a>
+                      <DeleteOutlined />
+                      删除
+                    </a>
+                    <a>
+                      <DoubleRightOutlined />
+                      更多
+                    </a>
                   </Space>
                 )}
               />
             </Table>
           </Row>
+          <Modal width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+            <Form form={userFormModel} name="userFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0" }} autoComplete="off">
+              <Row>
+                <Col span={11}>
+                  <Form.Item label="用户昵称" name="nickName">
+                    <Input placeholder="请输入用户昵称" />
+                  </Form.Item>
+                </Col>
+                <Col span={11} offset={2}>
+                  <Form.Item label="归属部门" name="deptId">
+                    {/* <Input placeholder="请输入归属部门" /> */}
+                    <TreeSelect onChange={onSelectTreeChange} value={userForm.deptId} fieldNames={{ label: "label", value: "id", children: "children" }} style={{ width: "100%" }} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={treeList} placeholder="请选择归属部门" treeDefaultExpandAll />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <Form.Item label="手机号码" name="phonenumber">
+                    <Input placeholder="请输入手机号码" />
+                  </Form.Item>
+                </Col>
+                <Col span={11} offset={2}>
+                  <Form.Item label="邮箱" name="email">
+                    <Input placeholder="请输入邮箱" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <Form.Item label="用户名称" name="userName">
+                    <Input placeholder="请输入用户名称" />
+                  </Form.Item>
+                </Col>
+                <Col span={11} offset={2}>
+                  <Form.Item label="用户密码" name="password">
+                    <Input.Password placeholder="请输入用户密码" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <Form.Item label="用户性别" name="sex">
+                    <Select placeholder="请选择用户性别">
+                      {dicts.sys_user_sex.map((dict: any) => {
+                        return (
+                          <Option value={dict.dictValue} key={"sex" + dict.dictValue}>
+                            {dict.dictLabel}
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={11} offset={2}>
+                  <Form.Item label="状态" name="status">
+                    <Radio.Group>
+                      {dicts.sys_normal_disable.map((dict: any) => {
+                        return (
+                          <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
+                            {dict.dictLabel}
+                          </Radio>
+                        );
+                      })}
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={11}>
+                  <Form.Item label="岗位" name="postIds">
+                    <Select placeholder="请选择岗位">
+                      {dicts.postOptions.map((dict: any) => {
+                        return (
+                          <Option value={dict.postId} key={"postId" + dict.postId}>
+                            {dict.postName}
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={11} offset={2}>
+                  <Form.Item label="角色" name="roleIds">
+                    <Select placeholder="请选择角色">
+                      {dicts.roleOptions.map((dict: any) => {
+                        return (
+                          <Option value={dict.roleId} key={"roleId" + dict.roleId}>
+                            {dict.roleName}
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={24}>
+                  <Form.Item label="内容" name="remark">
+                    <Input.TextArea placeholder="请输入内容" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Modal>
         </Col>
       </Row>
     </div>
