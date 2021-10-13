@@ -1,25 +1,23 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-12 10:02:00
+ * @LastEditTime: 2021-10-12 11:32:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
  */
+// 
 import axios from "axios";
-// import { Notification, MessageBox, Message } from "element-ui";
-// import store from '@/store'
-// import { getToken } from '@/utils/auth'
 import errorCode from "./errorCode";
-// import router from '@/router'
 import React from "react";
-
-import { createHashHistory } from "history";
 import { Modal, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-const customHash = createHashHistory();
-const { confirm } = Modal;
 
+// 引入路由
+import { createHashHistory} from "history";
+const customHash = createHashHistory();
+
+const { confirm } = Modal;
 function getToken() {
   return window.localStorage.getItem("ruoyi_token");
 }
@@ -91,7 +89,7 @@ service.interceptors.response.use(
         centered: true,
         cancelText: "取消",
         onOk() {
-          // 跳转路由首页
+          // 跳转路由
           customHash.push("/login");
         },
         onCancel() {

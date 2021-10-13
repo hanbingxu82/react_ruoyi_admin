@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 09:30:58
- * @LastEditTime: 2021-10-11 18:00:05
+ * @LastEditTime: 2021-10-13 09:06:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/login/index.tsx
  */
 
-import react, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Form, Input, Button, Checkbox, Row, Col } from "antd";
 import "./index.less";
 import { connect } from "react-redux";
@@ -58,7 +58,7 @@ const Login = (props: any) => {
         // 存token 查用户信息 跳转首页
         window.localStorage.setItem("ruoyi_token", res.token);
         // 调用 redux 方法
-        props.getInfo(props)
+        props.getInfo(props);
         // getInfo().then((userRes: any) => {
         //   // 存入角色信息
         //   window.localStorage.setItem("ruoyi_role", JSON.stringify(userRes.roles));
@@ -121,4 +121,4 @@ const Login = (props: any) => {
 };
 const mapDispatchToProps = (dispatch: any) => bindActionCreators(actions, dispatch);
 
-export default connect((state:any)=>state, mapDispatchToProps)(Login);
+export default connect((state: any) => state, mapDispatchToProps)(Login);
