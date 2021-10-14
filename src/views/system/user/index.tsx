@@ -1,15 +1,15 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:33
- * @LastEditTime: 2021-10-13 17:12:08
+ * @LastEditTime: 2021-10-14 10:05:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/user/index.tsx
  */
 import React, { useState, useEffect, useRef } from "react";
 import "./index.less";
-import { listUser, getUser } from "../../../api/system/user";
-import { Tree, Input, Row, Col, Form, Button, Select, DatePicker, Tooltip, Table, Space, Switch, Modal, Radio, TreeSelect } from "antd";
+import { listUser, getUser, updateUser, addUser } from "../../../api/system/user";
+import { Tree, Input, Row, Col, Form, Button, Select, DatePicker, Tooltip, Table, Space, Switch, Modal, Radio, TreeSelect, message } from "antd";
 import { SearchOutlined, SyncOutlined, AppstoreOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined } from "@ant-design/icons";
 import { treeselect } from "../../../api/system/dept";
 import { getDicts } from "../../../api/global";
@@ -69,6 +69,7 @@ function User() {
   // 用户form字段
   const [userForm, setUserForm] = useState({
     deptId: "",
+    userId: "",
   });
   const [userFormModel] = Form.useForm();
   const [dicts, setDicts] = useState({
@@ -151,13 +152,6 @@ function User() {
         return data;
       });
     });
-    getUser("").then((response: any) => {
-      setDicts((data) => {
-        data.postOptions = response.posts;
-        data.roleOptions = response.roles;
-        return data;
-      });
-    });
     getList();
     getOtherList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -167,18 +161,69 @@ function User() {
    * @param {*}
    * @return {*}
    */
-  const showModal = (titleName: string) => {
+  const showModal = (titleName: string, row: any = { userId: "" }) => {
     setVisibleTitle(titleName);
+    userFormModel.resetFields();
+    setUserForm(() => {
+      return {
+        deptId: "",
+        userId: "",
+      };
+    });
+    if (titleName === "修改用户") {
+      const userId = row.userId || selectedRowKeys[0];
+      // 调用查询详细接口
+      getUser(userId).then((response: any) => {
+        setUserForm((data: any) => {
+          return { ...data, ...response.data, postId: response.postId, roleId: response.roleId };
+        });
+        // 变更字典
+        setDicts((data) => {
+          data.postOptions = response.posts;
+          data.roleOptions = response.roles;
+          return { ...data };
+        });
+        userFormModel.setFieldsValue({
+          ...response.data,
+          postIds: response.postIds,
+          roleIds: response.roleIds,
+        });
+      });
+    } else {
+      // 新增用户操作
+      getUser("").then((response: any) => {
+        setDicts((data) => {
+          data.postOptions = response.posts;
+          data.roleOptions = response.roles;
+          return { ...data };
+        });
+      });
+    }
     setVisible(true);
   };
-
+  /**
+   * @description: 弹窗确认点击事件
+   * @param {*}
+   * @return {*}
+   */
   const handleOk = () => {
-    console.log(userFormModel.getFieldsValue());
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setVisible(false);
-      setConfirmLoading(false);
-    }, 2000);
+    // form 表单内容
+    // setConfirmLoading(true);
+    if (userForm.userId !== "") {
+      updateUser({ ...userForm, ...userFormModel.getFieldsValue() }).then(() => {
+        message.success("修改成功");
+        // setConfirmLoading(false);
+        setVisible(false);
+        getList();
+      });
+    } else {
+      addUser({ ...userFormModel.getFieldsValue() }).then(() => {
+        message.success("增加成功");
+        setVisible(false);
+        // setConfirmLoading(false);
+        getList();
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -245,7 +290,7 @@ function User() {
     onChange: onSelectChange,
   };
   /**
-   * @description:table 选框变更事件
+   * @description:table 开关选框变更事件
    * @param {*}
    * @return {*}
    */
@@ -381,10 +426,20 @@ function User() {
               </Button>
             </Col>
             <Col span={2} style={{ marginRight: 20 }}>
-              <Button icon={<EditOutlined />}>修改</Button>
+              <Button
+                disabled={selectedRowKeys.length !== 1}
+                onClick={() => {
+                  showModal("修改用户");
+                }}
+                icon={<EditOutlined />}
+              >
+                修改
+              </Button>
             </Col>
             <Col span={2} style={{ marginRight: 20 }}>
-              <Button icon={<DeleteOutlined />}>删除</Button>
+              <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
+                删除
+              </Button>
             </Col>
             <Col span={2} style={{ marginRight: 20 }}>
               <Button icon={<VerticalAlignTopOutlined />}>导入</Button>
@@ -413,27 +468,33 @@ function User() {
               <Column align="center" title="用户昵称" dataIndex="nickName" />
               <Column align="center" title="部门" dataIndex={["dept", "deptName"]} />
               <Column align="center" title="手机号码" dataIndex="phonenumber" />
-              <Column align="center" title="状态" render={(text, row: any) => <Switch checkedChildren="开启" onChange={onTableSwitchChange} unCheckedChildren="关闭" defaultChecked={row.status === "0" ? true : false} />} />
+              <Column align="center" title="状态" render={(text, row: any) => <Switch checked={row.status === "0" ? true : false} checkedChildren="开启" onChange={onTableSwitchChange} unCheckedChildren="关闭" defaultChecked={row.status === "0" ? true : false} />} />
               <Column align="center" title="创建时间" dataIndex="createTime" />
               <Column
                 align="center"
                 title="操作"
-                render={(text, row: any) => (
-                  <Space size="middle">
-                    <a>
-                      <EditOutlined />
-                      修改
-                    </a>
-                    <a>
-                      <DeleteOutlined />
-                      删除
-                    </a>
-                    <a>
-                      <DoubleRightOutlined />
-                      更多
-                    </a>
-                  </Space>
-                )}
+                render={(text, row: any) =>
+                  row.userId !== 1 ? (
+                    <Space size="middle">
+                      <a
+                        onClick={() => {
+                          showModal("修改用户", row);
+                        }}
+                      >
+                        <EditOutlined />
+                        修改
+                      </a>
+                      <a>
+                        <DeleteOutlined />
+                        删除
+                      </a>
+                      <a>
+                        <DoubleRightOutlined />
+                        更多
+                      </a>
+                    </Space>
+                  ) : null
+                }
               />
             </Table>
           </Row>
@@ -464,18 +525,20 @@ function User() {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row>
-                <Col span={11}>
-                  <Form.Item label="用户名称" name="userName">
-                    <Input placeholder="请输入用户名称" />
-                  </Form.Item>
-                </Col>
-                <Col span={11} offset={2}>
-                  <Form.Item label="用户密码" name="password">
-                    <Input.Password placeholder="请输入用户密码" />
-                  </Form.Item>
-                </Col>
-              </Row>
+              {userForm.userId === "" ? (
+                <Row>
+                  <Col span={11}>
+                    <Form.Item label="用户名称" name="userName">
+                      <Input placeholder="请输入用户名称" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={11} offset={2}>
+                    <Form.Item label="用户密码" name="password">
+                      <Input.Password placeholder="请输入用户密码" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              ) : null}
               <Row>
                 <Col span={11}>
                   <Form.Item label="用户性别" name="sex">
@@ -507,7 +570,7 @@ function User() {
               <Row>
                 <Col span={11}>
                   <Form.Item label="岗位" name="postIds">
-                    <Select placeholder="请选择岗位">
+                    <Select placeholder="请选择岗位" mode="multiple">
                       {dicts.postOptions.map((dict: any) => {
                         return (
                           <Option value={dict.postId} key={"postId" + dict.postId}>
@@ -520,7 +583,7 @@ function User() {
                 </Col>
                 <Col span={11} offset={2}>
                   <Form.Item label="角色" name="roleIds">
-                    <Select placeholder="请选择角色">
+                    <Select placeholder="请选择角色" mode="multiple">
                       {dicts.roleOptions.map((dict: any) => {
                         return (
                           <Option value={dict.roleId} key={"roleId" + dict.roleId}>
