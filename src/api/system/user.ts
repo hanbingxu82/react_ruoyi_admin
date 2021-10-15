@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:35:06
- * @LastEditTime: 2021-10-09 17:37:22
+ * @LastEditTime: 2021-10-14 15:51:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/api/system/user.ts
@@ -149,5 +149,14 @@ export function updateAuthRole(data: any) {
     url: "/system/user/authRole",
     method: "put",
     params: data,
+  });
+}
+
+// 导出上传
+export function importFile(data: any, updateSupport: number) {
+  return request({
+    url: "/system/user/importData?updateSupport=" + updateSupport,
+    method: "post",
+    data,
   });
 }

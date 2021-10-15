@@ -1,12 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-10-12 08:37:41
+ * @LastEditTime: 2021-10-15 09:03:55
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
  */
 import { getInfo, logout } from "../api/login/login";
+import cookie from "react-cookies";
+
 const actions = {
   add: (num: number) => {
     return { type: "ADD", number: num };
@@ -27,6 +29,7 @@ const actions = {
           type: "getInfo",
         };
         window.localStorage.setItem("ruoyi_role", JSON.stringify(userRes.roles));
+        cookie.save("Admin-Token", window.localStorage.getItem("ruoyi_token") as string);
         window.localStorage.setItem("ruoyi_user", JSON.stringify(userRes.user));
         props.history.replace("/index/layout");
         // 动作的发送
@@ -38,7 +41,7 @@ const actions = {
    * @description: 用于实现登出效果
    * @param {any} props
    * @return {*}
-   */  
+   */
   getLogout(props: any) {
     return (dispatch: any) => {
       logout().then(() => {
@@ -50,6 +53,7 @@ const actions = {
         window.localStorage.removeItem("ruoyi_token");
         window.localStorage.removeItem("ruoyi_role");
         window.localStorage.removeItem("ruoyi_user");
+        cookie.remove("Admin-Token");
         // 跳转回登录页面
         props.history.replace("/login");
         // 动作的发送

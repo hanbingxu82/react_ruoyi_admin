@@ -1,12 +1,12 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-12 11:32:41
+ * @LastEditTime: 2021-10-15 08:48:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
  */
-// 
+//
 import axios from "axios";
 import errorCode from "./errorCode";
 import React from "react";
@@ -14,9 +14,8 @@ import { Modal, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 // 引入路由
-import { createHashHistory} from "history";
+import { createHashHistory } from "history";
 const customHash = createHashHistory();
-
 const { confirm } = Modal;
 function getToken() {
   return window.localStorage.getItem("ruoyi_token");
@@ -26,9 +25,10 @@ function getToken() {
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL: "http://localhost:8080/",
+  baseURL: process.env.REACT_APP_BASE_API,
   // 超时
   timeout: 20000,
+  withCredentials:true
 });
 // request拦截器
 service.interceptors.request.use(
