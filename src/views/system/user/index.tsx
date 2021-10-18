@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:33
- * @LastEditTime: 2021-10-15 13:48:44
+ * @LastEditTime: 2021-10-18 11:04:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/user/index.tsx
@@ -507,6 +507,7 @@ function User() {
       content: '确认要"' + text + '""' + row.userName + '"用户吗?',
       centered: true,
       onOk() {
+        // 反向更新数据，我在这边采用的是click事件，这个时候点击是不会变更状态的，直接更改row.status 组件不会进行监听
         row.status = row.status === "0" ? "1" : "0";
         changeUserStatus(row.userId, row.status).then(() => {
           message.success(text + "成功");
@@ -514,7 +515,9 @@ function User() {
         });
       },
       onCancel() {
-        getList();
+        // 无需任何操作
+        // row.status = row.status === "0" ? "1" : "0";
+        // getList();
       },
     });
   };
@@ -806,13 +809,14 @@ function User() {
                   title="状态"
                   render={(text, row: any, index) => (
                     <Switch
-                      key={text + index + switchKey}
+                      // key={text + index + switchKey}
                       checkedChildren="开启"
                       onClick={() => {
                         onTableSwitchChange(row);
                       }}
                       unCheckedChildren="关闭"
-                      defaultChecked={row.status === "0" ? true : false}
+                      checked={row.status === "0" ? true : false}
+                      // defaultChecked={row.status === "0" ? true : false}
                     />
                   )}
                 />

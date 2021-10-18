@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-12 15:18:52
+ * @LastEditTime: 2021-10-15 16:27:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -66,19 +66,24 @@ function App(props: any) {
               </NavLink>
             </Menu.Item>
             <SubMenu key="sub2" icon={<SettingOutlined />} title="系统管理">
-              <Menu.Item key="5">
+              <Menu.Item key="2">
                 <NavLink style={{ textDecoration: "none" }} to="/system/user">
                   用户管理
                 </NavLink>
               </Menu.Item>
-              <Menu.Item key="6">
+              <Menu.Item key="3">
                 <NavLink style={{ textDecoration: "none" }} to="/system/role">
                   角色管理
                 </NavLink>
               </Menu.Item>
-              <SubMenu key="sub3" title="日志管理">
-                <Menu.Item key="7">操作日志</Menu.Item>
-                <Menu.Item key="8">登录日志</Menu.Item>
+              <Menu.Item key="4">
+                <NavLink style={{ textDecoration: "none" }} to="/system/post">
+                  岗位管理
+                </NavLink>
+              </Menu.Item>
+              <SubMenu key="8" title="日志管理">
+                <Menu.Item key="8-1">操作日志</Menu.Item>
+                <Menu.Item key="8-2">登录日志</Menu.Item>
               </SubMenu>
             </SubMenu>
           </Menu>
