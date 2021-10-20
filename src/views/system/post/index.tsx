@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-10-20 15:14:17
+ * @LastEditTime: 2021-10-20 15:35:42
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -11,7 +11,7 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { InputNumber, Space, Input, Row, Col, Form, Button, Select, DatePicker, Table, Modal, Radio, message } from "antd";
+import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
 import { selectDictLabel } from "../../../utils/ruoyi";
@@ -19,14 +19,8 @@ import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
-// import moment from "moment";
-// const { Dragger } = Upload;
 const { confirm } = Modal;
 const { Option } = Select;
-// const { Search } = Input;
-// const { Column } = Table;
-const { RangePicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
 function Post() {
   /**
    * @description: 是否第一次加载组件
@@ -134,7 +128,7 @@ function Post() {
       });
     });
     getList();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // 监听副作用
   useEffect(() => {
     if (initComponent.current) return;
@@ -393,22 +387,10 @@ function Post() {
           <Form.Item label="岗位名称" name="postName" rules={[{ required: true, message: "岗位名称不能为空" }]}>
             <Input placeholder="请输入岗位名称" />
           </Form.Item>
-          <Form.Item
-            label="岗位编码"
-            name="postCode"
-            rules={[
-              { required: true, message: "岗位编码不能为空" },
-            ]}
-          >
+          <Form.Item label="岗位编码" name="postCode" rules={[{ required: true, message: "岗位编码不能为空" }]}>
             <Input placeholder="请输入岗位编码" />
           </Form.Item>
-          <Form.Item
-            label="岗位顺序"
-            name="postSort"
-            rules={[
-              { required: true, message: "岗位编码不能为空" },
-            ]}
-          >
+          <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位编码不能为空" }]}>
             <InputNumber placeholder="请输入岗位顺序" defaultValue={0} />
           </Form.Item>
           <Form.Item label="岗位状态" name="status">
