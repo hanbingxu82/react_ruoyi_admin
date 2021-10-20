@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-10-15 09:03:55
+ * @LastEditTime: 2021-10-20 10:29:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
@@ -56,6 +56,7 @@ const actions = {
         cookie.remove("Admin-Token");
         // 跳转回登录页面
         props.history.replace("/login");
+        
         // 动作的发送
         dispatch(action);
       });

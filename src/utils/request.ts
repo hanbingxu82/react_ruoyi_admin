@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-15 08:48:01
+ * @LastEditTime: 2021-10-20 10:31:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
@@ -91,9 +91,13 @@ service.interceptors.response.use(
         onOk() {
           // 跳转路由
           customHash.push("/login");
+          // 移除所有的弹窗
+          Modal.destroyAll()
         },
         onCancel() {
           console.log("Cancel");
+          // 移除所有的弹窗
+          Modal.destroyAll()
         },
       });
       return Promise.reject();
