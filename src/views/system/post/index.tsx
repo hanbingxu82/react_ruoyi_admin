@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-10-20 14:58:57
+ * @LastEditTime: 2021-10-20 15:14:17
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -16,6 +16,7 @@ import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, 
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
+import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
 // import moment from "moment";
@@ -274,14 +275,14 @@ function Post() {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: "是否确认导出所有用户数据项？",
+      content: "是否确认导出所有岗位数据项？",
       centered: true,
       onOk() {
-        // exportUser(queryParams)
-        //   .then((response: any) => {
-        //     download(response.msg);
-        //   })
-        //   .catch(() => {});
+        exportPost(queryForm)
+          .then((response: any) => {
+            download(response.msg);
+          })
+          .catch(() => {});
       },
       onCancel() {
         console.log("Cancel");
@@ -303,12 +304,12 @@ function Post() {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="岗位编码" name="postName">
+              <Form.Item label="岗位编码" name="postCode">
                 <Input placeholder="请输入岗位编码" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="岗位名称" name="postCode">
+              <Form.Item label="岗位名称" name="postName">
                 <Input placeholder="请输入岗位名称" />
               </Form.Item>
             </Col>
