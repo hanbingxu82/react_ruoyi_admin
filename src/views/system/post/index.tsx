@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-10-20 15:35:42
+ * @LastEditTime: 2021-10-22 10:10:21
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -383,7 +383,7 @@ function Post() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0" }} autoComplete="off">
+        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
           <Form.Item label="岗位名称" name="postName" rules={[{ required: true, message: "岗位名称不能为空" }]}>
             <Input placeholder="请输入岗位名称" />
           </Form.Item>
@@ -391,7 +391,7 @@ function Post() {
             <Input placeholder="请输入岗位编码" />
           </Form.Item>
           <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位编码不能为空" }]}>
-            <InputNumber placeholder="请输入岗位顺序" defaultValue={0} />
+            <InputNumber placeholder="请输入岗位顺序" />
           </Form.Item>
           <Form.Item label="岗位状态" name="status">
             <Radio.Group>
