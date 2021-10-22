@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-15 16:27:08
+ * @LastEditTime: 2021-10-22 17:06:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -81,6 +81,11 @@ function App(props: any) {
                   岗位管理
                 </NavLink>
               </Menu.Item>
+              <Menu.Item key="5">
+                <NavLink style={{ textDecoration: "none" }} to="/system/dept">
+                  部门管理
+                </NavLink>
+              </Menu.Item>
               <SubMenu key="8" title="日志管理">
                 <Menu.Item key="8-1">操作日志</Menu.Item>
                 <Menu.Item key="8-2">登录日志</Menu.Item>
@@ -109,6 +114,7 @@ function App(props: any) {
               margin: "24px 16px",
               padding: 24,
               minHeight: 280,
+              overflowY:'auto'
             }}
           >
             {routers.subRouters.map((v) => (

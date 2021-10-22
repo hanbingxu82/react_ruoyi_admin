@@ -1,14 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-10-13 10:05:43
- * @LastEditTime: 2021-10-13 10:05:43
+ * @LastEditTime: 2021-10-22 15:26:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/api/system/dept.ts
  */
 import request from '../../utils/request'
 // 查询部门列表
-export function listDept(query: any) {
+export function listDept(query?: any) {
     return request({
       url: '/system/dept/list',
       method: 'get',
