@@ -1,17 +1,21 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-10-22 10:46:35
+ * @LastEditTime: 2021-10-25 13:59:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
  */
 import App from "../views/App/App";
 import Layout from "../views/Layout";
+
+import Login from "../views/login";
+
 import User from "../views/system/user";
 import Post from "../views/system/post";
 import Dept from "../views/system/dept";
-import Login from "../views/login";
+import Notice from "../views/system/notice";
+
 // import Details from '../views/Details/Details';
 // import Details from '../views/Details/Details'
 // import Messages from '../views/Messages/Messages';
@@ -80,6 +84,11 @@ const subRouters = [
     path: "/system/dept",
     exact: true,
     component: Dept,
+  },
+  {
+    path: "/system/notice",
+    exact: true,
+    component: Notice,
   },
 ];
 

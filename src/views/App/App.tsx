@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-22 17:06:19
+ * @LastEditTime: 2021-10-25 14:54:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -84,6 +84,11 @@ function App(props: any) {
               <Menu.Item key="5">
                 <NavLink style={{ textDecoration: "none" }} to="/system/dept">
                   部门管理
+                </NavLink>
+              </Menu.Item>
+              <Menu.Item key="6">
+                <NavLink style={{ textDecoration: "none" }} to="/system/notice">
+                  公告管理
                 </NavLink>
               </Menu.Item>
               <SubMenu key="8" title="日志管理">

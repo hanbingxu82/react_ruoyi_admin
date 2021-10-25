@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-22 10:27:17
- * @LastEditTime: 2021-10-22 17:27:10
+ * @LastEditTime: 2021-10-25 14:00:17
  * @LastEditors: Please set LastEditors
  * @Description: 部门管理
  * @FilePath: /use-hooks/src/views/system/dept/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 import HeaderBar from "../../../compoents/HeaderBar";
 
 import { TreeSelect, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from "../../../api/system/dept";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
