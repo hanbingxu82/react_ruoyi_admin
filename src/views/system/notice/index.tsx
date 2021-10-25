@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-10-25 16:11:38
+ * @LastEditTime: 2021-10-25 16:22:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -11,12 +11,11 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import {  Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
+import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "../../../api/system/notice";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
-import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 import Editor from "../../../compoents/Editor";
 
@@ -105,13 +104,13 @@ function Notice() {
     },
   ];
   // 表单弹窗
-  const [postFormModel] = Form.useForm();
+  const [noticeFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [visibleTitle, setVisibleTitle] = useState("添加公告");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [postForm, setPostForm] = useState({
-    postId: "",
+  const [noticeForm, setNoticeForm] = useState({
+    noticeId: "",
     noticeContent: "123",
   });
   /**
@@ -148,7 +147,7 @@ function Notice() {
    */
   function getList() {
     setGetLoading(true);
-    listPost({ ...queryForm }).then((res: any) => {
+    listNotice({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -189,22 +188,22 @@ function Notice() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { postId: "" }) {
+  function showModal(titleName: string, row: any = { noticeId: "" }) {
     setVisibleTitle(titleName);
-    postFormModel.resetFields();
-    setPostForm(() => {
+    noticeFormModel.resetFields();
+    setNoticeForm(() => {
       return {
-        postId: "",
+        noticeId: "",
         noticeContent: "",
       };
     });
     if (titleName === "修改公告") {
-      const postId = row.postId || selectedRowKeys[0];
+      const noticeId = row.noticeId || selectedRowKeys[0];
       // 调用查询详细接口
-      getPost(postId).then((response: any) => {
+      getNotice(noticeId).then((response: any) => {
         console.log(response);
-        setPostForm({ ...response.data });
-        postFormModel.setFieldsValue({
+        setNoticeForm({ ...response.data });
+        noticeFormModel.setFieldsValue({
           ...response.data,
         });
       });
@@ -218,18 +217,18 @@ function Notice() {
    */
   const handleOk = () => {
     // form 表单内容
-    postFormModel
+    noticeFormModel
       .validateFields()
       .then((values) => {
-        if (postForm.postId !== "") {
-          updatePost({ ...postForm, ...postFormModel.getFieldsValue() }).then(() => {
+        if (noticeForm.noticeId !== "") {
+          updateNotice({ ...noticeForm, ...noticeFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addPost({ ...postFormModel.getFieldsValue() }).then(() => {
+          addNotice({ ...noticeFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -249,15 +248,15 @@ function Notice() {
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { postId: "" }) => {
-    const postIds = row.postId || selectedRowKeys;
+  const delData = (row: any = { noticeId: "" }) => {
+    const noticeIds = row.noticeId || selectedRowKeys;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delPost(postIds).then(() => {
+        delNotice(noticeIds).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -267,29 +266,6 @@ function Notice() {
       },
     });
   };
-  /**
-   * @description: 导出函数
-   * @param {*}
-   * @return {*}
-   */
-  function handleExport() {
-    confirm({
-      title: "警告",
-      icon: <ExclamationCircleOutlined />,
-      content: "是否确认导出所有公告数据项？",
-      centered: true,
-      onOk() {
-        exportPost(queryForm)
-          .then((response: any) => {
-            download(response.msg);
-          })
-          .catch(() => {});
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
-    });
-  }
   function onSelectChange(selectedRowKeys: any) {
     setSelectedRowKeys(selectedRowKeys);
   }
@@ -319,7 +295,7 @@ function Notice() {
                 <Select placeholder="请选择类型" allowClear>
                   {dicts.sys_notice_type.map((dict: any) => {
                     return (
-                      <Option value={dict.dictValue} key={"sex" + dict.dictValue}>
+                      <Option value={dict.dictValue} key={"noticeTypeQueryForm" + dict.dictValue}>
                         {dict.dictLabel}
                       </Option>
                     );
@@ -369,9 +345,6 @@ function Notice() {
             删除
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }} onClick={handleExport}>
-          <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
-        </Col>
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
             onSeachShow={() => {
@@ -385,7 +358,7 @@ function Notice() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.postId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.noticeId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
         <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -395,7 +368,7 @@ function Notice() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
+        <Form form={noticeFormModel} name="noticeFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
           <Row>
             <Col span={12}>
               <Form.Item label="公告标题" name="noticeTitle" rules={[{ required: true, message: "公告标题不能为空" }]}>
@@ -432,9 +405,9 @@ function Notice() {
             <Col span={24}>
               <Form.Item label="内容" name="noticeContent">
                 <Editor
-                  value={postForm.noticeContent}
+                  value={noticeForm.noticeContent}
                   onChange={(noticeContent: any) => {
-                    setPostForm({ ...postForm, noticeContent });
+                    setNoticeForm({ ...noticeForm, noticeContent });
                   }}
                 ></Editor>
               </Form.Item>
