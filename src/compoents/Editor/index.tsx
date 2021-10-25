@@ -1,27 +1,26 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 14:32:35
- * @LastEditTime: 2021-10-25 16:10:39
+ * @LastEditTime: 2021-10-25 18:02:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/compoents/Editor/index.tsx
  */
 import E from "wangeditor";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { message } from "antd";
 import { uploadImage } from "../../api/global";
-
+let editor: any = null;
 function Editor(props: any) {
-  // let editor: any = null;
-  const { value, onChange } = props;
-  let editor: any = useRef(null);
+  let { value, onChange } = props;
   useEffect(() => {
-    editor.current = new E("#wangEditor");
-    editor.current.config.uploadImgMaxSize = 2 * 1024 * 1024; // 上传图片大小2M
-    editor.current.config.uploadImgServer = "/"; // 路径
+    // eslint-disable-next-line
+    editor = new E("#wangEditor");
+    editor.config.uploadImgMaxSize = 2 * 1024 * 1024; // 上传图片大小2M
+    editor.config.uploadImgServer = "/"; // 路径
     // 限制一次最多上传 1 张图片
-    editor.current.config.uploadImgMaxLength = 1;
-    editor.current.config.customUploadImg = function (files: (string | Blob)[], insert: (arg0: any) => void) {
+    editor.config.uploadImgMaxLength = 1;
+    editor.config.customUploadImg = function (files: (string | Blob)[], insert: (arg0: any) => void) {
       // files 是 input 中选中的文件列表
       console.log(files);
       if (files[0]) {
@@ -55,7 +54,7 @@ function Editor(props: any) {
         message.info("请选择要上传的图片");
       }
     };
-    editor.current.config.menus = [
+    editor.config.menus = [
       "head", // 标题
       "bold", // 粗体
       "fontSize", // 字号
@@ -77,7 +76,7 @@ function Editor(props: any) {
       "undo", // 撤销
       "redo", // 重复
     ];
-    editor.current.config.lang = {
+    editor.config.lang = {
       设置标题: "Title",
       字号: "Size",
       文字颜色: "Color",
@@ -99,21 +98,25 @@ function Editor(props: any) {
       上传: "Upload",
       创建: "init",
     };
-    editor.current.config.onchange = (newHtml: any) => {
+    editor.config.onchange = (newHtml: any) => {
       onChange(newHtml);
     };
     /**一定要创建 */
-    editor.current.create();
-
+    editor.create();
+    editor.txt.html(value);
     return () => {
       // 组件销毁时销毁编辑器  注：class写法需要在componentWillUnmount中调用
-      editor.current.destroy();
+      editor.destroy();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
-    console.log(value)
-      editor.current.txt.html(value);
+
+      if (editor) {
+        editor.txt.html(value);
+      }
+
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 

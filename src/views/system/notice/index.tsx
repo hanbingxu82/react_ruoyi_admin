@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-10-25 16:22:07
+ * @LastEditTime: 2021-10-25 17:59:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -111,7 +111,7 @@ function Notice() {
   // 用户form字段
   const [noticeForm, setNoticeForm] = useState({
     noticeId: "",
-    noticeContent: "123",
+    noticeContent: "",
   });
   /**
    * @description: 生命周期初始化
@@ -201,11 +201,11 @@ function Notice() {
       const noticeId = row.noticeId || selectedRowKeys[0];
       // 调用查询详细接口
       getNotice(noticeId).then((response: any) => {
-        console.log(response);
-        setNoticeForm({ ...response.data });
         noticeFormModel.setFieldsValue({
           ...response.data,
         });
+        setNoticeForm({...response.data})
+
       });
     }
     setVisible(true);
@@ -367,7 +367,7 @@ function Notice() {
         />
       </Row>
       {/* 增加修改表单区域 */}
-      <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+      <Modal  centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Form form={noticeFormModel} name="noticeFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
           <Row>
             <Col span={12}>
@@ -406,9 +406,10 @@ function Notice() {
               <Form.Item label="内容" name="noticeContent">
                 <Editor
                   value={noticeForm.noticeContent}
-                  onChange={(noticeContent: any) => {
-                    setNoticeForm({ ...noticeForm, noticeContent });
-                  }}
+                  onChange={(noticeContent: any) => {setNoticeForm((data)=>{ 
+                    data.noticeContent = noticeContent
+                    return {...data}
+                  })}}
                 ></Editor>
               </Form.Item>
             </Col>
