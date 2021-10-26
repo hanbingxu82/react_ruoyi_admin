@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 14:32:35
- * @LastEditTime: 2021-10-25 18:02:42
+ * @LastEditTime: 2021-10-26 15:02:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/compoents/Editor/index.tsx
@@ -11,9 +11,11 @@ import { useEffect, useLayoutEffect } from "react";
 import { message } from "antd";
 import { uploadImage } from "../../api/global";
 let editor: any = null;
+let count = 0;
 function Editor(props: any) {
   let { value, onChange } = props;
   useEffect(() => {
+    count = 0;
     // eslint-disable-next-line
     editor = new E("#wangEditor");
     editor.config.uploadImgMaxSize = 2 * 1024 * 1024; // 上传图片大小2M
@@ -34,22 +36,6 @@ function Editor(props: any) {
             console.log(res.msg);
           }
         });
-        // fetch(urlPath + "/fileclient-management/api/uploadpic", {
-        //   method: "POST",
-        //   body: formData,
-        // })
-        //   .then((res) => {
-        //     return res.json();
-        //   })
-        //   .then((res) => {
-        //     const data = res.resultData;
-        //     if (data) {
-        //       // 上传代码返回结果之后，将图片插入到编辑器中
-        //       insert(data.resourceUrl);
-        //     } else {
-        //       console.log(data.msg);
-        //     }
-        //   });
       } else {
         message.info("请选择要上传的图片");
       }
@@ -99,11 +85,15 @@ function Editor(props: any) {
       创建: "init",
     };
     editor.config.onchange = (newHtml: any) => {
+      // 监听变更 value 值
       onChange(newHtml);
     };
     /**一定要创建 */
     editor.create();
-    editor.txt.html(value);
+    setTimeout(() => {
+      editor.txt.html(value);
+    }, 1000);
+
     return () => {
       // 组件销毁时销毁编辑器  注：class写法需要在componentWillUnmount中调用
       editor.destroy();
@@ -111,13 +101,11 @@ function Editor(props: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-
-      if (editor) {
-        editor.txt.html(value);
-      }
-
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // 相当于默认值
+    count++;
+    if (editor && count <= 2 && value !== undefined) {
+      editor.txt.html(value);
+    }
   }, [value]);
 
   return (

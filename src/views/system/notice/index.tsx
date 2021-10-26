@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-10-25 17:59:01
+ * @LastEditTime: 2021-10-26 09:55:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -204,8 +204,7 @@ function Notice() {
         noticeFormModel.setFieldsValue({
           ...response.data,
         });
-        setNoticeForm({...response.data})
-
+        setNoticeForm({ ...response.data });
       });
     }
     setVisible(true);
@@ -367,7 +366,7 @@ function Notice() {
         />
       </Row>
       {/* 增加修改表单区域 */}
-      <Modal  centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+      <Modal destroyOnClose centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Form form={noticeFormModel} name="noticeFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
           <Row>
             <Col span={12}>
@@ -406,10 +405,12 @@ function Notice() {
               <Form.Item label="内容" name="noticeContent">
                 <Editor
                   value={noticeForm.noticeContent}
-                  onChange={(noticeContent: any) => {setNoticeForm((data)=>{ 
-                    data.noticeContent = noticeContent
-                    return {...data}
-                  })}}
+                  onChange={(noticeContent: any) => {
+                    setNoticeForm((data) => {
+                      data.noticeContent = noticeContent;
+                      return { ...data };
+                    });
+                  }}
                 ></Editor>
               </Form.Item>
             </Col>
