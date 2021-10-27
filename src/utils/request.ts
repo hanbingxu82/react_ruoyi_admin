@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:17:06
- * @LastEditTime: 2021-10-20 10:31:40
+ * @LastEditTime: 2021-10-27 08:56:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/utils/request.ts
@@ -121,15 +121,17 @@ service.interceptors.response.use(
   },
   (error: any) => {
     console.log("err" + error);
-    let { message } = error;
-    if (message === "Network Error") {
-      message = "后端接口连接异常";
-    } else if (message.includes("timeout")) {
-      message = "系统接口请求超时";
-    } else if (message.includes("Request failed with status code")) {
-      message = "系统接口" + message.substr(message.length - 3) + "异常";
+    let { msg } = error;
+    if (msg === "Network Error") {
+      msg = "后端接口连接异常";
+    } else if (msg.includes("timeout")) {
+      msg = "系统接口请求超时";
+    } else if (msg.includes("Request failed with status code")) {
+      msg = "系统接口" + msg.substr(msg.length - 3) + "异常";
+    }else{
+      msg = '服务器开小差了，请稍后！';
     }
-    message.error(message);
+    message.error(msg);
     // Message({
     //   message: message,
     //   type: "error",
