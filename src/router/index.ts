@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-10-27 11:48:03
+ * @LastEditTime: 2021-10-28 10:40:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -15,6 +15,7 @@ import User from "../views/system/user";
 import Post from "../views/system/post";
 import Dept from "../views/system/dept";
 import Notice from "../views/system/notice";
+import Config from '../views/system/config'
 import OperLog from "views/system/log/operlog";
 import LoginInfor from "views/system/log/logininfor";
 
@@ -91,6 +92,11 @@ const subRouters = [
     path: "/system/notice",
     exact: true,
     component: Notice,
+  },
+  {
+    path: "/system/config",
+    exact: true,
+    component: Config,
   },
   {
     path: "/system/log/operlog",
