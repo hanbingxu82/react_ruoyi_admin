@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:19
- * @LastEditTime: 2021-10-28 08:49:15
+ * @LastEditTime: 2021-10-28 09:09:18
  * @LastEditors: Please set LastEditors
  * @Description: 操作日志
  * @FilePath: /use-hooks/src/views/system/log/operlog/index.tsx
@@ -334,7 +334,7 @@ function OperLog() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Post">
+    <div className="OperLog">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
