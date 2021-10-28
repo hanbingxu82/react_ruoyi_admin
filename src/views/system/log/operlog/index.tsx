@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:19
- * @LastEditTime: 2021-10-27 16:11:10
+ * @LastEditTime: 2021-10-28 08:49:15
  * @LastEditors: Please set LastEditors
  * @Description: 操作日志
  * @FilePath: /use-hooks/src/views/system/log/operlog/index.tsx
@@ -180,7 +180,6 @@ function OperLog() {
     list({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData([...res.rows]);
-      console.log(tableData);
       setTotal(res.total);
     });
   }
@@ -223,7 +222,6 @@ function OperLog() {
    */
   function showModal(titleName: string, row: any = { title: "" }) {
     setVisibleTitle(titleName);
-    // operLogFormModel.resetFields();
     setOperLogForm(() => {
       return {
         operId: "",
@@ -244,14 +242,7 @@ function OperLog() {
       };
     });
     if (titleName === "操作日志详细") {
-      //   const title = row.title || selectedRowKeys[0];
-      //   // 调用查询详细接口
-      //   getNotice(title).then((response: any) => {
-      //     operLogFormModel.setFieldsValue({
-      //       ...response.data,
-      //     });
       setOperLogForm({ ...row });
-      //   });
     }
     setVisible(true);
   }
@@ -261,29 +252,7 @@ function OperLog() {
    * @return {*}
    */
   const handleOk = () => {
-    // form 表单内容
-    // operLogFormModel
-    //   .validateFields()
-    //   .then((values) => {
-    //     if (operLogForm.title !== "") {
-    //       updateNotice({ ...operLogForm, ...operLogFormModel.getFieldsValue() }).then(() => {
-    //         message.success("修改成功");
-    //         // setConfirmLoading(false);
     setVisible(false);
-    //         getList();
-    //       });
-    //     } else {
-    //       addNotice({ ...operLogFormModel.getFieldsValue() }).then(() => {
-    //         message.success("增加成功");
-    //         setVisible(false);
-    //         // setConfirmLoading(false);
-    //         getList();
-    //       });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log("校验失败", err);
-    //   });
   };
   const handleCancel = () => {
     setVisible(false);
