@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:12
- * @LastEditTime: 2021-10-29 16:03:12
+ * @LastEditTime: 2021-10-29 16:46:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/type.tsx
@@ -24,7 +24,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Post() {
+function Dict() {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -459,4 +459,4 @@ function Post() {
     </div>
   );
 }
-export default Post;
+export default Dict;
