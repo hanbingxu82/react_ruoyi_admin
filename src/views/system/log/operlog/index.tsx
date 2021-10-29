@@ -397,7 +397,7 @@ function OperLog() {
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             icon={<DeleteOutlined />}
             onClick={() => {
@@ -408,12 +408,12 @@ function OperLog() {
             删除
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} onClick={clearData}>
             清空
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
             导出
           </Button>

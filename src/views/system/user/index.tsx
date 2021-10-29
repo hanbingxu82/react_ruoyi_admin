@@ -735,7 +735,7 @@ function User() {
 
           {/* 搜索条区域 */}
           <Row>
-            <Col span={2} style={{ marginRight: 20 }}>
+            <Col  style={{ marginRight: 20 }}>
               <Button
                 icon={<PlusOutlined />}
                 type="primary"
@@ -746,7 +746,7 @@ function User() {
                 新增
               </Button>
             </Col>
-            <Col span={2} style={{ marginRight: 20 }}>
+            <Col  style={{ marginRight: 20 }}>
               <Button
                 disabled={selectedRowKeys.length !== 1}
                 onClick={() => {
@@ -757,7 +757,7 @@ function User() {
                 修改
               </Button>
             </Col>
-            <Col span={2} style={{ marginRight: 20 }}>
+            <Col  style={{ marginRight: 20 }}>
               <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
                 删除
               </Button>
@@ -771,7 +771,7 @@ function User() {
             >
               <Button icon={<VerticalAlignTopOutlined />}>导入</Button>
             </Col>
-            <Col span={2} style={{ marginRight: 20 }} onClick={handleExport}>
+            <Col  style={{ marginRight: 20 }} onClick={handleExport}>
               <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
             </Col>
             <Col style={{ flex: 1, textAlign: "right" }}>

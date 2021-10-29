@@ -308,7 +308,7 @@ function Dept() {
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"

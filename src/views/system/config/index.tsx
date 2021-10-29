@@ -1,9 +1,9 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-28 10:39:02
+ * @LastEditTime: 2021-10-29 10:58:07
  * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
+ * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
  */
 
@@ -14,7 +14,7 @@ import HeaderBar from "../../../compoents/HeaderBar";
 
 import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
+import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
@@ -39,12 +39,16 @@ function Post() {
     postName: "",
     postCode: "",
     status: "",
+    params: {
+      beginTime: "",
+      endTime: "",
+    },
   });
   const [queryFormRef] = Form.useForm();
   const [showQueryForm, setShowQueryForm] = useState(true);
   // 字典列表
   const [dicts, setDicts] = useState({
-    sys_normal_disable: [],
+    sys_yes_no: [],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -56,25 +60,32 @@ function Post() {
   // 表格列头对应字段
   const columns = [
     {
-      title: "岗位编号",
-      dataIndex: "postId",
+      title: "参数主键",
+      dataIndex: "configId",
     },
     {
-      title: "岗位编码",
-      dataIndex: "postCode",
+      title: "参数名称",
+      dataIndex: "configName",
+      ellipsis: true,
     },
     {
-      title: "岗位名称",
-      dataIndex: "postName",
+      title: "参数键名",
+      dataIndex: "configKey",
+      ellipsis: true,
     },
     {
-      title: "岗位排序",
-      dataIndex: "postSort",
+      title: "参数键值",
+      dataIndex: "configValue",
     },
     {
-      title: "状态",
-      dataIndex: "status",
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
+      title: "系统内置",
+      dataIndex: "configType",
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
+    },
+    {
+      title: "备注",
+      dataIndex: "remark",
+      ellipsis: true,
     },
     {
       title: "创建时间",
@@ -89,7 +100,7 @@ function Post() {
             <Space size="middle">
               <a
                 onClick={() => {
-                  showModal("修改岗位", row);
+                  showModal("修改参数", row);
                 }}
               >
                 <EditOutlined />
@@ -110,13 +121,13 @@ function Post() {
     },
   ];
   // 表单弹窗
-  const [postFormModel] = Form.useForm();
+  const [configFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const [visibleTitle, setVisibleTitle] = useState("添加岗位");
+  const [visibleTitle, setVisibleTitle] = useState("添加参数");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [postForm, setPostForm] = useState({
-    postId: "",
+  const [configForm, setConfigForm] = useState({
+    configId: "",
   });
   /**
    * @description: 生命周期初始化
@@ -125,9 +136,9 @@ function Post() {
    */
   useEffect(() => {
     initComponent.current = false;
-    getDicts("sys_normal_disable").then((response) => {
+    getDicts("sys_yes_no").then((response) => {
       setDicts((data) => {
-        data.sys_normal_disable = response.data;
+        data.sys_yes_no = response.data;
         return data;
       });
     });
@@ -146,7 +157,7 @@ function Post() {
    */
   function getList() {
     setGetLoading(true);
-    listPost({ ...queryForm }).then((res: any) => {
+    listConfig({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -162,13 +173,13 @@ function Post() {
       data.postName = form.postName;
       data.postCode = form.postCode;
       data.status = form.status;
-      // if (form.time) {
-      //   data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
-      //   data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
-      // } else {
-      //   data.params.beginTime = "";
-      //   data.params.endTime = "";
-      // }
+      if (form.time) {
+        data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
+        data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
+      } else {
+        data.params.beginTime = "";
+        data.params.endTime = "";
+      }
       return { ...data };
     });
   }
@@ -187,21 +198,21 @@ function Post() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { postId: "" }) {
+  function showModal(titleName: string, row: any = { configId: "" }) {
     setVisibleTitle(titleName);
-    postFormModel.resetFields();
-    setPostForm(() => {
+    configFormModel.resetFields();
+    setConfigForm(() => {
       return {
-        postId: "",
+        configId: "",
       };
     });
-    if (titleName === "修改岗位") {
-      const postId = row.postId || selectedRowKeys[0];
+    if (titleName === "修改参数") {
+      const configId = row.configId || selectedRowKeys[0];
       // 调用查询详细接口
-      getPost(postId).then((response: any) => {
+      getConfig(configId).then((response: any) => {
         console.log(response);
-        setPostForm({ ...response.data });
-        postFormModel.setFieldsValue({
+        setConfigForm({ ...response.data });
+        configFormModel.setFieldsValue({
           ...response.data,
         });
       });
@@ -215,18 +226,18 @@ function Post() {
    */
   const handleOk = () => {
     // form 表单内容
-    postFormModel
+    configFormModel
       .validateFields()
       .then((values) => {
-        if (postForm.postId !== "") {
-          updatePost({ ...postForm, ...postFormModel.getFieldsValue() }).then(() => {
+        if (configForm.configId !== "") {
+          updateConfig({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addPost({ ...postFormModel.getFieldsValue() }).then(() => {
+          addConfig({ ...configFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -246,15 +257,15 @@ function Post() {
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { postId: "" }) => {
-    const postIds = row.postId || selectedRowKeys;
+  const delData = (row: any = { configId: "" }) => {
+    const configIds = row.configId || selectedRowKeys;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delPost(postIds).then(() => {
+        delConfig(configIds).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -273,10 +284,10 @@ function Post() {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: "是否确认导出所有岗位数据项？",
+      content: "是否确认导出所有参数数据项？",
       centered: true,
       onOk() {
-        exportPost(queryForm)
+        exportConfig(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -302,20 +313,25 @@ function Post() {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="参数名称" name="postCode">
+              <Form.Item label="参数名称" name="configName">
                 <Input placeholder="请输入参数名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="参数键名" name="postName">
+              <Form.Item label="参数键名" name="configKey">
                 <Input placeholder="请输入参数键名" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="系统内置" name="status">
-                <Select placeholder="请输入系统内置" allowClear>
-                  <Option value="0">是</Option>
-                  <Option value="1">否</Option>
+              <Form.Item label="系统内置" name="configType">
+                <Select placeholder="请选择系统内置">
+                  {dicts.sys_yes_no.map((dict: any) => {
+                    return (
+                      <Option value={dict.configId} key={"configId" + dict.configId}>
+                        {dict.postName}
+                      </Option>
+                    );
+                  })}
                 </Select>
               </Form.Item>
             </Col>
@@ -326,7 +342,7 @@ function Post() {
             </Col>
           </Row>
           <Row>
-            <Col span={6}>
+            <Col span={6} offset={18}>
               <Form.Item style={{ float: "right" }}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -341,39 +357,39 @@ function Post() {
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showModal("添加岗位");
+              showModal("添加参数");
             }}
           >
             新增
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
-              showModal("修改岗位");
+              showModal("修改参数");
             }}
             icon={<EditOutlined />}
           >
             修改
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
             导出
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<SyncOutlined />} onClick={handleExport}>
             刷新缓存
           </Button>
@@ -391,7 +407,7 @@ function Post() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.postId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.configId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
         <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -401,19 +417,19 @@ function Post() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
-          <Form.Item label="岗位名称" name="postName" rules={[{ required: true, message: "岗位名称不能为空" }]}>
-            <Input placeholder="请输入岗位名称" />
+        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
+          <Form.Item label="参数名称" name="postName" rules={[{ required: true, message: "参数名称不能为空" }]}>
+            <Input placeholder="请输入参数名称" />
           </Form.Item>
-          <Form.Item label="岗位编码" name="postCode" rules={[{ required: true, message: "岗位编码不能为空" }]}>
-            <Input placeholder="请输入岗位编码" />
+          <Form.Item label="参数编码" name="postCode" rules={[{ required: true, message: "参数编码不能为空" }]}>
+            <Input placeholder="请输入参数编码" />
           </Form.Item>
-          <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位编码不能为空" }]}>
-            <InputNumber placeholder="请输入岗位顺序" />
+          <Form.Item label="参数顺序" name="postSort" rules={[{ required: true, message: "参数编码不能为空" }]}>
+            <InputNumber placeholder="请输入参数顺序" />
           </Form.Item>
-          <Form.Item label="岗位状态" name="status">
+          <Form.Item label="参数状态" name="status">
             <Radio.Group>
-              {dicts.sys_normal_disable.map((dict: any) => {
+              {dicts.sys_yes_no.map((dict: any) => {
                 return (
                   <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
                     {dict.dictLabel}

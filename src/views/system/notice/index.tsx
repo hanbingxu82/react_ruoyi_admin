@@ -317,7 +317,7 @@ function Notice() {
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
@@ -328,7 +328,7 @@ function Notice() {
             新增
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
@@ -339,7 +339,7 @@ function Notice() {
             修改
           </Button>
         </Col>
-        <Col span={2} style={{ marginRight: 20 }}>
+        <Col  style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
