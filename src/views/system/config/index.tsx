@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 11:25:23
+ * @LastEditTime: 2021-10-29 13:56:14
  * @LastEditors: Please set LastEditors
  * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
@@ -317,7 +317,7 @@ function Post() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Post">
+    <div className="Config">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
