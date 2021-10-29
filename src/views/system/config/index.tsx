@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 10:58:07
+ * @LastEditTime: 2021-10-29 11:22:34
  * @LastEditors: Please set LastEditors
  * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
@@ -36,9 +36,9 @@ function Post() {
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    postName: "",
-    postCode: "",
-    status: "",
+    configName: "",
+    configKey: "",
+    configType: "",
     params: {
       beginTime: "",
       endTime: "",
@@ -170,9 +170,9 @@ function Post() {
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.postName = form.postName;
-      data.postCode = form.postCode;
-      data.status = form.status;
+      data.configName = form.configName;
+      data.configKey = form.configKey;
+      data.configType = form.configType;
       if (form.time) {
         data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
         data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
@@ -298,6 +298,16 @@ function Post() {
       },
     });
   }
+  /**
+   * @description: 清除缓存函数
+   * @param {*}
+   * @return {*}
+   */
+  function clearCache() {
+    refreshCache().then(() => {
+      message.success("刷新成功")
+    });
+  }
   function onSelectChange(selectedRowKeys: any) {
     setSelectedRowKeys(selectedRowKeys);
   }
@@ -327,8 +337,8 @@ function Post() {
                 <Select placeholder="请选择系统内置">
                   {dicts.sys_yes_no.map((dict: any) => {
                     return (
-                      <Option value={dict.configId} key={"configId" + dict.configId}>
-                        {dict.postName}
+                      <Option value={dict.dictValue} key={"configId" + dict.dictValue}>
+                        {dict.dictLabel}
                       </Option>
                     );
                   })}
@@ -357,7 +367,7 @@ function Post() {
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
@@ -368,7 +378,7 @@ function Post() {
             新增
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
@@ -379,18 +389,18 @@ function Post() {
             修改
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
             导出
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
-          <Button icon={<SyncOutlined />} onClick={handleExport}>
+        <Col style={{ marginRight: 20 }}>
+          <Button icon={<SyncOutlined />} onClick={clearCache}>
             刷新缓存
           </Button>
         </Col>
@@ -417,21 +427,21 @@ function Post() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
-          <Form.Item label="参数名称" name="postName" rules={[{ required: true, message: "参数名称不能为空" }]}>
+        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ configType: "Y" }} autoComplete="off">
+          <Form.Item label="参数名称" name="configName" rules={[{ required: true, message: "参数名称不能为空" }]}>
             <Input placeholder="请输入参数名称" />
           </Form.Item>
-          <Form.Item label="参数编码" name="postCode" rules={[{ required: true, message: "参数编码不能为空" }]}>
-            <Input placeholder="请输入参数编码" />
+          <Form.Item label="参数键名" name="configKey" rules={[{ required: true, message: "参数键名不能为空" }]}>
+            <Input placeholder="请输入参数键名" />
           </Form.Item>
-          <Form.Item label="参数顺序" name="postSort" rules={[{ required: true, message: "参数编码不能为空" }]}>
-            <InputNumber placeholder="请输入参数顺序" />
+          <Form.Item label="参数键值" name="configValue" rules={[{ required: true, message: "参数键值不能为空" }]}>
+            <Input placeholder="请输入参数键值" />
           </Form.Item>
-          <Form.Item label="参数状态" name="status">
+          <Form.Item label="系统内置" name="configType">
             <Radio.Group>
               {dicts.sys_yes_no.map((dict: any) => {
                 return (
-                  <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
+                  <Radio value={dict.dictValue} key={"configType" + dict.dictValue}>
                     {dict.dictLabel}
                   </Radio>
                 );
