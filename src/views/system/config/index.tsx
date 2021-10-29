@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 11:22:34
+ * @LastEditTime: 2021-10-29 11:25:23
  * @LastEditors: Please set LastEditors
  * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import {  Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
 import { selectDictLabel } from "../../../utils/ruoyi";
