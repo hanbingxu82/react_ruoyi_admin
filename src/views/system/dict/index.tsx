@@ -1,31 +1,30 @@
 /*
  * @Author: your name
- * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 16:04:37
+ * @Date: 2021-10-29 15:17:12
+ * @LastEditTime: 2021-10-29 16:03:12
  * @LastEditors: Please set LastEditors
- * @Description: 参数设置
- * @FilePath: /use-hooks/src/views/system/config/index.tsx
+ * @Description: In User Settings Edit
+ * @FilePath: /use-hooks/src/views/system/dict/type.tsx
  */
-
 import { useState, useEffect, useRef } from "react";
 import "./index.less";
 
-import HeaderBar from "../../../compoents/HeaderBar";
-
-import {  Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import HeaderBar from "compoents/HeaderBar";
+import { NavLink } from "react-router-dom";
+import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
-import { selectDictLabel } from "../../../utils/ruoyi";
-import { getDicts } from "../../../api/global";
-import { download } from "../../../utils/ruoyi";
+import { listType, getType, delType, addType, updateType, exportType, refreshCache } from "api/system/dict/type";
+import { selectDictLabel } from "utils/ruoyi";
+import { getDicts } from "api/global";
+import { download } from "utils/ruoyi";
 import moment from "moment";
-import RuoYiPagination from "../../../compoents/RuoYiPagination";
+import RuoYiPagination from "compoents/RuoYiPagination";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Config() {
+function Post() {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -36,9 +35,9 @@ function Config() {
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    configName: "",
-    configKey: "",
-    configType: "",
+    dictName: "",
+    dictType: "",
+    status: "",
     params: {
       beginTime: "",
       endTime: "",
@@ -48,7 +47,7 @@ function Config() {
   const [showQueryForm, setShowQueryForm] = useState(true);
   // 字典列表
   const [dicts, setDicts] = useState({
-    sys_yes_no: [],
+    sys_normal_disable: [],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -60,27 +59,30 @@ function Config() {
   // 表格列头对应字段
   const columns = [
     {
-      title: "参数主键",
-      dataIndex: "configId",
+      title: "字典编号",
+      dataIndex: "dictId",
     },
     {
-      title: "参数名称",
-      dataIndex: "configName",
+      title: "字典名称",
+      dataIndex: "dictName",
       ellipsis: true,
     },
     {
-      title: "参数键名",
-      dataIndex: "configKey",
+      title: "字典类型",
+      dataIndex: "dictType",
       ellipsis: true,
+      render: (text: any, row: any) => (
+        <>
+          <NavLink style={{ textDecoration: "none" }} to={"/system/dict-data/" + row.dictId}>
+            {text}
+          </NavLink>
+        </>
+      ),
     },
     {
-      title: "参数键值",
-      dataIndex: "configValue",
-    },
-    {
-      title: "系统内置",
-      dataIndex: "configType",
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
+      title: "状态",
+      dataIndex: "status",
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "备注",
@@ -127,7 +129,7 @@ function Config() {
   const [confirmLoading] = useState(false);
   // 用户form字段
   const [configForm, setConfigForm] = useState({
-    configId: "",
+    dictId: "",
   });
   /**
    * @description: 生命周期初始化
@@ -136,9 +138,9 @@ function Config() {
    */
   useEffect(() => {
     initComponent.current = false;
-    getDicts("sys_yes_no").then((response) => {
+    getDicts("sys_normal_disable").then((response) => {
       setDicts((data) => {
-        data.sys_yes_no = response.data;
+        data.sys_normal_disable = response.data;
         return data;
       });
     });
@@ -157,7 +159,7 @@ function Config() {
    */
   function getList() {
     setGetLoading(true);
-    listConfig({ ...queryForm }).then((res: any) => {
+    listType({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -170,9 +172,9 @@ function Config() {
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.configName = form.configName;
-      data.configKey = form.configKey;
-      data.configType = form.configType;
+      data.dictName = form.dictName;
+      data.dictType = form.dictType;
+      data.status = form.status;
       if (form.time) {
         data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
         data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
@@ -198,18 +200,18 @@ function Config() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { configId: "" }) {
+  function showModal(titleName: string, row: any = { dictId: "" }) {
     setVisibleTitle(titleName);
     configFormModel.resetFields();
     setConfigForm(() => {
       return {
-        configId: "",
+        dictId: "",
       };
     });
     if (titleName === "修改参数") {
-      const configId = row.configId || selectedRowKeys[0];
+      const dictId = row.dictId || selectedRowKeys[0];
       // 调用查询详细接口
-      getConfig(configId).then((response: any) => {
+      getType(dictId).then((response: any) => {
         console.log(response);
         setConfigForm({ ...response.data });
         configFormModel.setFieldsValue({
@@ -229,15 +231,15 @@ function Config() {
     configFormModel
       .validateFields()
       .then((values) => {
-        if (configForm.configId !== "") {
-          updateConfig({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
+        if (configForm.dictId !== "") {
+          updateType({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addConfig({ ...configFormModel.getFieldsValue() }).then(() => {
+          addType({ ...configFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -257,15 +259,15 @@ function Config() {
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { configId: "" }) => {
-    const configIds = row.configId || selectedRowKeys;
+  const delData = (row: any = { dictId: "" }) => {
+    const dictIds = row.dictId || selectedRowKeys;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delConfig(configIds).then(() => {
+        delType(dictIds).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -287,7 +289,7 @@ function Config() {
       content: "是否确认导出所有参数数据项？",
       centered: true,
       onOk() {
-        exportConfig(queryForm)
+        exportType(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -305,7 +307,7 @@ function Config() {
    */
   function clearCache() {
     refreshCache().then(() => {
-      message.success("刷新成功")
+      message.success("刷新成功");
     });
   }
   function onSelectChange(selectedRowKeys: any) {
@@ -317,27 +319,27 @@ function Config() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Config">
+    <div className="Dict">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="参数名称" name="configName">
-                <Input placeholder="请输入参数名称" />
+              <Form.Item label="字典名称" name="dictName">
+                <Input placeholder="请输入字典名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="参数键名" name="configKey">
-                <Input placeholder="请输入参数键名" />
+              <Form.Item label="字典类型" name="dictType">
+                <Input placeholder="请输入字典类型" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="系统内置" name="configType">
-                <Select placeholder="请选择系统内置">
-                  {dicts.sys_yes_no.map((dict: any) => {
+              <Form.Item label="状态" name="status">
+                <Select placeholder="请选择状态">
+                  {dicts.sys_normal_disable.map((dict: any) => {
                     return (
-                      <Option value={dict.dictValue} key={"configId" + dict.dictValue}>
+                      <Option value={dict.dictValue} key={"dictId" + dict.dictValue}>
                         {dict.dictLabel}
                       </Option>
                     );
@@ -346,7 +348,7 @@ function Config() {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="操作时间" name="time">
+              <Form.Item label="创建时间" name="time">
                 <RangePicker format={dateFormat} />
               </Form.Item>
             </Col>
@@ -417,7 +419,7 @@ function Config() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.configId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
         <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -427,21 +429,18 @@ function Config() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ configType: "Y" }} autoComplete="off">
-          <Form.Item label="参数名称" name="configName" rules={[{ required: true, message: "参数名称不能为空" }]}>
-            <Input placeholder="请输入参数名称" />
+        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0" }} autoComplete="off">
+          <Form.Item label="字典名称" name="dictName" rules={[{ required: true, message: "字典名称不能为空" }]}>
+            <Input placeholder="请输入字典名称" />
           </Form.Item>
-          <Form.Item label="参数键名" name="configKey" rules={[{ required: true, message: "参数键名不能为空" }]}>
-            <Input placeholder="请输入参数键名" />
+          <Form.Item label="字典类型" name="dictType" rules={[{ required: true, message: "字典类型不能为空" }]}>
+            <Input placeholder="请输入字典类型" />
           </Form.Item>
-          <Form.Item label="参数键值" name="configValue" rules={[{ required: true, message: "参数键值不能为空" }]}>
-            <Input placeholder="请输入参数键值" />
-          </Form.Item>
-          <Form.Item label="系统内置" name="configType">
+          <Form.Item label="状态" name="status">
             <Radio.Group>
-              {dicts.sys_yes_no.map((dict: any) => {
+              {dicts.sys_normal_disable.map((dict: any) => {
                 return (
-                  <Radio value={dict.dictValue} key={"configType" + dict.dictValue}>
+                  <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
                     {dict.dictLabel}
                   </Radio>
                 );
@@ -460,4 +459,4 @@ function Config() {
     </div>
   );
 }
-export default Config;
+export default Post;

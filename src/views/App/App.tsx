@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-28 10:44:53
+ * @LastEditTime: 2021-10-29 15:31:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -77,32 +77,42 @@ function App(props: any) {
                 </NavLink>
               </Menu.Item>
               <Menu.Item key="4">
+                <NavLink style={{ textDecoration: "none" }} to="/system/role">
+                  菜单管理
+                </NavLink>
+              </Menu.Item>
+              <Menu.Item key="5">
                 <NavLink style={{ textDecoration: "none" }} to="/system/post">
                   岗位管理
                 </NavLink>
               </Menu.Item>
-              <Menu.Item key="5">
+              <Menu.Item key="6">
                 <NavLink style={{ textDecoration: "none" }} to="/system/dept">
                   部门管理
                 </NavLink>
               </Menu.Item>
-              <Menu.Item key="6">
+              <Menu.Item key="7">
+                <NavLink style={{ textDecoration: "none" }} to="/system/dict">
+                  字典管理
+                </NavLink>
+              </Menu.Item>
+              <Menu.Item key="8">
                 <NavLink style={{ textDecoration: "none" }} to="/system/config">
                   参数设置
                 </NavLink>
               </Menu.Item>
-              <Menu.Item key="7">
+              <Menu.Item key="9">
                 <NavLink style={{ textDecoration: "none" }} to="/system/notice">
                   公告管理
                 </NavLink>
               </Menu.Item>
-              <SubMenu key="8" title="日志管理">
-                <Menu.Item key="8-1">
+              <SubMenu key="10" title="日志管理">
+                <Menu.Item key="10-1">
                   <NavLink style={{ textDecoration: "none" }} to="/system/log/operlog">
                     操作日志
                   </NavLink>
                 </Menu.Item>
-                <Menu.Item key="8-2">
+                <Menu.Item key="10-2">
                   <NavLink style={{ textDecoration: "none" }} to="/system/log/logininfor">
                     登录日志
                   </NavLink>

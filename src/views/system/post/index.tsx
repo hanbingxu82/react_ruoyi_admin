@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-10-22 10:10:21
+ * @LastEditTime: 2021-10-29 16:05:34
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -353,7 +353,7 @@ function Post() {
           </Button>
         </Col>
         <Col  style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
+          <Button icon={<DeleteOutlined /> } onClick={delData} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>

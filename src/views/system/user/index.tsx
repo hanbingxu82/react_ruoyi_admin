@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:33
- * @LastEditTime: 2021-10-18 11:04:48
+ * @LastEditTime: 2021-10-29 16:05:38
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/user/index.tsx
@@ -758,7 +758,7 @@ function User() {
               </Button>
             </Col>
             <Col  style={{ marginRight: 20 }}>
-              <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
+              <Button icon={<DeleteOutlined />} onClick={delData} disabled={selectedRowKeys.length <= 0}>
                 删除
               </Button>
             </Col>

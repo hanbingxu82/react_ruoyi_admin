@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-10-26 09:55:35
+ * @LastEditTime: 2021-10-29 16:05:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -340,7 +340,7 @@ function Notice() {
           </Button>
         </Col>
         <Col  style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined />} disabled={selectedRowKeys.length <= 0}>
+          <Button icon={<DeleteOutlined />} onClick={delData} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>

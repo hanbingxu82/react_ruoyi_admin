@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-10-28 10:40:58
+ * @LastEditTime: 2021-10-29 15:51:38
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -18,6 +18,8 @@ import Notice from "../views/system/notice";
 import Config from '../views/system/config'
 import OperLog from "views/system/log/operlog";
 import LoginInfor from "views/system/log/logininfor";
+import Dict from 'views/system/dict'
+import DictData from 'views/system/dict/data'
 
 // import Details from '../views/Details/Details';
 // import Details from '../views/Details/Details'
@@ -107,6 +109,16 @@ const subRouters = [
     path: "/system/log/logininfor",
     exact: true,
     component: LoginInfor,
+  },
+  {
+    path: "/system/dict",
+    exact: true,
+    component: Dict,
+  },
+  {
+    path: "/system/dict-data/:id",
+    exact: true,
+    component: DictData,
   },
 ];
 const threeRouters = [];

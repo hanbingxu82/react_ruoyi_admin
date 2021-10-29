@@ -1,14 +1,14 @@
 /*
  * @Author: your name
- * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 16:04:37
+ * @Date: 2021-10-29 15:17:04
+ * @LastEditTime: 2021-10-29 16:05:01
  * @LastEditors: Please set LastEditors
- * @Description: 参数设置
- * @FilePath: /use-hooks/src/views/system/config/index.tsx
+ * @Description: In User Settings Edit
+ * @FilePath: /use-hooks/src/views/system/dict/data.tsx
  */
 
 import { useState, useEffect, useRef } from "react";
-import "./index.less";
+import "./data.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
@@ -25,7 +25,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Config() {
+function Post() {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -317,7 +317,7 @@ function Config() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Config">
+    <div className="Dict">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
@@ -460,4 +460,4 @@ function Config() {
     </div>
   );
 }
-export default Config;
+export default Post;
