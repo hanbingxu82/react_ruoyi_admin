@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-10-29 16:05:34
+ * @LastEditTime: 2021-11-01 14:45:41
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -121,6 +121,12 @@ dataIndex: "address",
   const [postForm, setPostForm] = useState({
     postId: "",
   });
+    // 监听副作用
+    useEffect(() => {
+      if (initComponent.current) return;
+      // 监听queryParams变化
+      getList();
+    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -136,12 +142,7 @@ dataIndex: "address",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}

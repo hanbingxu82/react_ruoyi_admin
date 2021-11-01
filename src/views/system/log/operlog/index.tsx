@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:19
- * @LastEditTime: 2021-10-28 09:09:18
+ * @LastEditTime: 2021-11-01 14:45:25
  * @LastEditors: Please set LastEditors
  * @Description: 操作日志
  * @FilePath: /use-hooks/src/views/system/log/operlog/index.tsx
@@ -153,6 +153,12 @@ dataIndex: "address",
     businessType: "",
     noticeContent: "",
   });
+    // 监听副作用
+    useEffect(() => {
+      if (initComponent.current) return;
+      // 监听queryParams变化
+      getList();
+    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -174,12 +180,7 @@ dataIndex: "address",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}

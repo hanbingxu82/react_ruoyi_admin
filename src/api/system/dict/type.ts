@@ -9,7 +9,7 @@
 import request from 'utils/request'
 
 // 查询字典类型列表
-export function listType(query: any) {
+export function listType(query?: any) {
   return request({
     url: '/system/dict/type/list',
     method: 'get',

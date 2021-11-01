@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:12
- * @LastEditTime: 2021-10-29 16:46:23
+ * @LastEditTime: 2021-11-01 14:45:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/type.tsx
@@ -138,6 +138,12 @@ dataIndex: "address",
   const [configForm, setConfigForm] = useState({
     dictId: "",
   });
+    // 监听副作用
+    useEffect(() => {
+      if (initComponent.current) return;
+      // 监听queryParams变化
+      getList();
+    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -153,12 +159,7 @@ dataIndex: "address",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}

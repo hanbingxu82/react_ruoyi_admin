@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-11-01 11:48:37
+ * @LastEditTime: 2021-11-01 14:44:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
@@ -12,9 +12,10 @@ import "./data.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
+import { listData, getData, delData, addData, updateData, exportData } from "api/system/dict/data";
+import { listType, getType } from "api/system/dict/type";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
@@ -25,7 +26,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Post() {
+function Post(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -36,9 +37,9 @@ function Post() {
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    configName: "",
-    configKey: "",
-    configType: "",
+    dictType: "",
+    dictLabel: "",
+    status: "",
     params: {
       beginTime: "",
       endTime: "",
@@ -48,7 +49,8 @@ function Post() {
   const [showQueryForm, setShowQueryForm] = useState(true);
   // 字典列表
   const [dicts, setDicts] = useState({
-    sys_yes_no: [],
+    sys_normal_disable: [],
+    typeOptions: [],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -58,50 +60,55 @@ function Post() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
       title: "字典编码",
-      align:'center',
-dataIndex: "dictCode",
+      align: "center",
+      dataIndex: "dictCode",
     },
     {
-      title: "参数名称",
-      align:'center',
-dataIndex: "configName",
+      title: "字典标签",
+      align: "center",
+      dataIndex: "dictLabel",
+      ellipsis: true,
+      render: (text: any, row: any) => (
+        <>
+          <Tag color={"processing"}>{text}</Tag>{" "}
+        </>
+      ),
+    },
+    {
+      title: "字典键值",
+      align: "center",
+      dataIndex: "dictValue",
       ellipsis: true,
     },
     {
-      title: "参数键名",
-      align:'center',
-dataIndex: "configKey",
-      ellipsis: true,
+      title: "字典排序",
+      align: "center",
+      dataIndex: "dictSort",
     },
     {
-      title: "参数键值",
-      align:'center',
-dataIndex: "configValue",
-    },
-    {
-      title: "系统内置",
-      align:'center',
-dataIndex: "configType",
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
+      title: "状态",
+      align: "center",
+      dataIndex: "status",
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "备注",
-      align:'center',
-dataIndex: "remark",
+      align: "center",
+      dataIndex: "remark",
       ellipsis: true,
     },
     {
       title: "创建时间",
-      align:'center',
-dataIndex: "createTime",
+      align: "center",
+      dataIndex: "createTime",
     },
     {
       title: "操作",
-      // align:'center',
-dataIndex: "address",
+      align: "center",
+      dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -116,7 +123,7 @@ dataIndex: "address",
               </a>
               <a
                 onClick={() => {
-                  delData(row);
+                  delDatas(row);
                 }}
               >
                 <DeleteOutlined />
@@ -135,23 +142,9 @@ dataIndex: "address",
   const [confirmLoading] = useState(false);
   // 用户form字段
   const [configForm, setConfigForm] = useState({
-    configId: "",
+    dictCode: "",
   });
-  /**
-   * @description: 生命周期初始化
-   * @param {*}
-   * @return {*}
-   */
-  useEffect(() => {
-    initComponent.current = false;
-    getDicts("sys_yes_no").then((response) => {
-      setDicts((data) => {
-        data.sys_yes_no = response.data;
-        return data;
-      });
-    });
-    getList();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [defaultDictType, setDefaultDictType] = useState("");
   // 监听副作用
   useEffect(() => {
     if (initComponent.current) return;
@@ -159,14 +152,53 @@ dataIndex: "address",
     getList();
   }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
+   * @description: 生命周期初始化
+   * @param {*}
+   * @return {*}
+   */
+  useEffect(() => {
+    const dictId = props.match ? props.match.params.id : "";
+    initComponent.current = false;
+    getDicts("sys_normal_disable").then((response) => {
+      setDicts((data) => {
+        data.sys_normal_disable = response.data;
+        return data;
+      });
+    });
+    /**
+     * @description: 获取当前的type类型
+     * @param {*} dictId
+     * @return {*}
+     */
+    getType(dictId).then((response: any) => {
+      // setQueryForm((data: any) => {
+      //   data.dictType = response.data.dictType;
+      //   return data;
+      // });
+      setDefaultDictType(response.data.dictType);
+      queryFormRef.setFieldsValue({
+        dictType: response.data.dictType,
+      });
+      onQueryFinish({ dictType: response.data.dictType });
+    });
+    listType().then((response: any) => {
+      setDicts((data) => {
+        data.typeOptions = response.rows;
+        return data;
+      });
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
    * @description: 获取表格信息
    * @param {*}
    * @return {*}
    */
   function getList() {
     setGetLoading(true);
-    listConfig({ ...queryForm }).then((res: any) => {
+    listData({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
+      console.log(res.rows);
       setTableData(res.rows);
       setTotal(res.total);
     });
@@ -178,16 +210,9 @@ dataIndex: "address",
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.configName = form.configName;
-      data.configKey = form.configKey;
-      data.configType = form.configType;
-      if (form.time) {
-        data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
-        data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
-      } else {
-        data.params.beginTime = "";
-        data.params.endTime = "";
-      }
+      data.dictType = form.dictType;
+      data.dictLabel = form.dictLabel;
+      data.status = form.status;
       return { ...data };
     });
   }
@@ -198,6 +223,9 @@ dataIndex: "address",
    */
   function onResetQuery() {
     queryFormRef.resetFields();
+    queryFormRef.setFieldsValue({
+      dictType: defaultDictType,
+    });
     onQueryFinish({});
   }
 
@@ -206,18 +234,18 @@ dataIndex: "address",
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { configId: "" }) {
+  function showModal(titleName: string, row: any = { dictCode: "" }) {
     setVisibleTitle(titleName);
     configFormModel.resetFields();
     setConfigForm(() => {
       return {
-        configId: "",
+        dictCode: "",
       };
     });
     if (titleName === "修改参数") {
-      const configId = row.configId || selectedRowKeys[0];
+      const dictCode = row.dictCode || selectedRowKeys[0];
       // 调用查询详细接口
-      getConfig(configId).then((response: any) => {
+      getData(dictCode).then((response: any) => {
         console.log(response);
         setConfigForm({ ...response.data });
         configFormModel.setFieldsValue({
@@ -237,15 +265,15 @@ dataIndex: "address",
     configFormModel
       .validateFields()
       .then((values) => {
-        if (configForm.configId !== "") {
-          updateConfig({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
+        if (configForm.dictCode !== "") {
+          updateData({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addConfig({ ...configFormModel.getFieldsValue() }).then(() => {
+          addData({ ...configFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -265,15 +293,15 @@ dataIndex: "address",
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { configId: "" }) => {
-    const configIds = row.configId || selectedRowKeys;
+  const delDatas = (row: any = { dictCode: "" }) => {
+    const dictCodes = row.dictCode || selectedRowKeys;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delConfig(configIds).then(() => {
+        delData(dictCodes).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -295,7 +323,7 @@ dataIndex: "address",
       content: "是否确认导出所有参数数据项？",
       centered: true,
       onOk() {
-        exportConfig(queryForm)
+        exportData(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -304,16 +332,6 @@ dataIndex: "address",
       onCancel() {
         console.log("Cancel");
       },
-    });
-  }
-  /**
-   * @description: 清除缓存函数
-   * @param {*}
-   * @return {*}
-   */
-  function clearCache() {
-    refreshCache().then(() => {
-      message.success("刷新成功");
     });
   }
   function onSelectChange(selectedRowKeys: any) {
@@ -331,21 +349,29 @@ dataIndex: "address",
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="字典名称" name="configName">
-                <Input placeholder="请输入字典名称" />
+              <Form.Item label="字典名称" name="dictType">
+                <Select placeholder="请选择字典名称">
+                  {dicts.typeOptions.map((dict: any) => {
+                    return (
+                      <Option value={dict.dictType} key={"dictCode" + dict.dictId}>
+                        {dict.dictName}
+                      </Option>
+                    );
+                  })}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="字典标签" name="configKey">
+              <Form.Item label="字典标签" name="dictLabel">
                 <Input placeholder="请输入字典标签" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="状态" name="configType">
+              <Form.Item label="状态" name="status">
                 <Select placeholder="请选择状态">
-                  {dicts.sys_yes_no.map((dict: any) => {
+                  {dicts.sys_normal_disable.map((dict: any) => {
                     return (
-                      <Option value={dict.dictValue} key={"configId" + dict.dictValue}>
+                      <Option value={dict.dictValue} key={"dictCode" + dict.dictValue}>
                         {dict.dictLabel}
                       </Option>
                     );
@@ -391,7 +417,7 @@ dataIndex: "address",
           </Button>
         </Col>
         <Col style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined />} onClick={delData} disabled={selectedRowKeys.length <= 0}>
+          <Button icon={<DeleteOutlined />} onClick={delDatas} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>
@@ -414,7 +440,7 @@ dataIndex: "address",
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.configId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictCode} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
         <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -424,21 +450,21 @@ dataIndex: "address",
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ configType: "Y" }} autoComplete="off">
-          <Form.Item label="参数名称" name="configName" rules={[{ required: true, message: "参数名称不能为空" }]}>
+        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "Y" }} autoComplete="off">
+          <Form.Item label="参数名称" name="dictType" rules={[{ required: true, message: "参数名称不能为空" }]}>
             <Input placeholder="请输入参数名称" />
           </Form.Item>
-          <Form.Item label="参数键名" name="configKey" rules={[{ required: true, message: "参数键名不能为空" }]}>
+          <Form.Item label="参数键名" name="dictLabel" rules={[{ required: true, message: "参数键名不能为空" }]}>
             <Input placeholder="请输入参数键名" />
           </Form.Item>
           <Form.Item label="参数键值" name="configValue" rules={[{ required: true, message: "参数键值不能为空" }]}>
             <Input placeholder="请输入参数键值" />
           </Form.Item>
-          <Form.Item label="系统内置" name="configType">
+          <Form.Item label="系统内置" name="status">
             <Radio.Group>
-              {dicts.sys_yes_no.map((dict: any) => {
+              {dicts.sys_normal_disable.map((dict: any) => {
                 return (
-                  <Radio value={dict.dictValue} key={"configType" + dict.dictValue}>
+                  <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
                     {dict.dictLabel}
                   </Radio>
                 );

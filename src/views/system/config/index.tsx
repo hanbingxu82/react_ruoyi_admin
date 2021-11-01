@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-10-29 16:04:37
+ * @LastEditTime: 2021-11-01 14:44:38
  * @LastEditors: Please set LastEditors
  * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import {  Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
 import { selectDictLabel } from "../../../utils/ruoyi";
@@ -58,50 +58,50 @@ function Config() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
       title: "参数主键",
-      align:'center',
-dataIndex: "configId",
+      align: "center",
+      dataIndex: "configId",
     },
     {
       title: "参数名称",
-      align:'center',
-dataIndex: "configName",
+      align: "center",
+      dataIndex: "configName",
       ellipsis: true,
     },
     {
       title: "参数键名",
-      align:'center',
-dataIndex: "configKey",
+      align: "center",
+      dataIndex: "configKey",
       ellipsis: true,
     },
     {
       title: "参数键值",
-      align:'center',
-dataIndex: "configValue",
+      align: "center",
+      dataIndex: "configValue",
     },
     {
       title: "系统内置",
-      align:'center',
-dataIndex: "configType",
+      align: "center",
+      dataIndex: "configType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
     },
     {
       title: "备注",
-      align:'center',
-dataIndex: "remark",
+      align: "center",
+      dataIndex: "remark",
       ellipsis: true,
     },
     {
       title: "创建时间",
-      align:'center',
-dataIndex: "createTime",
+      align: "center",
+      dataIndex: "createTime",
     },
     {
       title: "操作",
       // align:'center',
-dataIndex: "address",
+      dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -137,6 +137,12 @@ dataIndex: "address",
   const [configForm, setConfigForm] = useState({
     configId: "",
   });
+  // 监听副作用
+  useEffect(() => {
+    if (initComponent.current) return;
+    // 监听queryParams变化
+    getList();
+  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -152,12 +158,7 @@ dataIndex: "address",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}
@@ -313,7 +314,7 @@ dataIndex: "address",
    */
   function clearCache() {
     refreshCache().then(() => {
-      message.success("刷新成功")
+      message.success("刷新成功");
     });
   }
   function onSelectChange(selectedRowKeys: any) {

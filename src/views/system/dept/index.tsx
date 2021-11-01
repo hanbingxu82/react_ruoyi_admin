@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-22 10:27:17
- * @LastEditTime: 2021-10-25 14:00:17
+ * @LastEditTime: 2021-11-01 14:44:50
  * @LastEditors: Please set LastEditors
  * @Description: 部门管理
  * @FilePath: /use-hooks/src/views/system/dept/index.tsx
@@ -48,27 +48,27 @@ function Dept() {
   const [tableData, setTableData] = useState([]);
   //   const [total, setTotal] = useState(0);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
       title: "部门名称",
-      align:'center',
-dataIndex: "deptName",
+      // align: "center",
+      dataIndex: "deptName",
     },
     {
       title: "排序",
-      align:'center',
-dataIndex: "orderNum",
+      align: "center",
+      dataIndex: "orderNum",
     },
     {
       title: "状态",
-      align:'center',
-dataIndex: "status",
+      align: "center",
+      dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "创建时间",
-      align:'center',
-dataIndex: "createTime",
+      align: "center",
+      dataIndex: "createTime",
     },
     {
       title: "操作",
@@ -116,6 +116,12 @@ dataIndex: "createTime",
     deptId: "",
     parentId: "",
   });
+    // 监听副作用
+    useEffect(() => {
+      if (initComponent.current) return;
+      // 监听queryParams变化
+      getList();
+    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -131,12 +137,7 @@ dataIndex: "createTime",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}
@@ -312,7 +313,7 @@ dataIndex: "createTime",
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-10-29 16:05:25
+ * @LastEditTime: 2021-11-01 14:45:34
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -51,38 +51,32 @@ function Notice() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns = [
     {
       title: "公告标题",
-      align:'center',
-dataIndex: "noticeTitle",
+      dataIndex: "noticeTitle",
     },
     {
       title: "公告类型",
-      align:'center',
-dataIndex: "noticeType",
+      dataIndex: "noticeType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_notice_type, text)}</>,
     },
     {
       title: "状态",
-      align:'center',
-dataIndex: "status",
+      dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_notice_status, text)}</>,
     },
     {
       title: "创建者",
-      align:'center',
-dataIndex: "createBy",
+      dataIndex: "createBy",
     },
     {
       title: "创建时间",
-      align:'center',
-dataIndex: "createTime",
+      dataIndex: "createTime",
     },
     {
       title: "操作",
-      // align:'center',
-dataIndex: "address",
+      // dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -119,6 +113,12 @@ dataIndex: "address",
     noticeId: "",
     noticeContent: "",
   });
+    // 监听副作用
+    useEffect(() => {
+      if (initComponent.current) return;
+      // 监听queryParams变化
+      getList();
+    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -140,12 +140,7 @@ dataIndex: "address",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}

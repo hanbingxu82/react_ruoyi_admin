@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:01
- * @LastEditTime: 2021-10-28 09:18:49
+ * @LastEditTime: 2021-11-01 14:45:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/log/logininfor/index.tsx
@@ -35,8 +35,8 @@ function OperLog() {
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    ipaddr:'',
-    userName:'',
+    ipaddr: "",
+    userName: "",
     status: "",
     params: {
       beginTime: "",
@@ -58,57 +58,62 @@ function OperLog() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
       title: "访问编号",
-      align:'center',
-dataIndex: "infoId",
+      align: "center",
+      dataIndex: "infoId",
     },
     {
       title: "用户名称",
-      align:'center',
-dataIndex: "userName",
+      align: "center",
+      dataIndex: "userName",
     },
     {
       title: "登录地址",
-      align:'center',
-dataIndex: "ipaddr",
+      align: "center",
+      dataIndex: "ipaddr",
     },
     {
       title: "登录地点",
-      align:'center',
-dataIndex: "loginLocation",
+      align: "center",
+      dataIndex: "loginLocation",
     },
     {
       title: "浏览器",
-      align:'center',
-dataIndex: "browser",
+      align: "center",
+      dataIndex: "browser",
     },
     {
       title: "操作系统",
-      align:'center',
-dataIndex: "os",
+      align: "center",
+      dataIndex: "os",
     },
 
     {
       title: "登录状态",
-      align:'center',
-dataIndex: "status",
+      align: "center",
+      dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_common_status, text)}</>,
     },
     {
       title: "操作信息",
-      align:'center',
-dataIndex: "msg",
+      align: "center",
+      dataIndex: "msg",
     },
 
     {
       title: "登录日期",
-      align:'center',
-dataIndex: "loginTime",
+      align: "center",
+      dataIndex: "loginTime",
     },
   ];
-
+  // 监听副作用
+  useEffect(() => {
+    if (initComponent.current) return;
+    // 监听queryParams变化
+    getList();
+  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -130,12 +135,7 @@ dataIndex: "loginTime",
     });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // 监听副作用
-  useEffect(() => {
-    if (initComponent.current) return;
-    // 监听queryParams变化
-    getList();
-  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * @description: 获取表格信息
    * @param {*}
@@ -308,7 +308,7 @@ dataIndex: "loginTime",
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             icon={<DeleteOutlined />}
             onClick={() => {
@@ -319,12 +319,12 @@ dataIndex: "loginTime",
             删除
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} onClick={clearData}>
             清空
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
             导出
           </Button>
