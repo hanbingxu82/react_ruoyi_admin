@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-11-01 14:45:41
+ * @LastEditTime: 2021-11-01 16:05:19
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -398,7 +398,7 @@ dataIndex: "address",
           <Form.Item label="岗位编码" name="postCode" rules={[{ required: true, message: "岗位编码不能为空" }]}>
             <Input placeholder="请输入岗位编码" />
           </Form.Item>
-          <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位编码不能为空" }]}>
+          <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位顺序不能为空" }]}>
             <InputNumber placeholder="请输入岗位顺序" />
           </Form.Item>
           <Form.Item label="岗位状态" name="status">

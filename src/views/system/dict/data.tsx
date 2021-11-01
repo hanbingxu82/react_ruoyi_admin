@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-11-01 14:44:28
+ * @LastEditTime: 2021-11-01 16:45:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
@@ -12,18 +12,15 @@ import "./data.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
+import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listData, getData, delData, addData, updateData, exportData } from "api/system/dict/data";
 import { listType, getType } from "api/system/dict/type";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
-import moment from "moment";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
-const { RangePicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
 function Post(props: any) {
@@ -40,10 +37,6 @@ function Post(props: any) {
     dictType: "",
     dictLabel: "",
     status: "",
-    params: {
-      beginTime: "",
-      endTime: "",
-    },
   });
   const [queryFormRef] = Form.useForm();
   const [showQueryForm, setShowQueryForm] = useState(true);
@@ -51,6 +44,32 @@ function Post(props: any) {
   const [dicts, setDicts] = useState({
     sys_normal_disable: [],
     typeOptions: [],
+    listClassOptions: [
+      {
+        value: "default",
+        label: "默认",
+      },
+      {
+        value: "primary",
+        label: "主要",
+      },
+      {
+        value: "success",
+        label: "成功",
+      },
+      {
+        value: "info",
+        label: "信息",
+      },
+      {
+        value: "warning",
+        label: "警告",
+      },
+      {
+        value: "danger",
+        label: "危险",
+      },
+    ],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -71,11 +90,21 @@ function Post(props: any) {
       align: "center",
       dataIndex: "dictLabel",
       ellipsis: true,
-      render: (text: any, row: any) => (
-        <>
-          <Tag color={"processing"}>{text}</Tag>{" "}
-        </>
-      ),
+      render: (text: any, row: any) => {
+        if (row.listClass === "primary") {
+          return <Tag color={"processing"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "success") {
+          return <Tag color={"success"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "info" || row.listClass === "default") {
+          return <Tag color={"default"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "warning") {
+          return <Tag color={"warning"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "danger") {
+          return <Tag color={"error"}>{row.dictLabel}</Tag>;
+        } else {
+          return row.dictLabel;
+        }
+      },
     },
     {
       title: "字典键值",
@@ -115,7 +144,7 @@ function Post(props: any) {
             <Space size="middle">
               <a
                 onClick={() => {
-                  showModal("修改参数", row);
+                  showModal("修改字典数据", row);
                 }}
               >
                 <EditOutlined />
@@ -136,12 +165,12 @@ function Post(props: any) {
     },
   ];
   // 表单弹窗
-  const [configFormModel] = Form.useForm();
+  const [dataFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const [visibleTitle, setVisibleTitle] = useState("添加参数");
+  const [visibleTitle, setVisibleTitle] = useState("添加字典数据");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [configForm, setConfigForm] = useState({
+  const [dataForm, setDataForm] = useState({
     dictCode: "",
   });
   const [defaultDictType, setDefaultDictType] = useState("");
@@ -198,7 +227,6 @@ function Post(props: any) {
     setGetLoading(true);
     listData({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
-      console.log(res.rows);
       setTableData(res.rows);
       setTotal(res.total);
     });
@@ -226,7 +254,8 @@ function Post(props: any) {
     queryFormRef.setFieldsValue({
       dictType: defaultDictType,
     });
-    onQueryFinish({});
+    
+    onQueryFinish({dictType: defaultDictType});
   }
 
   /**
@@ -236,19 +265,22 @@ function Post(props: any) {
    */
   function showModal(titleName: string, row: any = { dictCode: "" }) {
     setVisibleTitle(titleName);
-    configFormModel.resetFields();
-    setConfigForm(() => {
+    dataFormModel.resetFields();
+    dataFormModel.setFieldsValue({
+      dictType:queryForm.dictType
+    });
+    setDataForm(() => {
       return {
         dictCode: "",
       };
     });
-    if (titleName === "修改参数") {
+
+    if (titleName === "修改字典数据") {
       const dictCode = row.dictCode || selectedRowKeys[0];
       // 调用查询详细接口
       getData(dictCode).then((response: any) => {
-        console.log(response);
-        setConfigForm({ ...response.data });
-        configFormModel.setFieldsValue({
+        setDataForm({ ...response.data });
+        dataFormModel.setFieldsValue({
           ...response.data,
         });
       });
@@ -262,18 +294,18 @@ function Post(props: any) {
    */
   const handleOk = () => {
     // form 表单内容
-    configFormModel
+    dataFormModel
       .validateFields()
       .then((values) => {
-        if (configForm.dictCode !== "") {
-          updateData({ ...configForm, ...configFormModel.getFieldsValue() }).then(() => {
+        if (dataForm.dictCode !== "") {
+          updateData({ ...dataForm, ...dataFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addData({ ...configFormModel.getFieldsValue() }).then(() => {
+          addData({ ...dataFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -399,7 +431,7 @@ function Post(props: any) {
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showModal("添加参数");
+              showModal("添加字典数据");
             }}
           >
             新增
@@ -409,7 +441,7 @@ function Post(props: any) {
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
-              showModal("修改参数");
+              showModal("修改字典数据");
             }}
             icon={<EditOutlined />}
           >
@@ -450,17 +482,34 @@ function Post(props: any) {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "Y" }} autoComplete="off">
-          <Form.Item label="参数名称" name="dictType" rules={[{ required: true, message: "参数名称不能为空" }]}>
-            <Input placeholder="请输入参数名称" />
+        <Form form={dataFormModel} name="dataFormModel" labelCol={{ style: { width: 90 } }} initialValues={{dictSort:'0', status: "0", listClass: "default" }} autoComplete="off">
+          <Form.Item label="字典类型" name="dictType" >
+            <Input disabled placeholder="请输入字典类型" />
           </Form.Item>
-          <Form.Item label="参数键名" name="dictLabel" rules={[{ required: true, message: "参数键名不能为空" }]}>
-            <Input placeholder="请输入参数键名" />
+          <Form.Item label="数据标签" name="dictLabel" rules={[{ required: true, message: "数据标签不能为空" }]}>
+            <Input placeholder="请输入数据标签" />
           </Form.Item>
-          <Form.Item label="参数键值" name="configValue" rules={[{ required: true, message: "参数键值不能为空" }]}>
-            <Input placeholder="请输入参数键值" />
+          <Form.Item label="数据键值" name="dictValue" rules={[{ required: true, message: "数据键值不能为空" }]}>
+            <Input placeholder="请输入数据键值" />
           </Form.Item>
-          <Form.Item label="系统内置" name="status">
+          <Form.Item label="样式属性" name="cssClass" >
+            <Input placeholder="请输入样式属性" />
+          </Form.Item>
+          <Form.Item label="显示排序" name="dictSort" rules={[{ required: true, message: "显示排序不能为空" }]}>
+            <InputNumber placeholder="请输入显示排序" />
+          </Form.Item>
+          <Form.Item label="回显样式" name="listClass" >
+            <Select placeholder="请选择回显样式">
+              {dicts.listClassOptions.map((dict: any) => {
+                return (
+                  <Option value={dict.value} key={"listClassOptions" + dict.value}>
+                    {dict.label}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+          <Form.Item label="状态" name="status">
             <Radio.Group>
               {dicts.sys_normal_disable.map((dict: any) => {
                 return (
