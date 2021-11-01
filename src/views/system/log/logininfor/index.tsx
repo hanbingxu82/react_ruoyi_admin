@@ -58,45 +58,54 @@ function OperLog() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "访问编号",
-      dataIndex: "infoId",
+      align:'center',
+dataIndex: "infoId",
     },
     {
       title: "用户名称",
-      dataIndex: "userName",
+      align:'center',
+dataIndex: "userName",
     },
     {
       title: "登录地址",
-      dataIndex: "ipaddr",
+      align:'center',
+dataIndex: "ipaddr",
     },
     {
       title: "登录地点",
-      dataIndex: "loginLocation",
+      align:'center',
+dataIndex: "loginLocation",
     },
     {
       title: "浏览器",
-      dataIndex: "browser",
+      align:'center',
+dataIndex: "browser",
     },
     {
       title: "操作系统",
-      dataIndex: "os",
+      align:'center',
+dataIndex: "os",
     },
 
     {
       title: "登录状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_common_status, text)}</>,
     },
     {
       title: "操作信息",
-      dataIndex: "msg",
+      align:'center',
+dataIndex: "msg",
     },
 
     {
       title: "登录日期",
-      dataIndex: "loginTime",
+      align:'center',
+dataIndex: "loginTime",
     },
   ];
 

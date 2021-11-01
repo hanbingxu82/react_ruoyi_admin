@@ -58,42 +58,50 @@ function Config() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "参数主键",
-      dataIndex: "configId",
+      align:'center',
+dataIndex: "configId",
     },
     {
       title: "参数名称",
-      dataIndex: "configName",
+      align:'center',
+dataIndex: "configName",
       ellipsis: true,
     },
     {
       title: "参数键名",
-      dataIndex: "configKey",
+      align:'center',
+dataIndex: "configKey",
       ellipsis: true,
     },
     {
       title: "参数键值",
-      dataIndex: "configValue",
+      align:'center',
+dataIndex: "configValue",
     },
     {
       title: "系统内置",
-      dataIndex: "configType",
+      align:'center',
+dataIndex: "configType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
     },
     {
       title: "备注",
-      dataIndex: "remark",
+      align:'center',
+dataIndex: "remark",
       ellipsis: true,
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>

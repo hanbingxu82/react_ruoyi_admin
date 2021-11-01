@@ -51,32 +51,38 @@ function Notice() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "公告标题",
-      dataIndex: "noticeTitle",
+      align:'center',
+dataIndex: "noticeTitle",
     },
     {
       title: "公告类型",
-      dataIndex: "noticeType",
+      align:'center',
+dataIndex: "noticeType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_notice_type, text)}</>,
     },
     {
       title: "状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_notice_status, text)}</>,
     },
     {
       title: "创建者",
-      dataIndex: "createBy",
+      align:'center',
+dataIndex: "createBy",
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>

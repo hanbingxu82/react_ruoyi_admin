@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-10-29 16:05:01
+ * @LastEditTime: 2021-11-01 11:48:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
@@ -12,7 +12,7 @@ import "./data.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import {  Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, refreshCache } from "api/system/config";
 import { selectDictLabel } from "../../../utils/ruoyi";
@@ -58,42 +58,50 @@ function Post() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
-      title: "参数主键",
-      dataIndex: "configId",
+      title: "字典编码",
+      align:'center',
+dataIndex: "dictCode",
     },
     {
       title: "参数名称",
-      dataIndex: "configName",
+      align:'center',
+dataIndex: "configName",
       ellipsis: true,
     },
     {
       title: "参数键名",
-      dataIndex: "configKey",
+      align:'center',
+dataIndex: "configKey",
       ellipsis: true,
     },
     {
       title: "参数键值",
-      dataIndex: "configValue",
+      align:'center',
+dataIndex: "configValue",
     },
     {
       title: "系统内置",
-      dataIndex: "configType",
+      align:'center',
+dataIndex: "configType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_yes_no, text)}</>,
     },
     {
       title: "备注",
-      dataIndex: "remark",
+      align:'center',
+dataIndex: "remark",
       ellipsis: true,
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -305,7 +313,7 @@ function Post() {
    */
   function clearCache() {
     refreshCache().then(() => {
-      message.success("刷新成功")
+      message.success("刷新成功");
     });
   }
   function onSelectChange(selectedRowKeys: any) {
@@ -323,18 +331,18 @@ function Post() {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="参数名称" name="configName">
-                <Input placeholder="请输入参数名称" />
+              <Form.Item label="字典名称" name="configName">
+                <Input placeholder="请输入字典名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="参数键名" name="configKey">
-                <Input placeholder="请输入参数键名" />
+              <Form.Item label="字典标签" name="configKey">
+                <Input placeholder="请输入字典标签" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="系统内置" name="configType">
-                <Select placeholder="请选择系统内置">
+              <Form.Item label="状态" name="configType">
+                <Select placeholder="请选择状态">
                   {dicts.sys_yes_no.map((dict: any) => {
                     return (
                       <Option value={dict.dictValue} key={"configId" + dict.dictValue}>
@@ -346,13 +354,6 @@ function Post() {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="操作时间" name="time">
-                <RangePicker format={dateFormat} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={6} offset={18}>
               <Form.Item style={{ float: "right" }}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -399,11 +400,7 @@ function Post() {
             导出
           </Button>
         </Col>
-        <Col style={{ marginRight: 20 }}>
-          <Button icon={<SyncOutlined />} onClick={clearCache}>
-            刷新缓存
-          </Button>
-        </Col>
+
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
             onSeachShow={() => {

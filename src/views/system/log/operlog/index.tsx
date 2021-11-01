@@ -59,49 +59,59 @@ function OperLog() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "日志编号",
-      dataIndex: "operId",
+      align:'center',
+dataIndex: "operId",
     },
     {
       title: "系统模块",
-      dataIndex: "title",
+      align:'center',
+dataIndex: "title",
     },
     {
       title: "操作类型",
-      dataIndex: "businessType",
+      align:'center',
+dataIndex: "businessType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_oper_type, text)}</>,
     },
     {
       title: "请求方式",
-      dataIndex: "requestMethod",
+      align:'center',
+dataIndex: "requestMethod",
     },
     {
       title: "操作人员",
-      dataIndex: "operName",
+      align:'center',
+dataIndex: "operName",
     },
     {
       title: "操作地址",
-      dataIndex: "operIp",
+      align:'center',
+dataIndex: "operIp",
     },
     {
       title: "操作地点",
-      dataIndex: "operLocation",
+      align:'center',
+dataIndex: "operLocation",
     },
 
     {
       title: "操作状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_common_status, text)}</>,
     },
     {
       title: "操作时间",
-      dataIndex: "operTime",
+      align:'center',
+dataIndex: "operTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>

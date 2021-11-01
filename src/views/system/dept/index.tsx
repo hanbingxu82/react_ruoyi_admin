@@ -48,23 +48,27 @@ function Dept() {
   const [tableData, setTableData] = useState([]);
   //   const [total, setTotal] = useState(0);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "部门名称",
-      dataIndex: "deptName",
+      align:'center',
+dataIndex: "deptName",
     },
     {
       title: "排序",
-      dataIndex: "orderNum",
+      align:'center',
+dataIndex: "orderNum",
     },
     {
       title: "状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",

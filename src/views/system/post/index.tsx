@@ -50,35 +50,42 @@ function Post() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "岗位编号",
-      dataIndex: "postId",
+      align:'center',
+dataIndex: "postId",
     },
     {
       title: "岗位编码",
-      dataIndex: "postCode",
+      align:'center',
+dataIndex: "postCode",
     },
     {
       title: "岗位名称",
-      dataIndex: "postName",
+      align:'center',
+dataIndex: "postName",
     },
     {
       title: "岗位排序",
-      dataIndex: "postSort",
+      align:'center',
+dataIndex: "postSort",
     },
     {
       title: "状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>

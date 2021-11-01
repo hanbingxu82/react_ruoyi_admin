@@ -57,19 +57,22 @@ function Dict() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "字典编号",
-      dataIndex: "dictId",
+      align:'center',
+dataIndex: "dictId",
     },
     {
       title: "字典名称",
-      dataIndex: "dictName",
+      align:'center',
+dataIndex: "dictName",
       ellipsis: true,
     },
     {
       title: "字典类型",
-      dataIndex: "dictType",
+      align:'center',
+dataIndex: "dictType",
       ellipsis: true,
       render: (text: any, row: any) => (
         <>
@@ -81,21 +84,25 @@ function Dict() {
     },
     {
       title: "状态",
-      dataIndex: "status",
+      align:'center',
+dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
       title: "备注",
-      dataIndex: "remark",
+      align:'center',
+dataIndex: "remark",
       ellipsis: true,
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      align:'center',
+dataIndex: "createTime",
     },
     {
       title: "操作",
-      // dataIndex: "address",
+      // align:'center',
+dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
