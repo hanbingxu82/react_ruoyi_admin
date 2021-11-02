@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-11-01 16:45:14
+ * @LastEditTime: 2021-11-02 08:39:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
@@ -23,7 +23,7 @@ import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
 const { confirm } = Modal;
 const { Option } = Select;
-function Post(props: any) {
+function Data(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -375,7 +375,7 @@ function Post(props: any) {
     onChange: onSelectChange,
   };
   return (
-    <div className="Dict">
+    <div className="Data">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
@@ -532,4 +532,4 @@ function Post(props: any) {
     </div>
   );
 }
-export default Post;
+export default Data;
