@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-02 10:42:16
+ * @LastEditTime: 2021-11-02 17:24:54
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -11,14 +11,17 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
+import { Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
+import moment from "moment";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
+const { RangePicker } = DatePicker;
+const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
 function Role() {
@@ -35,6 +38,10 @@ function Role() {
     postName: "",
     postCode: "",
     status: "",
+    params: {
+      beginTime: "",
+      endTime: "",
+    },
   });
   const [queryFormRef] = Form.useForm();
   const [showQueryForm, setShowQueryForm] = useState(true);
@@ -50,42 +57,53 @@ function Role() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
-      title: "岗位编号",
-      align:'center',
-dataIndex: "postId",
+      title: "角色编号",
+      align: "center",
+      dataIndex: "roleId",
     },
     {
-      title: "岗位编码",
-      align:'center',
-dataIndex: "postCode",
+      title: "角色名称",
+      align: "center",
+      dataIndex: "roleName",
     },
     {
-      title: "岗位名称",
-      align:'center',
-dataIndex: "postName",
+      title: "权限字符",
+      align: "center",
+      dataIndex: "roleKey",
     },
     {
-      title: "岗位排序",
-      align:'center',
-dataIndex: "postSort",
+      title: "显示顺序",
+      align: "center",
+      dataIndex: "roleSort",
     },
     {
       title: "状态",
-      align:'center',
-dataIndex: "status",
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
+      align: "center",
+      dataIndex: "status",
+      render: (text: any, row: any) => (
+        <Switch
+          // key={text + index + switchKey}
+          checkedChildren="开启"
+          onClick={() => {
+            onTableSwitchChange(row);
+          }}
+          unCheckedChildren="关闭"
+          checked={row.status === "0" ? true : false}
+          // defaultChecked={row.status === "0" ? true : false}
+        />
+      ),
     },
     {
       title: "创建时间",
-      align:'center',
-dataIndex: "createTime",
+      align: "center",
+      dataIndex: "createTime",
     },
     {
       title: "操作",
-      // align:'center',
-dataIndex: "address",
+      align:'center',
+      dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -121,12 +139,12 @@ dataIndex: "address",
   const [postForm, setPostForm] = useState({
     postId: "",
   });
-    // 监听副作用
-    useEffect(() => {
-      if (initComponent.current) return;
-      // 监听queryParams变化
-      getList();
-    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 监听副作用
+  useEffect(() => {
+    if (initComponent.current) return;
+    // 监听queryParams变化
+    getList();
+  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -166,13 +184,13 @@ dataIndex: "address",
       data.postName = form.postName;
       data.postCode = form.postCode;
       data.status = form.status;
-      // if (form.time) {
-      //   data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
-      //   data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
-      // } else {
-      //   data.params.beginTime = "";
-      //   data.params.endTime = "";
-      // }
+      if (form.time) {
+        data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
+        data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
+      } else {
+        data.params.beginTime = "";
+        data.params.endTime = "";
+      }
       return { ...data };
     });
   }
@@ -211,6 +229,33 @@ dataIndex: "address",
       });
     }
     setVisible(true);
+  }
+  /**
+   * @description: 变更表格 开关状态
+   * @param {any} row
+   * @return {*}
+   */  
+  function onTableSwitchChange(row: any) {
+    let text = row.status !== "0" ? "启用" : "停用";
+    confirm({
+      title: "警告",
+      icon: <ExclamationCircleOutlined />,
+      content: '确认要"' + text + '""' + row.userName + '"用户吗?',
+      centered: true,
+      onOk() {
+        // 反向更新数据，我在这边采用的是click事件，这个时候点击是不会变更状态的，直接更改row.status 组件不会进行监听
+        row.status = row.status === "0" ? "1" : "0";
+        // changeUserStatus(row.userId, row.status).then(() => {
+        //   message.success(text + "成功");
+        //   getList();
+        // });
+      },
+      onCancel() {
+        // 无需任何操作
+        // row.status = row.status === "0" ? "1" : "0";
+        // getList();
+      },
+    });
   }
   /**
    * @description: 弹窗确认点击事件
@@ -306,24 +351,31 @@ dataIndex: "address",
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="岗位编码" name="postCode">
-                <Input placeholder="请输入岗位编码" />
+              <Form.Item label="角色名称" name="postCode">
+                <Input placeholder="请输入角色名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="岗位名称" name="postName">
-                <Input placeholder="请输入岗位名称" />
+              <Form.Item label="权限字符" name="postName">
+                <Input placeholder="请输入权限字符" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="岗位状态" name="status">
-                <Select placeholder="请输入岗位状态" allowClear>
+              <Form.Item label="角色状态" name="status">
+                <Select placeholder="请输入角色状态" allowClear>
                   <Option value="0">启用</Option>
                   <Option value="1">停用</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={6}>
+              <Form.Item label="操作时间" name="time">
+                <RangePicker format={dateFormat} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col offset={18} span={6}>
               <Form.Item style={{ float: "right" }}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -338,7 +390,7 @@ dataIndex: "address",
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
@@ -349,7 +401,7 @@ dataIndex: "address",
             新增
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
@@ -360,12 +412,12 @@ dataIndex: "address",
             修改
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined /> } onClick={delData} disabled={selectedRowKeys.length <= 0}>
+        <Col style={{ marginRight: 20 }}>
+          <Button icon={<DeleteOutlined />} onClick={delData} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }} onClick={handleExport}>
+        <Col style={{ marginRight: 20 }} onClick={handleExport}>
           <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
         </Col>
         <Col style={{ flex: 1, textAlign: "right" }}>
