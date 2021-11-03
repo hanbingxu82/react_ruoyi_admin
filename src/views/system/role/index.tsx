@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-03 14:06:17
+ * @LastEditTime: 2021-11-03 17:14:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -136,13 +136,17 @@ function Role() {
     },
   ];
   // 表单弹窗
-  const [postFormModel] = Form.useForm();
+  const [roleFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [visibleTitle, setVisibleTitle] = useState("添加角色");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [postForm, setPostForm] = useState({
+  const [roleForm, setRoleForm] = useState({
     roleId: "",
+    menuCheckStrictly: true,
+    deptCheckStrictly: true,
+    menuIds:[],
+    deptIds:[]
   });
   // 监听副作用
   useEffect(() => {
@@ -217,19 +221,18 @@ function Role() {
    */
   function showModal(titleName: string, row: any = { roleId: "" }) {
     setVisibleTitle(titleName);
-    postFormModel.resetFields();
-    setPostForm(() => {
-      return {
-        roleId: "",
-      };
+    roleFormModel.resetFields();
+    setRoleForm((data: any) => {
+      data.roleId = "";
+      return data;
     });
     if (titleName === "修改角色") {
       const roleId = row.roleId || selectedRowKeys[0];
       // 调用查询详细接口
       getRole(roleId).then((response: any) => {
         console.log(response);
-        setPostForm({ ...response.data });
-        postFormModel.setFieldsValue({
+        setRoleForm({ ...response.data });
+        roleFormModel.setFieldsValue({
           ...response.data,
         });
       });
@@ -270,18 +273,17 @@ function Role() {
    */
   const handleOk = () => {
     // form 表单内容
-    postFormModel
+    roleFormModel
       .validateFields()
       .then((values) => {
-        if (postForm.roleId !== "") {
-          updateRole({ ...postForm, ...postFormModel.getFieldsValue() }).then(() => {
+        if (roleForm.roleId !== "") {
+          updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(),menuIds:checkedKeys  }).then(() => {
             message.success("修改成功");
-            // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addRole({ ...postFormModel.getFieldsValue() }).then(() => {
+          addRole({ ...roleForm,...roleFormModel.getFieldsValue(),menuIds:checkedKeys }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -385,6 +387,10 @@ function Role() {
   function handleCheckedTreeConnect(value: CheckboxChangeEvent, type: string) {
     if (type === "menu") {
       setIsCheckStrictly(!isCheckStrictly);
+      setRoleForm((data: any) => {
+        data.menuCheckStrictly = !isCheckStrictly;
+        return data;
+      });
     } else if (type === "dept") {
     }
   }
@@ -415,9 +421,6 @@ function Role() {
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
   const onExpand = (expandedKeysValue: any) => {
-    console.log("onExpand", expandedKeysValue);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
@@ -530,7 +533,7 @@ function Role() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
+        <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
           <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
             <Input placeholder="请输入角色名称" />
           </Form.Item>
