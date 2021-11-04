@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-04 10:27:04
+ * @LastEditTime: 2021-11-04 10:44:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -262,15 +262,19 @@ function Role() {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: '确认要"' + text + '""' + row.userName + '"用户吗?',
+      content: '确认要"' + text + '""' + row.roleName + '"角色吗?',
       centered: true,
       onOk() {
         // 反向更新数据，我在这边采用的是click事件，这个时候点击是不会变更状态的，直接更改row.status 组件不会进行监听
         row.status = row.status === "0" ? "1" : "0";
-        // changeUserStatus(row.userId, row.status).then(() => {
-        //   message.success(text + "成功");
-        //   getList();
-        // });
+        changeRoleStatus(row.roleId, row.status)
+          .then(() => {
+            message.success(text + "成功");
+            getList();
+          })
+          .catch((err) => {
+            getList();
+          });
       },
       onCancel() {
         // 无需任何操作
@@ -392,9 +396,8 @@ function Role() {
     if (type === "menu") {
       setRoleForm((data: any) => {
         data.menuCheckStrictly = value.target.checked;
-        return {...data};
+        return { ...data };
       });
-
     } else if (type === "dept") {
     }
   }
@@ -440,13 +443,11 @@ function Role() {
   };
 
   const onCheck = (checkedKeysValue: any) => {
-    if(Array.isArray(checkedKeysValue)){
-        setCheckedKeys(checkedKeysValue);
-    }else{
-        setCheckedKeys(checkedKeysValue.checked);
+    if (Array.isArray(checkedKeysValue)) {
+      setCheckedKeys(checkedKeysValue);
+    } else {
+      setCheckedKeys(checkedKeysValue.checked);
     }
-
-    
   };
 
   const onSelect = (selectedKeysValue: any, info: any) => {
