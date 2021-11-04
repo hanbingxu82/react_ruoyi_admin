@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-03 17:14:56
+ * @LastEditTime: 2021-11-04 10:27:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -145,8 +145,8 @@ function Role() {
     roleId: "",
     menuCheckStrictly: true,
     deptCheckStrictly: true,
-    menuIds:[],
-    deptIds:[]
+    menuIds: [],
+    deptIds: [],
   });
   // 监听副作用
   useEffect(() => {
@@ -154,6 +154,11 @@ function Role() {
     // 监听queryParams变化
     getList();
   }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+  //   // 监听副作用
+  //   useEffect(() => {
+  //     if (!visible) return;
+  //     // 监听queryParams变化
+  //   }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -230,11 +235,19 @@ function Role() {
       const roleId = row.roleId || selectedRowKeys[0];
       // 调用查询详细接口
       getRole(roleId).then((response: any) => {
-        console.log(response);
-        setRoleForm({ ...response.data });
+        setRoleForm(() => {
+          return { ...response.data };
+        });
         roleFormModel.setFieldsValue({
           ...response.data,
         });
+        // setTimeout(() => {
+        const roleMenu = getRoleMenuTreeselect(roleId);
+        roleMenu.then((res) => {
+          let checkedKeys = res.checkedKeys;
+          setCheckedKeys([...checkedKeys]);
+        });
+        // }, 0);
       });
     }
     setVisible(true);
@@ -277,13 +290,13 @@ function Role() {
       .validateFields()
       .then((values) => {
         if (roleForm.roleId !== "") {
-          updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(),menuIds:checkedKeys  }).then(() => {
+          updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
             message.success("修改成功");
             setVisible(false);
             getList();
           });
         } else {
-          addRole({ ...roleForm,...roleFormModel.getFieldsValue(),menuIds:checkedKeys }).then(() => {
+          addRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -355,21 +368,12 @@ function Role() {
   // 树权限（展开/折叠）
   function handleCheckedTreeExpand(value: CheckboxChangeEvent, type: string) {
     if (type === "menu") {
-      //   let treeList = this.menuOptions;
-      //   for (let i = 0; i < treeList.length; i++) {
-      //     this.$refs.menu.store.nodesMap[treeList[i].id].expanded = value;
-      //   }
-      // dicts.menuOptions
       if (value.target.checked) {
         setExpandedKeys(dicts.menuOptionsAll);
       } else {
         setExpandedKeys([]);
       }
     } else if (type === "dept") {
-      //   let treeList = this.deptOptions;
-      //   for (let i = 0; i < treeList.length; i++) {
-      //     this.$refs.dept.store.nodesMap[treeList[i].id].expanded = value;
-      //   }
     }
   }
   // 树权限（全选/全不选）
@@ -386,11 +390,11 @@ function Role() {
   // 树权限（父子联动）
   function handleCheckedTreeConnect(value: CheckboxChangeEvent, type: string) {
     if (type === "menu") {
-      setIsCheckStrictly(!isCheckStrictly);
       setRoleForm((data: any) => {
-        data.menuCheckStrictly = !isCheckStrictly;
-        return data;
+        data.menuCheckStrictly = value.target.checked;
+        return {...data};
       });
+
     } else if (type === "dept") {
     }
   }
@@ -414,10 +418,20 @@ function Role() {
       });
     });
   }
+  /** 根据角色ID查询菜单树结构 */
+  function getRoleMenuTreeselect(roleId: string) {
+    return roleMenuTreeselect(roleId).then((response: any) => {
+      setDicts((data: any) => {
+        data.menuOptions = response.menus;
+        return { ...data };
+      });
+      return response;
+    });
+  }
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
-  const [isCheckStrictly, setIsCheckStrictly] = useState(true);
+
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
   const onExpand = (expandedKeysValue: any) => {
@@ -426,8 +440,13 @@ function Role() {
   };
 
   const onCheck = (checkedKeysValue: any) => {
-    console.log("onCheck", checkedKeysValue);
-    setCheckedKeys(checkedKeysValue);
+    if(Array.isArray(checkedKeysValue)){
+        setCheckedKeys(checkedKeysValue);
+    }else{
+        setCheckedKeys(checkedKeysValue.checked);
+    }
+
+    
   };
 
   const onSelect = (selectedKeysValue: any, info: any) => {
@@ -574,11 +593,11 @@ function Role() {
               onChange={(event) => {
                 handleCheckedTreeConnect(event, "menu");
               }}
-              defaultChecked={false}
+              checked={roleForm.menuCheckStrictly}
             >
               父子联动
             </Checkbox>
-            <Tree checkStrictly={isCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
+            <Tree checkStrictly={!roleForm.menuCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
           </Form.Item>
           <Row>
             <Col span={24}>
