@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-04 10:44:18
+ * @LastEditTime: 2021-11-04 17:18:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -11,8 +11,8 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined } from "@ant-design/icons";
 import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "../../../api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "api/system/dept";
@@ -61,6 +61,30 @@ function Role() {
   const [total, setTotal] = useState(0);
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const menu = function (row: any) {
+    return (
+      <Menu>
+        <Menu.Item
+          //   onClick={() => {
+          //     resetPassword(row);
+          //   }}
+          key="KeyOutlined"
+          icon={<KeyOutlined />}
+        >
+          数据权限
+        </Menu.Item>
+        <Menu.Item
+          //   onClick={() => {
+          //     distributionRole(row);
+          //   }}
+          key="SmileOutlined"
+          icon={<SmileOutlined />}
+        >
+          分配用户
+        </Menu.Item>
+      </Menu>
+    );
+  };
   // 表格列头对应字段
   const columns: any = [
     {
@@ -129,6 +153,13 @@ function Role() {
                 <DeleteOutlined />
                 删除
               </a>
+
+              <Dropdown overlay={menu(row)}>
+                <a>
+                  <DoubleRightOutlined />
+                  更多
+                </a>
+              </Dropdown>
             </Space>
           </>
         );
