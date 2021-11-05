@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-04 17:18:16
+ * @LastEditTime: 2021-11-05 10:22:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -53,6 +53,31 @@ function Role() {
     sys_normal_disable: [],
     menuOptions: [],
     menuOptionsAll: [],
+    deptOptions: [],
+    deptOptionsAll: [],
+    // 数据范围选项
+    dataScopeOptions: [
+      {
+        value: "1",
+        label: "全部数据权限",
+      },
+      {
+        value: "2",
+        label: "自定数据权限",
+      },
+      {
+        value: "3",
+        label: "本部门数据权限",
+      },
+      {
+        value: "4",
+        label: "本部门及以下数据权限",
+      },
+      {
+        value: "5",
+        label: "仅本人数据权限",
+      },
+    ],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -65,18 +90,18 @@ function Role() {
     return (
       <Menu>
         <Menu.Item
-          //   onClick={() => {
-          //     resetPassword(row);
-          //   }}
+          onClick={() => {
+            dataPermissions(row);
+          }}
           key="KeyOutlined"
           icon={<KeyOutlined />}
         >
           数据权限
         </Menu.Item>
         <Menu.Item
-          //   onClick={() => {
-          //     distributionRole(row);
-          //   }}
+          onClick={() => {
+            systemUser(row);
+          }}
           key="SmileOutlined"
           icon={<SmileOutlined />}
         >
@@ -204,6 +229,7 @@ function Role() {
       });
     });
     getMenuTreeselect();
+    getDeptTreeselect();
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -249,20 +275,36 @@ function Role() {
     queryFormRef.resetFields();
     onQueryFinish({});
   }
-
   /**
-   * @description: 点击增加修改事件
+   * @description: 数据权限点击事件
+   * @param {*}
+   * @return {*}
+   */
+  function dataPermissions(row: any) {
+    showModal("分配数据权限", row);
+  }
+  /**
+   * @description: 分配用户事件
+   * @param {*}
+   * @return {*}
+   */
+  function systemUser(row: any) {
+    //  跳转路由页面
+  }
+  /**
+   * @description: 点击增加、修改、分配数据权限事件
    * @param {*}
    * @return {*}
    */
   function showModal(titleName: string, row: any = { roleId: "" }) {
+    // setExpandedKeys([]);
     setVisibleTitle(titleName);
     roleFormModel.resetFields();
     setRoleForm((data: any) => {
       data.roleId = "";
       return data;
     });
-    if (titleName === "修改角色") {
+    if (titleName !== "添加角色") {
       const roleId = row.roleId || selectedRowKeys[0];
       // 调用查询详细接口
       getRole(roleId).then((response: any) => {
@@ -272,13 +314,19 @@ function Role() {
         roleFormModel.setFieldsValue({
           ...response.data,
         });
-        // setTimeout(() => {
-        const roleMenu = getRoleMenuTreeselect(roleId);
-        roleMenu.then((res) => {
-          let checkedKeys = res.checkedKeys;
-          setCheckedKeys([...checkedKeys]);
-        });
-        // }, 0);
+        if (titleName === "分配数据权限") {
+          const roleDeptTreeselect = getRoleDeptTreeselect(roleId);
+          roleDeptTreeselect.then((res) => {
+            let checkedKeys = res.checkedKeys;
+            setCheckedKeys([...checkedKeys]);
+          });
+        } else {
+          const roleMenu = getRoleMenuTreeselect(roleId);
+          roleMenu.then((res) => {
+            let checkedKeys = res.checkedKeys;
+            setCheckedKeys([...checkedKeys]);
+          });
+        }
       });
     }
     setVisible(true);
@@ -344,6 +392,8 @@ function Role() {
       });
   };
   const handleCancel = () => {
+    setExpandedKeys([]);
+    setCheckedKeys([]);
     setVisible(false);
   };
   /**
@@ -409,6 +459,11 @@ function Role() {
         setExpandedKeys([]);
       }
     } else if (type === "dept") {
+      if (value.target.checked) {
+        setExpandedKeys(dicts.deptOptionsAll);
+      } else {
+        setExpandedKeys([]);
+      }
     }
   }
   // 树权限（全选/全不选）
@@ -420,16 +475,26 @@ function Role() {
         setCheckedKeys([]);
       }
     } else if (type === "dept") {
+      if (value.target.checked) {
+        setCheckedKeys(dicts.deptOptionsAll);
+      } else {
+        setCheckedKeys([]);
+      }
     }
   }
   // 树权限（父子联动）
   function handleCheckedTreeConnect(value: CheckboxChangeEvent, type: string) {
+    console.log(type);
     if (type === "menu") {
       setRoleForm((data: any) => {
         data.menuCheckStrictly = value.target.checked;
         return { ...data };
       });
     } else if (type === "dept") {
+      setRoleForm((data: any) => {
+        data.deptCheckStrictly = value.target.checked;
+        return { ...data };
+      });
     }
   }
   /** 查询菜单树结构 */
@@ -452,11 +517,41 @@ function Role() {
       });
     });
   }
+  /** 查询部门树结构 */
+  function getDeptTreeselect() {
+    deptTreeselect().then((response) => {
+      const deptOptionsAll: any[] = [];
+      function callback(item: any) {
+        item.forEach((e: any) => {
+          if (e.children) {
+            callback(e.children);
+          }
+          deptOptionsAll.push(e.id);
+        });
+      }
+      callback(response.data);
+      setDicts((data: any) => {
+        data.deptOptionsAll = deptOptionsAll;
+        data.deptOptions = response.data;
+        return data;
+      });
+    });
+  }
   /** 根据角色ID查询菜单树结构 */
   function getRoleMenuTreeselect(roleId: string) {
     return roleMenuTreeselect(roleId).then((response: any) => {
       setDicts((data: any) => {
         data.menuOptions = response.menus;
+        return { ...data };
+      });
+      return response;
+    });
+  }
+  /** 根据角色ID查询部门树结构 */
+  function getRoleDeptTreeselect(roleId: string) {
+    return roleDeptTreeselect(roleId).then((response: any) => {
+      setDicts((data: any) => {
+        data.deptOptions = response.depts;
         return { ...data };
       });
       return response;
@@ -583,61 +678,83 @@ function Role() {
         />
       </Row>
       {/* 增加修改表单区域 */}
-      <Modal className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+      <Modal destroyOnClose className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
           <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
             <Input placeholder="请输入角色名称" />
           </Form.Item>
-          <Form.Item label="角色编码" name="roleKey" rules={[{ required: true, message: "角色编码不能为空" }]}>
-            <Input placeholder="请输入角色编码" />
+          <Form.Item label="权限字符" name="roleKey" rules={[{ required: true, message: "权限字符不能为空" }]}>
+            <Input placeholder="请输入权限字符" />
           </Form.Item>
-          <Form.Item label="角色顺序" name="roleSort" rules={[{ required: true, message: "角色顺序不能为空" }]}>
-            <InputNumber placeholder="请输入角色顺序" />
-          </Form.Item>
-          <Form.Item label="角色状态" name="status">
-            <Radio.Group>
-              {dicts.sys_normal_disable.map((dict: any) => {
-                return (
-                  <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
-                    {dict.dictLabel}
-                  </Radio>
-                );
-              })}
-            </Radio.Group>
-          </Form.Item>
-
+          {visibleTitle !== "分配数据权限" && (
+            <Form.Item label="角色顺序" name="roleSort" rules={[{ required: true, message: "角色顺序不能为空" }]}>
+              <InputNumber placeholder="请输入角色顺序" />
+            </Form.Item>
+          )}
+          {visibleTitle !== "分配数据权限" && (
+            <Form.Item label="角色状态" name="status">
+              <Radio.Group>
+                {dicts.sys_normal_disable.map((dict: any) => {
+                  return (
+                    <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
+                      {dict.dictLabel}
+                    </Radio>
+                  );
+                })}
+              </Radio.Group>
+            </Form.Item>
+          )}
+          {visibleTitle === "分配数据权限" && (
+            <Form.Item label="用户性别" name="dataScope">
+              <Select placeholder="请选择用户性别">
+                {dicts.dataScopeOptions.map((dict: any) => {
+                  return (
+                    <Option value={dict.value} key={"dataScope" + dict.label}>
+                      {dict.label}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          )}
           <Form.Item label="菜单权限">
             <Checkbox
               onChange={(event) => {
-                handleCheckedTreeExpand(event, "menu");
+                handleCheckedTreeExpand(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
               }}
             >
               展开/折叠
             </Checkbox>
             <Checkbox
               onChange={(event) => {
-                handleCheckedTreeNodeAll(event, "menu");
+                handleCheckedTreeNodeAll(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
               }}
             >
               全选/全不选
             </Checkbox>
             <Checkbox
               onChange={(event) => {
-                handleCheckedTreeConnect(event, "menu");
+                handleCheckedTreeConnect(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
               }}
-              checked={roleForm.menuCheckStrictly}
+              checked={visibleTitle === "分配数据权限" ? roleForm.deptCheckStrictly : roleForm.menuCheckStrictly}
             >
               父子联动
             </Checkbox>
-            <Tree checkStrictly={!roleForm.menuCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
+            {visibleTitle === "分配数据权限" ? (
+              <Tree checkStrictly={!roleForm.deptCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.deptOptions} />
+            ) : (
+              <Tree checkStrictly={!roleForm.menuCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
+            )}
           </Form.Item>
-          <Row>
-            <Col span={24}>
-              <Form.Item label="备注" name="remark">
-                <Input.TextArea placeholder="请输入内容" />
-              </Form.Item>
-            </Col>
-          </Row>
+          {visibleTitle !== "分配数据权限" ? (
+            <Row>
+              <Col span={24}>
+                <Form.Item label="备注" name="remark">
+                  <Input.TextArea placeholder="请输入内容" />
+                </Form.Item>
+              </Col>
+            </Row>
+          ) : null}
         </Form>
       </Modal>
     </div>
