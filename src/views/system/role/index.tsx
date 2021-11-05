@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-05 10:22:01
+ * @LastEditTime: 2021-11-05 11:11:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -199,6 +199,7 @@ function Role() {
   // 用户form字段
   const [roleForm, setRoleForm] = useState({
     roleId: "",
+    dataScope: "",
     menuCheckStrictly: true,
     deptCheckStrictly: true,
     menuIds: [],
@@ -394,6 +395,10 @@ function Role() {
   const handleCancel = () => {
     setExpandedKeys([]);
     setCheckedKeys([]);
+    setRoleForm((data) => {
+      data.dataScope = "";
+      return { ...data };
+    });
     setVisible(false);
   };
   /**
@@ -557,6 +562,13 @@ function Role() {
       return response;
     });
   }
+  function dataScopeChange(e: any) {
+    console.log(e);
+    setRoleForm((data: any) => {
+      data.dataScope = e;
+      return { ...data };
+    });
+  }
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
@@ -681,10 +693,10 @@ function Role() {
       <Modal destroyOnClose className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
           <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
-            <Input placeholder="请输入角色名称" />
+            <Input disabled={visibleTitle === "分配数据权限"} placeholder="请输入角色名称" />
           </Form.Item>
           <Form.Item label="权限字符" name="roleKey" rules={[{ required: true, message: "权限字符不能为空" }]}>
-            <Input placeholder="请输入权限字符" />
+            <Input disabled={visibleTitle === "分配数据权限"} placeholder="请输入权限字符" />
           </Form.Item>
           {visibleTitle !== "分配数据权限" && (
             <Form.Item label="角色顺序" name="roleSort" rules={[{ required: true, message: "角色顺序不能为空" }]}>
@@ -706,7 +718,7 @@ function Role() {
           )}
           {visibleTitle === "分配数据权限" && (
             <Form.Item label="用户性别" name="dataScope">
-              <Select placeholder="请选择用户性别">
+              <Select value={roleForm.dataScope} placeholder="请选择用户性别" onChange={dataScopeChange}>
                 {dicts.dataScopeOptions.map((dict: any) => {
                   return (
                     <Option value={dict.value} key={"dataScope" + dict.label}>
@@ -717,35 +729,38 @@ function Role() {
               </Select>
             </Form.Item>
           )}
-          <Form.Item label="菜单权限">
-            <Checkbox
-              onChange={(event) => {
-                handleCheckedTreeExpand(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
-              }}
-            >
-              展开/折叠
-            </Checkbox>
-            <Checkbox
-              onChange={(event) => {
-                handleCheckedTreeNodeAll(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
-              }}
-            >
-              全选/全不选
-            </Checkbox>
-            <Checkbox
-              onChange={(event) => {
-                handleCheckedTreeConnect(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
-              }}
-              checked={visibleTitle === "分配数据权限" ? roleForm.deptCheckStrictly : roleForm.menuCheckStrictly}
-            >
-              父子联动
-            </Checkbox>
-            {visibleTitle === "分配数据权限" ? (
-              <Tree checkStrictly={!roleForm.deptCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.deptOptions} />
-            ) : (
-              <Tree checkStrictly={!roleForm.menuCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
-            )}
-          </Form.Item>
+          {roleForm.dataScope !== "2" && visibleTitle === "分配数据权限" ? null : (
+            <Form.Item label="菜单权限">
+              <Checkbox
+                onChange={(event) => {
+                  handleCheckedTreeExpand(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
+                }}
+              >
+                展开/折叠
+              </Checkbox>
+              <Checkbox
+                onChange={(event) => {
+                  handleCheckedTreeNodeAll(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
+                }}
+              >
+                全选/全不选
+              </Checkbox>
+              <Checkbox
+                onChange={(event) => {
+                  handleCheckedTreeConnect(event, visibleTitle !== "分配数据权限" ? "menu" : "dept");
+                }}
+                checked={visibleTitle === "分配数据权限" ? roleForm.deptCheckStrictly : roleForm.menuCheckStrictly}
+              >
+                父子联动
+              </Checkbox>
+              {visibleTitle === "分配数据权限" ? (
+                <Tree checkStrictly={!roleForm.deptCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.deptOptions} />
+              ) : (
+                <Tree checkStrictly={!roleForm.menuCheckStrictly} fieldNames={{ title: "label", key: "id", children: "children" }} checkable onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} onCheck={onCheck} checkedKeys={checkedKeys} onSelect={onSelect} selectedKeys={selectedKeys} treeData={dicts.menuOptions} />
+              )}
+            </Form.Item>
+          )}
+
           {visibleTitle !== "分配数据权限" ? (
             <Row>
               <Col span={24}>
