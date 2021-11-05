@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-05 11:15:43
+ * @LastEditTime: 2021-11-05 11:46:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -27,7 +27,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Role() {
+function Role(props:any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -291,6 +291,7 @@ function Role() {
    */
   function systemUser(row: any) {
     //  跳转路由页面
+    props.history.push("/index");
   }
   /**
    * @description: 点击增加、修改、分配数据权限事件
@@ -389,7 +390,7 @@ function Role() {
             });
           }
         } else {
-          dataScope({ ...roleForm, ...roleFormModel.getFieldsValue(), deptIds: checkedKeys }).then( ()=> {
+          dataScope({ ...roleForm, ...roleFormModel.getFieldsValue(), deptIds: checkedKeys }).then(() => {
             message.success("修改成功");
             setVisible(false);
             getList();
