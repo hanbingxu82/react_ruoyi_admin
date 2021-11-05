@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-05 11:11:08
+ * @LastEditTime: 2021-11-05 11:15:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -373,17 +373,25 @@ function Role() {
     roleFormModel
       .validateFields()
       .then((values) => {
-        if (roleForm.roleId !== "") {
-          updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
+        if (visibleTitle !== "分配数据权限") {
+          if (roleForm.roleId !== "") {
+            updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
+              message.success("修改成功");
+              setVisible(false);
+              getList();
+            });
+          } else {
+            addRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
+              message.success("增加成功");
+              setVisible(false);
+              // setConfirmLoading(false);
+              getList();
+            });
+          }
+        } else {
+          dataScope({ ...roleForm, ...roleFormModel.getFieldsValue(), deptIds: checkedKeys }).then( ()=> {
             message.success("修改成功");
             setVisible(false);
-            getList();
-          });
-        } else {
-          addRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
-            message.success("增加成功");
-            setVisible(false);
-            // setConfirmLoading(false);
             getList();
           });
         }
