@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-05 11:46:03
+ * @LastEditTime: 2021-11-05 14:12:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -291,7 +291,7 @@ function Role(props:any) {
    */
   function systemUser(row: any) {
     //  跳转路由页面
-    props.history.push("/index");
+    props.history.push("/system/role-auth/"+row.roleId);
   }
   /**
    * @description: 点击增加、修改、分配数据权限事件
@@ -602,7 +602,7 @@ function Role(props:any) {
     setSelectedKeys(selectedKeysValue);
   };
   return (
-    <div className="Post">
+    <div className="Role">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">

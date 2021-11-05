@@ -21,6 +21,7 @@ import OperLog from "views/system/log/operlog";
 import LoginInfor from "views/system/log/logininfor";
 import Dict from 'views/system/dict'
 import DictData from 'views/system/dict/data'
+import AuthUser from 'views/system/role/authUser'
 
 // import Details from '../views/Details/Details';
 // import Details from '../views/Details/Details'
@@ -125,6 +126,11 @@ const subRouters = [
     path: "/system/dict-data/:id",
     exact: true,
     component: DictData,
+  },
+  {
+    path: "/system/role-auth/:id",
+    exact: true,
+    component: AuthUser,
   },
 ];
 const threeRouters = [];
