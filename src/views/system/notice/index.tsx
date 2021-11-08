@@ -51,7 +51,7 @@ function Notice() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns = [
+  const columns:any = [
     {
       title: "公告标题",
       dataIndex: "noticeTitle",
@@ -76,6 +76,7 @@ function Notice() {
     },
     {
       title: "操作",
+      align:'center',
       // dataIndex: "address",
       render: (text: any, row: any) => {
         return (

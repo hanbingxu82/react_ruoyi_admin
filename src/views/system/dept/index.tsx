@@ -72,6 +72,7 @@ function Dept() {
     },
     {
       title: "操作",
+      align:'center',
       render: (text: any, row: any) => {
         return (
           <>

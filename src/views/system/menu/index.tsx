@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-08 11:22:46
+ * @LastEditTime: 2021-11-08 16:41:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -9,15 +9,16 @@
 import { useState, useEffect, useRef } from "react";
 import "./index.less";
 
-import HeaderBar from "../../../compoents/HeaderBar";
+import HeaderBar from "compoents/HeaderBar";
 
 import { TreeSelect, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from "../../../api/system/dept";
-import { selectDictLabel } from "../../../utils/ruoyi";
-import { getDicts } from "../../../api/global";
-import { handleTree } from "../../../utils/ruoyi";
-// import RuoYiPagination from "../../../compoents/RuoYiPagination";
+import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "api/system/menu";
+import { selectDictLabel } from "utils/ruoyi";
+import { getDicts } from "api/global";
+import { handleTree } from "utils/ruoyi";
+import SvgIcon from "compoents/SvgIcon";
+// import RuoYiPagination from "compoents/RuoYiPagination";
 
 const { confirm } = Modal;
 const { Option } = Select;
@@ -50,18 +51,49 @@ function Menu() {
   // 表格列头对应字段
   const columns: any = [
     {
-      title: "部门名称",
+      title: "菜单名称",
       // align: "center",
-      dataIndex: "deptName",
+      dataIndex: "menuName",
+    },
+    {
+      title: "图标",
+      align: "center",
+      width:80,
+      dataIndex: "icon",
+      render: (text: any, row: any) => {
+        console.log(text);
+        return (
+          <>
+            <SvgIcon iconClass={text}></SvgIcon>
+          </>
+        );
+      },
     },
     {
       title: "排序",
       align: "center",
+      width:80,
       dataIndex: "orderNum",
+    },
+    {
+      title: "权限标识",
+      
+      align: "center",
+ 
+      dataIndex: "perms",
+      ellipsis: true,
+    },
+    {
+      title: "组件路径",
+      align: "center",
+
+      dataIndex: "component",
+      ellipsis: true,
     },
     {
       title: "状态",
       align: "center",
+      width:120,
       dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
@@ -72,6 +104,7 @@ function Menu() {
     },
     {
       title: "操作",
+      align:'center',
       render: (text: any, row: any) => {
         return (
           <>
@@ -113,15 +146,15 @@ function Menu() {
   const [confirmLoading] = useState(false);
   // 用户form字段
   const [deptForm, setDeptForm] = useState({
-    deptId: "",
+    menuId: "",
     parentId: "",
   });
-    // 监听副作用
-    useEffect(() => {
-      if (initComponent.current) return;
-      // 监听queryParams变化
-      getList();
-    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 监听副作用
+  useEffect(() => {
+    if (initComponent.current) return;
+    // 监听queryParams变化
+    getList();
+  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -145,9 +178,9 @@ function Menu() {
    */
   function getList() {
     setGetLoading(true);
-    listDept({ ...queryForm }).then((res: any) => {
+    listMenu({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
-      setTableData(handleTree(res.data, "deptId"));
+      setTableData(handleTree(res.data, "menuId"));
       //   setTotal(res.total);
     });
   }
@@ -185,34 +218,31 @@ function Menu() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { deptId: "" }) {
+  function showModal(titleName: string, row: any = { menuId: "" }) {
     setVisibleTitle(titleName);
     deptFormModel.resetFields();
     setDeptForm(() => {
       return {
-        deptId: "",
+        menuId: "",
         parentId: "",
       };
     });
-    const deptId = row.deptId;
+    const menuId = row.menuId;
     if (titleName === "修改部门") {
       // 调用查询详细接口
-      getDept(deptId).then((response: any) => {
+      getMenu(menuId).then((response: any) => {
         setDeptForm({ ...response.data });
         deptFormModel.setFieldsValue({
           ...response.data,
         });
       });
-      listDeptExcludeChild(row.deptId).then((response) => {
-        setDicts({ ...dicts, deptOptions: handleTree(response.data, "deptId") });
-      });
     } else {
       deptFormModel.setFieldsValue({
-        parentId: deptId,
+        parentId: menuId,
       });
-      listDept().then((response) => {
-        setDicts({ ...dicts, deptOptions: handleTree(response.data, "deptId") });
-      });
+      //   listMenu().then((response) => {
+      //     setDicts({ ...dicts, deptOptions: handleTree(response.data, "menuId") });
+      //   });
     }
     setVisible(true);
   }
@@ -227,15 +257,15 @@ function Menu() {
       .validateFields()
       .then((values) => {
         console.log(values);
-        if (deptForm.deptId !== "") {
-          updateDept({ ...deptForm, ...deptFormModel.getFieldsValue() }).then(() => {
+        if (deptForm.menuId !== "") {
+          updateMenu({ ...deptForm, ...deptFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addDept({ ...deptFormModel.getFieldsValue() }).then(() => {
+          addMenu({ ...deptFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -255,15 +285,15 @@ function Menu() {
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { deptId: "" }) => {
-    const deptIds = row.deptId;
+  const delData = (row: any = { menuId: "" }) => {
+    const menuIds = row.menuId;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delDept(deptIds).then(() => {
+        delMenu(menuIds).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -286,13 +316,13 @@ function Menu() {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="部门名称" name="deptName">
-                <Input placeholder="请输入部门名称" />
+              <Form.Item label="菜单名称" name="deptName">
+                <Input placeholder="请输入菜单名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="状态" name="status">
-                <Select placeholder="请选择状态" allowClear>
+              <Form.Item label="菜单状态" name="status">
+                <Select placeholder="请选择菜单状态" allowClear>
                   <Option value="0">正常</Option>
                   <Option value="1">停用</Option>
                 </Select>
@@ -338,7 +368,7 @@ function Menu() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        {<Table key={new Date().getTime()} defaultExpandAllRows dataSource={tableData} style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.deptId} columns={columns} />}
+        {<Table key={new Date().getTime()} defaultExpandAllRows dataSource={tableData} style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.menuId} columns={columns} />}
         {/* <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -353,7 +383,7 @@ function Menu() {
             <Row>
               <Col span={24}>
                 <Form.Item label="上级部门" name="parentId" rules={[{ required: true, message: "上级部门不能为空" }]}>
-                  <TreeSelect placeholder="请选择上级部门" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "deptId", children: "children" }} onChange={onSelectTreeChange} value={deptForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
+                  <TreeSelect placeholder="请选择上级部门" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={deptForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
                 </Form.Item>
               </Col>
             </Row>
@@ -361,8 +391,8 @@ function Menu() {
 
           <Row>
             <Col span={12}>
-              <Form.Item label="部门名称" name="deptName" rules={[{ required: true, message: "部门名称不能为空" }]}>
-                <Input placeholder="请输入部门名称" />
+              <Form.Item label="菜单名称" name="deptName" rules={[{ required: true, message: "菜单名称不能为空" }]}>
+                <Input placeholder="请输入菜单名称" />
               </Form.Item>
             </Col>
             <Col span={12}>

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:19
- * @LastEditTime: 2021-11-01 14:45:25
+ * @LastEditTime: 2021-11-08 16:41:49
  * @LastEditors: Please set LastEditors
  * @Description: 操作日志
  * @FilePath: /use-hooks/src/views/system/log/operlog/index.tsx
@@ -110,7 +110,7 @@ dataIndex: "operTime",
     },
     {
       title: "操作",
-      // align:'center',
+      align:'center',
 dataIndex: "address",
       render: (text: any, row: any) => {
         return (

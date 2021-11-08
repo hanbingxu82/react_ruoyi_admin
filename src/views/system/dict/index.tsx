@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:12
- * @LastEditTime: 2021-11-05 11:45:10
+ * @LastEditTime: 2021-11-08 16:41:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/type.tsx
@@ -101,7 +101,7 @@ function Dict() {
     },
     {
       title: "操作",
-      // align:'center',
+      align:'center',
       dataIndex: "address",
       render: (text: any, row: any) => {
         return (

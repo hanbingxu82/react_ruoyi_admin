@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-10-13 09:00:49
+ * @LastEditTime: 2021-11-08 16:12:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/index.tsx
@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/es/locale/zh_CN";
 import "moment/locale/zh-cn";
+import 'assets/icons/index'
 
 // 引入 redux
 import store from "./store";

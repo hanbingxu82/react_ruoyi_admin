@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-28 10:00:34
- * @LastEditTime: 2021-11-01 14:44:38
+ * @LastEditTime: 2021-11-08 16:41:34
  * @LastEditors: Please set LastEditors
  * @Description: 参数设置
  * @FilePath: /use-hooks/src/views/system/config/index.tsx
@@ -100,7 +100,7 @@ function Config() {
     },
     {
       title: "操作",
-      // align:'center',
+      align:'center',
       dataIndex: "address",
       render: (text: any, row: any) => {
         return (

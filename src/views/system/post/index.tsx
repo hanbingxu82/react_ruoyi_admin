@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-11-01 16:05:19
+ * @LastEditTime: 2021-11-08 16:41:57
  * @LastEditors: Please set LastEditors
  * @Description: 岗位管理页面
  * @FilePath: /use-hooks/src/views/system/post/index.tsx
@@ -84,7 +84,7 @@ dataIndex: "createTime",
     },
     {
       title: "操作",
-      // align:'center',
+      align:'center',
 dataIndex: "address",
       render: (text: any, row: any) => {
         return (
