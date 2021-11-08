@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-25 13:47:29
- * @LastEditTime: 2021-11-01 14:45:34
+ * @LastEditTime: 2021-11-08 10:45:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/notice/index.tsx
@@ -275,7 +275,7 @@ function Notice() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Post">
+    <div className="Notice">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">

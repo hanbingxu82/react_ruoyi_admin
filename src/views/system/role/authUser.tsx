@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-05 11:47:51
- * @LastEditTime: 2021-11-05 15:43:22
+ * @LastEditTime: 2021-11-08 10:44:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/authUser.tsx
@@ -22,7 +22,7 @@ import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
 const { confirm } = Modal;
 const { Option } = Select;
-function Data(props: any) {
+function AuthUser(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -352,7 +352,7 @@ function Data(props: any) {
     onChange: onSelectChangeUser,
   };
   return (
-    <div className="Data">
+    <div className="AuthUser">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
@@ -467,4 +467,4 @@ function Data(props: any) {
     </div>
   );
 }
-export default Data;
+export default AuthUser;
