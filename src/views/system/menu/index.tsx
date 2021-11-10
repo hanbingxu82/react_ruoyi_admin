@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-08 16:41:17
+ * @LastEditTime: 2021-11-09 10:53:27
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -58,10 +58,9 @@ function Menu() {
     {
       title: "图标",
       align: "center",
-      width:80,
+      width: 80,
       dataIndex: "icon",
       render: (text: any, row: any) => {
-        console.log(text);
         return (
           <>
             <SvgIcon iconClass={text}></SvgIcon>
@@ -72,14 +71,14 @@ function Menu() {
     {
       title: "排序",
       align: "center",
-      width:80,
+      width: 80,
       dataIndex: "orderNum",
     },
     {
       title: "权限标识",
-      
+
       align: "center",
- 
+
       dataIndex: "perms",
       ellipsis: true,
     },
@@ -93,7 +92,7 @@ function Menu() {
     {
       title: "状态",
       align: "center",
-      width:120,
+      width: 120,
       dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
@@ -104,7 +103,7 @@ function Menu() {
     },
     {
       title: "操作",
-      align:'center',
+      align: "center",
       render: (text: any, row: any) => {
         return (
           <>
@@ -151,6 +150,7 @@ function Menu() {
   });
   // 监听副作用
   useEffect(() => {
+    console.log(setGetLoading);
     if (initComponent.current) return;
     // 监听queryParams变化
     getList();
@@ -379,16 +379,16 @@ function Menu() {
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Form form={deptFormModel} name="deptFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", deptSort: 0 }} autoComplete="off">
-          {deptForm.parentId > "0" || deptForm.parentId === "" ? (
-            <Row>
-              <Col span={24}>
-                <Form.Item label="上级部门" name="parentId" rules={[{ required: true, message: "上级部门不能为空" }]}>
-                  <TreeSelect placeholder="请选择上级部门" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={deptForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
-                </Form.Item>
-              </Col>
-            </Row>
-          ) : null}
-
+          <Form.Item label="上级菜单" name="parentId" rules={[{ required: true, message: "上级菜单不能为空" }]}>
+            <TreeSelect placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={deptForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
+          </Form.Item>
+          <Form.Item label="菜单类型" name="status">
+            <Radio.Group>
+              <Radio value="M">目录</Radio>
+              <Radio value="C">菜单</Radio>
+              <Radio value="F">按钮</Radio>
+            </Radio.Group>
+          </Form.Item>
           <Row>
             <Col span={12}>
               <Form.Item label="菜单名称" name="deptName" rules={[{ required: true, message: "菜单名称不能为空" }]}>
