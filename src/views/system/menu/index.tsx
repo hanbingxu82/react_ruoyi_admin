@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-10 15:09:43
+ * @LastEditTime: 2021-11-10 16:57:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -34,7 +34,7 @@ function Menu() {
   const [queryForm, setQueryForm] = useState({
     // pageNum: 1,
     // pageSize: 10,
-    deptName: "",
+    menuName: "",
     status: "",
   });
   const [queryFormRef] = Form.useForm();
@@ -42,7 +42,7 @@ function Menu() {
   // 字典列表
   const [dicts, setDicts] = useState({
     sys_normal_disable: [],
-    deptOptions: [],
+    menuOptions: [],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -149,7 +149,7 @@ function Menu() {
     icon: "",
     menuId: "",
     menuType: "M",
-    parentId: "",
+    parentId: 0,
   });
   // 监听副作用
   useEffect(() => {
@@ -193,7 +193,7 @@ function Menu() {
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.deptName = form.deptName;
+      data.menuName = form.menuName;
       data.status = form.status;
       // if (form.time) {
       //   data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
@@ -220,7 +220,7 @@ function Menu() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { menuId: "" }) {
+  function showModal(titleName: string, row: any = { menuId: 0 }) {
     setVisibleTitle(titleName);
     menuFormModel.resetFields();
     setMenuForm(() => {
@@ -228,7 +228,7 @@ function Menu() {
         icon: "",
         menuId: "",
         menuType: "M",
-        parentId: "",
+        parentId: 0
       };
     });
     const menuId = row.menuId;
@@ -244,9 +244,13 @@ function Menu() {
       menuFormModel.setFieldsValue({
         parentId: menuId,
       });
-      //   listMenu().then((response) => {
-      //     setDicts({ ...dicts, deptOptions: handleTree(response.data, "menuId") });
-      //   });
+      listMenu({}).then((response) => {
+        const menuOptions: any = [];
+        const menu: any = { menuId: 0, menuName: "主类目", children: [] };
+        menu.children = handleTree(response.data, "menuId");
+        menuOptions.push(menu);
+        setDicts({ ...dicts, menuOptions });
+      });
     }
     setVisible(true);
   }
@@ -307,7 +311,7 @@ function Menu() {
       },
     });
   };
-  function onSelectTreeChange(value: string) {
+  function onSelectTreeChange(value: number) {
     setMenuForm((data) => {
       data.parentId = value;
       return { ...data };
@@ -335,7 +339,7 @@ function Menu() {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="菜单名称" name="deptName">
+              <Form.Item label="菜单名称" name="menuName">
                 <Input placeholder="请输入菜单名称" />
               </Form.Item>
             </Col>
@@ -397,9 +401,9 @@ function Menu() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={menuFormModel} name="menuFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ menuType: "M", status: "0", deptSort: 0 }} autoComplete="off">
+        <Form form={menuFormModel} name="menuFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ parentId: 0, menuType: "M", status: "0", deptSort: 0 ,isFrame:'1',visible:'0',isCache:'0'}} autoComplete="off">
           <Form.Item label="上级菜单" name="parentId" rules={[{ required: true, message: "上级菜单不能为空" }]}>
-            <TreeSelect placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={menuForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
+            <TreeSelect value={menuForm.parentId} placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "menuName", value: "menuId", children: "children" }} onChange={onSelectTreeChange}  dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.menuOptions} />
           </Form.Item>
           <Form.Item label="菜单类型" name="menuType">
             <Radio.Group onChange={menuTypeChange}>
