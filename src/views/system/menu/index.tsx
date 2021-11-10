@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-09 10:53:27
+ * @LastEditTime: 2021-11-10 15:09:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -11,13 +11,14 @@ import "./index.less";
 
 import HeaderBar from "compoents/HeaderBar";
 
-import { TreeSelect, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
+import { Popover, TreeSelect, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "api/system/menu";
 import { selectDictLabel } from "utils/ruoyi";
 import { getDicts } from "api/global";
 import { handleTree } from "utils/ruoyi";
 import SvgIcon from "compoents/SvgIcon";
+import IconSelect from "compoents/IconSelect";
 // import RuoYiPagination from "compoents/RuoYiPagination";
 
 const { confirm } = Modal;
@@ -139,18 +140,19 @@ function Menu() {
     },
   ];
   // 表单弹窗
-  const [deptFormModel] = Form.useForm();
+  const [menuFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [visibleTitle, setVisibleTitle] = useState("添加部门");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [deptForm, setDeptForm] = useState({
+  const [menuForm, setMenuForm] = useState({
+    icon: "",
     menuId: "",
+    menuType: "M",
     parentId: "",
   });
   // 监听副作用
   useEffect(() => {
-    console.log(setGetLoading);
     if (initComponent.current) return;
     // 监听queryParams变化
     getList();
@@ -220,10 +222,12 @@ function Menu() {
    */
   function showModal(titleName: string, row: any = { menuId: "" }) {
     setVisibleTitle(titleName);
-    deptFormModel.resetFields();
-    setDeptForm(() => {
+    menuFormModel.resetFields();
+    setMenuForm(() => {
       return {
+        icon: "",
         menuId: "",
+        menuType: "M",
         parentId: "",
       };
     });
@@ -231,13 +235,13 @@ function Menu() {
     if (titleName === "修改部门") {
       // 调用查询详细接口
       getMenu(menuId).then((response: any) => {
-        setDeptForm({ ...response.data });
-        deptFormModel.setFieldsValue({
+        setMenuForm({ ...response.data });
+        menuFormModel.setFieldsValue({
           ...response.data,
         });
       });
     } else {
-      deptFormModel.setFieldsValue({
+      menuFormModel.setFieldsValue({
         parentId: menuId,
       });
       //   listMenu().then((response) => {
@@ -253,19 +257,19 @@ function Menu() {
    */
   const handleOk = () => {
     // form 表单内容
-    deptFormModel
+    menuFormModel
       .validateFields()
       .then((values) => {
         console.log(values);
-        if (deptForm.menuId !== "") {
-          updateMenu({ ...deptForm, ...deptFormModel.getFieldsValue() }).then(() => {
+        if (menuForm.menuId !== "") {
+          updateMenu({ ...menuForm, ...menuFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addMenu({ ...deptFormModel.getFieldsValue() }).then(() => {
+          addMenu({ ...menuFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -304,8 +308,23 @@ function Menu() {
     });
   };
   function onSelectTreeChange(value: string) {
-    setDeptForm((data) => {
+    setMenuForm((data) => {
       data.parentId = value;
+      return { ...data };
+    });
+  }
+  function selected(name: string) {
+    const obj = menuFormModel.getFieldsValue();
+    obj.icon = name;
+    menuFormModel.setFieldsValue({ ...obj });
+    setMenuForm((data) => {
+      data.icon = name;
+      return { ...data };
+    });
+  }
+  function menuTypeChange(e: any) {
+    setMenuForm((data: any) => {
+      data.menuType = e.target.value;
       return { ...data };
     });
   }
@@ -378,20 +397,28 @@ function Menu() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={deptFormModel} name="deptFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", deptSort: 0 }} autoComplete="off">
+        <Form form={menuFormModel} name="menuFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ menuType: "M", status: "0", deptSort: 0 }} autoComplete="off">
           <Form.Item label="上级菜单" name="parentId" rules={[{ required: true, message: "上级菜单不能为空" }]}>
-            <TreeSelect placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={deptForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
+            <TreeSelect placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "deptName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} value={menuForm.parentId} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.deptOptions} treeDefaultExpandAll />
           </Form.Item>
-          <Form.Item label="菜单类型" name="status">
-            <Radio.Group>
+          <Form.Item label="菜单类型" name="menuType">
+            <Radio.Group onChange={menuTypeChange}>
               <Radio value="M">目录</Radio>
               <Radio value="C">菜单</Radio>
               <Radio value="F">按钮</Radio>
             </Radio.Group>
           </Form.Item>
+          {menuForm.menuType !== "F" ? (
+            <Form.Item label="菜单类型" name="icon">
+              <Popover placement="bottom" content={<IconSelect selected={selected} />} trigger="click">
+                <Input value={menuForm.icon} readOnly placeholder="请输入菜单名称" suffix={menuForm.icon ? <SvgIcon iconClass={menuForm.icon} style={{ height: "32px", width: "16px" }} /> : null} />
+              </Popover>
+            </Form.Item>
+          ) : null}
+
           <Row>
             <Col span={12}>
-              <Form.Item label="菜单名称" name="deptName" rules={[{ required: true, message: "菜单名称不能为空" }]}>
+              <Form.Item label="菜单名称" name="menuName" rules={[{ required: true, message: "菜单名称不能为空" }]}>
                 <Input placeholder="请输入菜单名称" />
               </Form.Item>
             </Col>
@@ -402,36 +429,75 @@ function Menu() {
             </Col>
           </Row>
           <Row>
-            <Col span={12}>
-              <Form.Item label="负责人" name="leader">
-                <Input placeholder="请输入负责人" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="联系电话" name="phone">
-                <Input placeholder="请输入联系电话" />
-              </Form.Item>
-            </Col>
+            {menuForm.menuType !== "F" ? (
+              <Col span={12}>
+                <Form.Item label="是否外链" name="isFrame">
+                  <Radio.Group>
+                    <Radio value="0">是</Radio>
+                    <Radio value="1">否</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : null}
+            {menuForm.menuType !== "F" ? (
+              <Col span={12}>
+                <Form.Item label="路由地址" name="path">
+                  <Input placeholder="请输入路由地址" />
+                </Form.Item>
+              </Col>
+            ) : null}
           </Row>
           <Row>
-            <Col span={12}>
-              <Form.Item label="邮箱" name="email">
-                <Input placeholder="请输入邮箱" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="部门状态" name="status">
-                <Radio.Group>
-                  {dicts.sys_normal_disable.map((dict: any) => {
-                    return (
-                      <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
-                        {dict.dictLabel}
-                      </Radio>
-                    );
-                  })}
-                </Radio.Group>
-              </Form.Item>
-            </Col>
+            {menuForm.menuType !== "M" ? (
+              <Col span={12}>
+                <Form.Item label="权限字符" name="perms">
+                  <Input placeholder="请输入权限字符" />
+                </Form.Item>
+              </Col>
+            ) : null}
+            {menuForm.menuType === "C" ? (
+              <Col span={12}>
+                <Form.Item label="组件路径" name="component">
+                  <Input placeholder="请输入组件路径" />
+                </Form.Item>
+              </Col>
+            ) : null}
+          </Row>
+
+          <Row>
+            {menuForm.menuType !== "F" ? (
+              <Col span={12}>
+                <Form.Item label="显示状态" name="visible">
+                  <Radio.Group>
+                    <Radio value="0">显示</Radio>
+                    <Radio value="1">隐藏</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : null}
+            {menuForm.menuType !== "F" ? (
+              <Col span={12}>
+                <Form.Item label="菜单状态" name="status">
+                  <Radio.Group>
+                    <Radio value="0">正常</Radio>
+                    <Radio value="1">停用</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : null}
+          </Row>
+
+          <Row>
+            {menuForm.menuType === "C" ? (
+              <Col span={12}>
+                <Form.Item label="是否缓存" name="isCache">
+                  <Radio.Group>
+                    <Radio value="0">是</Radio>
+                    <Radio value="1">否</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : null}
           </Row>
         </Form>
       </Modal>
