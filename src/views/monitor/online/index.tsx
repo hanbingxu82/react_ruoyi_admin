@@ -1,10 +1,10 @@
 /*
  * @Author: your name
- * @Date: 2021-10-15 13:49:40
- * @LastEditTime: 2021-11-11 11:30:52
+ * @Date: 2021-11-11 11:26:30
+ * @LastEditTime: 2021-11-11 11:31:05
  * @LastEditors: Please set LastEditors
- * @Description: 岗位管理页面
- * @FilePath: /use-hooks/src/views/system/post/index.tsx
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: /use-hooks/src/views/monitor/online/index.tsx
  */
 import { useState, useEffect, useRef } from "react";
 import "./index.less";
@@ -21,7 +21,7 @@ import RuoYiPagination from "../../../compoents/RuoYiPagination";
 
 const { confirm } = Modal;
 const { Option } = Select;
-function Post() {
+function Online() {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -424,4 +424,4 @@ function Post() {
     </div>
   );
 }
-export default Post;
+export default Online;
