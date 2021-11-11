@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 15:36:41
- * @LastEditTime: 2021-11-08 15:57:21
+ * @LastEditTime: 2021-11-11 16:43:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/compoents/SvgIcon/index.tsx
@@ -34,7 +34,7 @@ function SvgIcon(props: any) {
     };
   }
   return (
-    <div className="SvgIcon">
+    <div style={props.style} className="SvgIcon">
       {isExternals() ? (
         <div style={styleExternalIcon()} className="svg-external-icon svg-icon" />
       ) : (
