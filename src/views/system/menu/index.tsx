@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-10 16:57:52
+ * @LastEditTime: 2021-11-11 10:16:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 import HeaderBar from "compoents/HeaderBar";
 
 import { Popover, TreeSelect, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, PicCenterOutlined } from "@ant-design/icons";
 import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "api/system/menu";
 import { selectDictLabel } from "utils/ruoyi";
 import { getDicts } from "api/global";
@@ -48,6 +48,8 @@ function Menu() {
   const [getLoading, setGetLoading] = useState(false);
   // 表格数据
   const [tableData, setTableData] = useState([]);
+  const [tableKey, setTableKey] = useState(0);
+  const [defaultExpandAllRows, setDefaultExpandAllRows] = useState(false);
   //   const [total, setTotal] = useState(0);
   // 表格列头对应字段
   const columns: any = [
@@ -183,6 +185,9 @@ function Menu() {
     listMenu({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(handleTree(res.data, "menuId"));
+      setTableKey(() => {
+        return tableKey + 1;
+      });
       //   setTotal(res.total);
     });
   }
@@ -223,12 +228,13 @@ function Menu() {
   function showModal(titleName: string, row: any = { menuId: 0 }) {
     setVisibleTitle(titleName);
     menuFormModel.resetFields();
+    debugger;
     setMenuForm(() => {
       return {
         icon: "",
         menuId: "",
         menuType: "M",
-        parentId: 0
+        parentId: 0,
       };
     });
     const menuId = row.menuId;
@@ -377,6 +383,17 @@ function Menu() {
             新增
           </Button>
         </Col>
+        <Col style={{ marginRight: 20 }}>
+          <Button
+            icon={<PicCenterOutlined />}
+            onClick={() => {
+              getList()
+              setDefaultExpandAllRows(!defaultExpandAllRows);
+            }}
+          >
+            展开 / 收起
+          </Button>
+        </Col>
 
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
@@ -391,7 +408,7 @@ function Menu() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        {<Table key={new Date().getTime()} defaultExpandAllRows dataSource={tableData} style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.menuId} columns={columns} />}
+        {<Table key={"table" + tableKey} defaultExpandAllRows={defaultExpandAllRows} dataSource={tableData} style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.menuId} columns={columns} />}
         {/* <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
@@ -401,9 +418,9 @@ function Menu() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={menuFormModel} name="menuFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ parentId: 0, menuType: "M", status: "0", deptSort: 0 ,isFrame:'1',visible:'0',isCache:'0'}} autoComplete="off">
+        <Form form={menuFormModel} name="menuFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ parentId: 0, menuType: "M", status: "0", deptSort: 0, isFrame: "1", visible: "0", isCache: "0" }} autoComplete="off">
           <Form.Item label="上级菜单" name="parentId" rules={[{ required: true, message: "上级菜单不能为空" }]}>
-            <TreeSelect value={menuForm.parentId} placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "menuName", value: "menuId", children: "children" }} onChange={onSelectTreeChange}  dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.menuOptions} />
+            <TreeSelect value={menuForm.parentId} placeholder="请选择上级菜单" style={{ width: "100%" }} fieldNames={{ label: "menuName", value: "menuId", children: "children" }} onChange={onSelectTreeChange} dropdownStyle={{ maxHeight: 400, overflow: "auto" }} treeData={dicts.menuOptions} />
           </Form.Item>
           <Form.Item label="菜单类型" name="menuType">
             <Radio.Group onChange={menuTypeChange}>
@@ -445,7 +462,7 @@ function Menu() {
             ) : null}
             {menuForm.menuType !== "F" ? (
               <Col span={12}>
-                <Form.Item label="路由地址" name="path">
+                <Form.Item label="路由地址" name="path" rules={[{ required: true, message: "路由地址不能为空" }]}>
                   <Input placeholder="请输入路由地址" />
                 </Form.Item>
               </Col>
