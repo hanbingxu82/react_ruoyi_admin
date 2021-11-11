@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-08 11:38:58
+ * @LastEditTime: 2021-11-11 16:57:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
 import routers from "../../router";
@@ -16,16 +16,20 @@ import { connect } from "react-redux";
 //从redux中引入一个方法用于将actionCreators中的方法进行绑定 就是用  dispatch({actions暴露方法})
 import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
+import SvgIcon from "compoents/SvgIcon";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
+  useEffect(() => {
+    props.getMenu();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [collapsed, setCollapsed] = useState(false);
   // 变换展开模式
   const toggle = () => {
     setCollapsed(!collapsed);
   };
-
   /**
    * @description: 退出方法
    * @param {*} void
@@ -65,7 +69,45 @@ function App(props: any) {
                 首页
               </NavLink>
             </Menu.Item>
-            <SubMenu key="sub2" icon={<SettingOutlined />} title="系统管理">
+            {props.sidebarRoutes.map((item: any) => {
+              if (!item.hidden) {
+                return (
+                  <SubMenu key={item.path} title={item.meta.title} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
+                    {item.children.map((e: any) => {
+                      if (!e.hidden) {
+                        if (e.children) {
+                          return (
+                            <SubMenu key={e.path} title={e.meta.title}>
+                              {e.children.map((i: any) => {
+                                return (
+                                  <Menu.Item key={i.path}>
+                                    <NavLink style={{ textDecoration: "none" }} to={item.path + "/" + e.path + "/" + i.path}>
+                                      {i.meta.title}
+                                    </NavLink>
+                                  </Menu.Item>
+                                );
+                              })}
+                            </SubMenu>
+                          );
+                        } else {
+                          return (
+                            <Menu.Item key={e.path}>
+                              <NavLink style={{ textDecoration: "none" }} to={item.path + "/" + e.path}>
+                                {e.meta.title}
+                              </NavLink>
+                            </Menu.Item>
+                          );
+                        }
+                      }
+                      return null;
+                    })}
+                  </SubMenu>
+                );
+              }
+              return null;
+            })}
+
+            {/* <SubMenu key="sub2" icon={<SettingOutlined />} title="系统管理">
               <Menu.Item key="2">
                 <NavLink style={{ textDecoration: "none" }} to="/system/user">
                   用户管理
@@ -118,7 +160,7 @@ function App(props: any) {
                   </NavLink>
                 </Menu.Item>
               </SubMenu>
-            </SubMenu>
+            </SubMenu> */}
           </Menu>
         </Sider>
         <Layout className="site-layout">
