@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-11 16:57:52
+ * @LastEditTime: 2021-11-12 09:14:50
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -9,6 +9,7 @@
 import "./App.less";
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
+import HeaderScroll from "compoents/HeaderScroll";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
@@ -165,18 +166,21 @@ function App(props: any) {
         </Sider>
         <Layout className="site-layout">
           <Header className="site-layout-background" style={{ padding: 0 }}>
-            {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-              className: "trigger",
-              onClick: toggle,
-            })}
-            <div className="rightheader">
-              <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
-                <div>
-                  <Avatar shape="square" icon={<UserOutlined />} />
-                  <CaretDownOutlined className="righticondown" />
-                </div>
-              </Dropdown>
+            <div>
+              {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                className: "trigger",
+                onClick: toggle,
+              })}
+              <div className="rightheader">
+                <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
+                  <div>
+                    <Avatar shape="square" icon={<UserOutlined />} />
+                    <CaretDownOutlined className="righticondown" />
+                  </div>
+                </Dropdown>
+              </div>
             </div>
+            <HeaderScroll></HeaderScroll>
           </Header>
           <Content
             className="site-layout-background"
