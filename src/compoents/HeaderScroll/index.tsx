@@ -1,13 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-11-12 09:38:30
+ * @LastEditTime: 2021-11-13 15:32:38
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
  */
 import React, { useState, useEffect, useRef } from "react";
 import { Tabs, Button } from "antd";
+import "./index.less";
 
 const { TabPane } = Tabs;
 function HeaderScroll() {
@@ -22,7 +23,7 @@ function HeaderScroll() {
   // 类似于 componentDidMount 和 componentDidUpdate:
   useEffect(() => {
     setActiveKey(panes[0].key);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const onChange = (activeKey: any) => {
     setActiveKey(activeKey);
   };
@@ -71,15 +72,13 @@ function HeaderScroll() {
     });
   }
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
+    <div className="HeaderScroll">
+      {/* <div style={{ marginBottom: 16 }}>
         <Button onClick={add}>ADD</Button>
-      </div>
-      <Tabs key={new Date().getTime()} hideAdd onChange={onChange} activeKey={activeKey} type="editable-card" onEdit={onEdit}>
+      </div> */}
+      <Tabs size="small" key={new Date().getTime()} hideAdd onChange={onChange} activeKey={activeKey} type="editable-card" onEdit={onEdit}>
         {panes.map((pane: { title: React.ReactNode; key: string | number | null | undefined; content: React.ReactNode }) => (
-          <TabPane tab={pane.title} key={pane.key}>
-            {pane.content}
-          </TabPane>
+          <TabPane tab={pane.title} key={pane.key}></TabPane>
         ))}
       </Tabs>
     </div>
