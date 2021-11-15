@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-12 09:14:50
+ * @LastEditTime: 2021-11-13 16:41:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -57,6 +57,10 @@ function App(props: any) {
       </Menu.Item>
     </Menu>
   );
+  // navLink点击事件
+  function toClickNavLink(link: any) {
+    console.log(link);
+  }
   return (
     <div className="App">
       <Layout>
@@ -66,7 +70,13 @@ function App(props: any) {
           </div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
             <Menu.Item key="1" icon={<AppstoreOutlined />}>
-              <NavLink style={{ textDecoration: "none" }} to="/index/layout">
+              <NavLink
+                onClick={() => {
+                  toClickNavLink("/index/layout");
+                }}
+                style={{ textDecoration: "none" }}
+                to="/index/layout"
+              >
                 首页
               </NavLink>
             </Menu.Item>
@@ -82,7 +92,13 @@ function App(props: any) {
                               {e.children.map((i: any) => {
                                 return (
                                   <Menu.Item key={i.path}>
-                                    <NavLink style={{ textDecoration: "none" }} to={item.path + "/" + e.path + "/" + i.path}>
+                                    <NavLink
+                                      onClick={() => {
+                                        toClickNavLink(item.path + "/" + e.path + "/" + i.path);
+                                      }}
+                                      style={{ textDecoration: "none" }}
+                                      to={item.path + "/" + e.path + "/" + i.path}
+                                    >
                                       {i.meta.title}
                                     </NavLink>
                                   </Menu.Item>
@@ -93,7 +109,13 @@ function App(props: any) {
                         } else {
                           return (
                             <Menu.Item key={e.path}>
-                              <NavLink style={{ textDecoration: "none" }} to={item.path + "/" + e.path}>
+                              <NavLink
+                                onClick={() => {
+                                  toClickNavLink(item.path + "/" + e.path);
+                                }}
+                                style={{ textDecoration: "none" }}
+                                to={item.path + "/" + e.path}
+                              >
                                 {e.meta.title}
                               </NavLink>
                             </Menu.Item>
@@ -185,7 +207,7 @@ function App(props: any) {
           <Content
             className="site-layout-background"
             style={{
-              margin: "24px 16px",
+              margin: "12px 24px",
               padding: 24,
               minHeight: 280,
               overflowY: "auto",
