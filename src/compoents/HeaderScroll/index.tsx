@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-11-13 16:36:47
+ * @LastEditTime: 2021-11-16 16:49:22
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 
 const { TabPane } = Tabs;
 function HeaderScroll(props:any) {
-  // 声明一个名为“count”的新状态变量
+  // 声明一个名为“count”的新状态变量 11
   const [activeKey, setActiveKey] = useState<any>("0");
   const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
   const newTabIndex = useRef(0);
