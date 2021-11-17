@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-13 16:41:29
+ * @LastEditTime: 2021-11-17 11:35:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
@@ -22,15 +22,52 @@ import SvgIcon from "compoents/SvgIcon";
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
+  const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
+  const [activeKey, setActiveKey] = useState<any>("0");
+  const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
     props.getMenu();
+    setActiveKey(panes[0].key);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [collapsed, setCollapsed] = useState(false);
   // 变换展开模式
   const toggle = () => {
     setCollapsed(!collapsed);
   };
+  const onHeaderMenuChange = (key: any) => {
+    setActiveKey(key);
+  };
+  function add(obj: any) {
+    const activeKey = obj.key;
+    setActiveKey(activeKey);
+    setPanes((data: any) => {
+      data.push({ title: obj.title, key: activeKey });
+      return [...data];
+    });
+  }
+  function remove(targetKey: any) {
+    let lastIndex = 0;
+    let activeKeyStr = "";
+    panes.forEach((pane: { key: any }, i: number) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const arr = panes.filter((pane: { key: any }) => pane.key !== targetKey);
+    if (panes.length && activeKey === targetKey) {
+      if (lastIndex >= 0) {
+        activeKeyStr = panes[lastIndex].key;
+      } else {
+        activeKeyStr = panes[0].key;
+      }
+    }
+
+    setActiveKey(activeKeyStr);
+    setPanes((data: any) => {
+      data = arr;
+      return [...data];
+    });
+  }
   /**
    * @description: 退出方法
    * @param {*} void
@@ -47,7 +84,17 @@ function App(props: any) {
     // })
     props.getLogout(props);
   };
-
+  // navLink点击事件
+  function toClickNavLink(link: any, title: any) {
+    const isYes = panes.some((item: any) => {
+      return item.key === link;
+    });
+    if (!isYes) {
+      add({ title, key: link });
+    } else {
+      setActiveKey(link);
+    }
+  }
   // menu 下选菜单
   const menu = (
     <Menu>
@@ -57,10 +104,7 @@ function App(props: any) {
       </Menu.Item>
     </Menu>
   );
-  // navLink点击事件
-  function toClickNavLink(link: any) {
-    console.log(link);
-  }
+
   return (
     <div className="App">
       <Layout>
@@ -72,7 +116,7 @@ function App(props: any) {
             <Menu.Item key="1" icon={<AppstoreOutlined />}>
               <NavLink
                 onClick={() => {
-                  toClickNavLink("/index/layout");
+                  toClickNavLink("/index/layout", "首页");
                 }}
                 style={{ textDecoration: "none" }}
                 to="/index/layout"
@@ -94,7 +138,7 @@ function App(props: any) {
                                   <Menu.Item key={i.path}>
                                     <NavLink
                                       onClick={() => {
-                                        toClickNavLink(item.path + "/" + e.path + "/" + i.path);
+                                        toClickNavLink(item.path + "/" + e.path + "/" + i.path, i.meta.title);
                                       }}
                                       style={{ textDecoration: "none" }}
                                       to={item.path + "/" + e.path + "/" + i.path}
@@ -111,7 +155,7 @@ function App(props: any) {
                             <Menu.Item key={e.path}>
                               <NavLink
                                 onClick={() => {
-                                  toClickNavLink(item.path + "/" + e.path);
+                                  toClickNavLink(item.path + "/" + e.path, e.meta.title);
                                 }}
                                 style={{ textDecoration: "none" }}
                                 to={item.path + "/" + e.path}
@@ -202,7 +246,7 @@ function App(props: any) {
                 </Dropdown>
               </div>
             </div>
-            <HeaderScroll></HeaderScroll>
+            <HeaderScroll {...props} add={add} remove={remove} onHeaderMenuChange={onHeaderMenuChange} activeKey={activeKey} panes={panes}></HeaderScroll>
           </Header>
           <Content
             className="site-layout-background"
