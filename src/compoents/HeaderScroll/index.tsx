@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-11-17 11:34:11
+ * @LastEditTime: 2021-11-17 11:41:33
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
@@ -13,7 +13,6 @@ import "./index.less";
 
 const { TabPane } = Tabs;
 function HeaderScroll(props: any) {
-  
   // 类似于 componentDidMount 和 componentDidUpdate:
   useEffect(() => {}, []); // eslint-disable-line react-hooks/exhaustive-deps
   const onChange = (activeKey: any) => {
@@ -38,7 +37,7 @@ function HeaderScroll(props: any) {
       <Tabs
         size="small"
         onTabClick={(key) => {
-          console.log(props)
+          console.log(props);
           props.history.push(key);
         }}
         key={new Date().getTime()}
@@ -49,7 +48,7 @@ function HeaderScroll(props: any) {
         onEdit={onEdit}
       >
         {props.panes.map((pane: { title: React.ReactNode; key: string | number | null | undefined; content: React.ReactNode }) => (
-          <TabPane tab={pane.title} key={pane.key}></TabPane>
+          <TabPane closeIcon={pane.key === "/index/layout"} tab={pane.title} key={pane.key}></TabPane>
         ))}
       </Tabs>
     </div>
