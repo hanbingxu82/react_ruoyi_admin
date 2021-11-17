@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-17 11:35:15
+ * @LastEditTime: 2021-11-17 11:37:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -67,6 +67,7 @@ function App(props: any) {
       data = arr;
       return [...data];
     });
+    props.history.push(activeKeyStr);
   }
   /**
    * @description: 退出方法
