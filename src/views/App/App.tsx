@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-17 11:43:10
+ * @LastEditTime: 2021-11-17 15:32:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -10,7 +10,7 @@ import "./App.less";
 import React, { useEffect, useState, useRef } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
 import { connect } from "react-redux";
@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
 import SvgIcon from "compoents/SvgIcon";
+import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -25,10 +26,32 @@ function App(props: any) {
   const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
   const [activeKey, setActiveKey] = useState<any>("0");
   const [collapsed, setCollapsed] = useState(false);
+  
+  const [fullScreen, setFullScreen] = useState(false);
+  const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
+  
   useEffect(() => {
     props.getMenu();
     setActiveKey(panes[0].key);
+    // 监听esc退出全屏
+    if (window.addEventListener) {
+      window.addEventListener("resize", onEscCancelFull, false);
+    } else {
+      setOriginResizeFunc(window.onresize);
+      window.onresize = onEscCancelFull;
+    }
+    return () => {
+      console.log(123123)
+      if (window.removeEventListener) {
+        window.removeEventListener("resize", onEscCancelFull, false);
+      } else {
+        window.onresize = originResizeFunc;
+      }
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  function onEscCancelFull() {
+    setFullScreen(isFullscreenElement());
+  }
 
   // 变换展开模式
   const toggle = () => {
@@ -175,7 +198,6 @@ function App(props: any) {
               }
               return null;
             })}
-
             {/* <SubMenu key="sub2" icon={<SettingOutlined />} title="系统管理">
               <Menu.Item key="2">
                 <NavLink style={{ textDecoration: "none" }} to="/system/user">
@@ -240,6 +262,22 @@ function App(props: any) {
                 onClick: toggle,
               })}
               <div className="rightheader">
+                {fullScreen ? (
+                  <FullscreenExitOutlined
+                    onClick={() => {
+                      exitFullScreen();
+                    }}
+                    style={{ fontSize: "24px", marginRight: "10px" }}
+                  />
+                ) : (
+                  <FullscreenOutlined
+                    onClick={() => {
+                      requestFullScreen(document.body);
+                    }}
+                    style={{ fontSize: "24px", marginRight: "10px" }}
+                  />
+                )}
+
                 <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
                   <div>
                     <Avatar shape="square" icon={<UserOutlined />} />
