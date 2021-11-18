@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-18 14:17:25
+ * @LastEditTime: 2021-11-18 15:19:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -19,11 +19,16 @@ import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
 import SvgIcon from "compoents/SvgIcon";
 import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
-import loadable from "utils/loadable";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
+  /**
+   * @description: 是否第一次加载组件
+   * @param {*}
+   * @return {*}
+   */
+  const initComponent = useRef(true);
   const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
   const [activeKey, setActiveKey] = useState<any>("0");
   const [collapsed, setCollapsed] = useState(false);
@@ -32,6 +37,25 @@ function App(props: any) {
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
 
   useEffect(() => {
+    if (initComponent.current) return;
+    /**
+     * @description: 判断是否为 hash 模式
+     * @param {*} test
+     * @return {*}
+     */
+    if (/#/.test(window.location.href)) {
+      const arr = window.location.href.split("#");
+      const pathObj = props.routerMenu.filter((item: any) => {
+        return item.path === arr[1];
+      });
+      if (pathObj.length > 0) {
+        add({ title: pathObj[0].meta.title, key: pathObj[0].path });
+      }
+    }
+  }, [props.routerMenu]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 生命周期执行副作用
+  useEffect(() => {
+    initComponent.current = false;
     props.getMenu();
     setActiveKey(panes[0].key);
     // 监听esc退出全屏
@@ -42,7 +66,6 @@ function App(props: any) {
       window.onresize = onEscCancelFull;
     }
     return () => {
-      console.log(123123);
       if (window.removeEventListener) {
         window.removeEventListener("resize", onEscCancelFull, false);
       } else {
@@ -53,7 +76,6 @@ function App(props: any) {
   function onEscCancelFull() {
     setFullScreen(isFullscreenElement());
   }
-
   // 变换展开模式
   const toggle = () => {
     setCollapsed(!collapsed);
@@ -304,7 +326,6 @@ function App(props: any) {
               <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
             ))}
             {props.routerMenu.map((v: any) => {
-       
               return <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />;
             })}
           </Content>
