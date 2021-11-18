@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-11-18 12:41:15
+ * @LastEditTime: 2021-11-18 13:55:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
@@ -33,7 +33,8 @@ const actions = {
           type: "getInfo",
         };
         window.localStorage.setItem("ruoyi_role", JSON.stringify(userRes.roles));
-        cookie.save("Admin-Token", window.localStorage.getItem("ruoyi_token") as string);
+        let inFifteenMinutes: any = new Date(new Date().getTime() + 24 * 3600 * 1000); //一天生存期
+        cookie.save("Admin-Token", window.localStorage.getItem("ruoyi_token") as string, inFifteenMinutes);
         window.localStorage.setItem("ruoyi_user", JSON.stringify(userRes.user));
         props.history.replace("/index/layout");
         // 动作的发送
