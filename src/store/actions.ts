@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-11-18 13:55:46
+ * @LastEditTime: 2021-11-18 14:18:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
@@ -91,7 +91,7 @@ const actions = {
               if (i.children) {
                 i.children.forEach((e: any) => {
                   e.exact = true;
-                  e.path = n.path + "/" + i.path + "/" + e.path;
+                  e.path = i.path + "/" + e.path;
                   mdata.push(e);
                 });
                 delete i.children;

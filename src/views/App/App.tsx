@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-18 13:35:17
+ * @LastEditTime: 2021-11-18 14:17:25
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -164,6 +164,7 @@ function App(props: any) {
                                   <Menu.Item key={i.path}>
                                     <NavLink
                                       onClick={() => {
+                                        console.log(item.path + "/" + e.path + "/" + i.path);
                                         toClickNavLink(item.path + "/" + e.path + "/" + i.path, i.meta.title);
                                       }}
                                       style={{ textDecoration: "none" }}
@@ -181,6 +182,7 @@ function App(props: any) {
                             <Menu.Item key={e.path}>
                               <NavLink
                                 onClick={() => {
+                                  console.log(item.path + "/" + e.path);
                                   toClickNavLink(item.path + "/" + e.path, e.meta.title);
                                 }}
                                 style={{ textDecoration: "none" }}
@@ -302,6 +304,7 @@ function App(props: any) {
               <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
             ))}
             {props.routerMenu.map((v: any) => {
+       
               return <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />;
             })}
           </Content>
