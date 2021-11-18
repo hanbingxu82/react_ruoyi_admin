@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-17 15:32:01
+ * @LastEditTime: 2021-11-18 13:35:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -19,6 +19,7 @@ import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
 import SvgIcon from "compoents/SvgIcon";
 import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
+import loadable from "utils/loadable";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -26,10 +27,10 @@ function App(props: any) {
   const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
   const [activeKey, setActiveKey] = useState<any>("0");
   const [collapsed, setCollapsed] = useState(false);
-  
+
   const [fullScreen, setFullScreen] = useState(false);
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
-  
+
   useEffect(() => {
     props.getMenu();
     setActiveKey(panes[0].key);
@@ -41,7 +42,7 @@ function App(props: any) {
       window.onresize = onEscCancelFull;
     }
     return () => {
-      console.log(123123)
+      console.log(123123);
       if (window.removeEventListener) {
         window.removeEventListener("resize", onEscCancelFull, false);
       } else {
@@ -300,6 +301,9 @@ function App(props: any) {
             {routers.subRouters.map((v) => (
               <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
             ))}
+            {props.routerMenu.map((v: any) => {
+              return <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />;
+            })}
           </Content>
         </Layout>
       </Layout>

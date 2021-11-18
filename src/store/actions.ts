@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-11-11 16:10:50
+ * @LastEditTime: 2021-11-18 12:41:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
@@ -10,6 +10,8 @@ import { getInfo, logout } from "../api/login/login";
 import { getRouters } from "api/menu";
 import cookie from "react-cookies";
 import App from "views/App/App";
+// import { asyncComponent } from "utils/asyncComponent";
+import loadable from "utils/loadable";
 
 const actions = {
   add: (num: number) => {
@@ -65,7 +67,7 @@ const actions = {
     };
   },
   /**
-   * @description: 用于实现登出效果
+   * @description: 用于实现获取 menu 菜单效果
    * @param {any} props
    * @return {*}
    */
@@ -75,12 +77,39 @@ const actions = {
       getRouters().then((res: any) => {
         const sdata = JSON.parse(JSON.stringify(res.data));
         const rdata = JSON.parse(JSON.stringify(res.data));
+        const menu = JSON.parse(JSON.stringify(res.data));
+        let mdata: any[] = [];
+        menu.forEach((n: any) => {
+          n.exact = true;
+          mdata.push(n);
+          if (n.children) {
+            n.children.forEach((i: any) => {
+              i.exact = true;
+              i.path = n.path + "/" + i.path;
+              mdata.push(i);
+              if (i.children) {
+                i.children.forEach((e: any) => {
+                  e.exact = true;
+                  e.path = n.path + "/" + i.path + "/" + e.path;
+                  mdata.push(e);
+                });
+                delete i.children;
+              }
+            });
+          }
+          delete n.children;
+        });
+        mdata = mdata.filter((item) => {
+          return item.component !== "ParentView" && item.component !== "Layout";
+        });
+        const routerMenu = filterAsyncRouter(mdata);
         const sidebarRoutes = filterAsyncRouter(sdata);
         const rewriteRoutes = filterAsyncRouter(rdata, false, true);
         rewriteRoutes.push({ path: "*", redirect: "/404", hidden: true });
         // 动作的发送
         const action = {
           type: "MENU",
+          routerMenu,
           sidebarRoutes,
           rewriteRoutes,
         };
@@ -100,14 +129,12 @@ function filterAsyncRouter(asyncRouterMap: any, lastRouter = false, type = false
       // Layout ParentView 组件特殊处理
       if (route.component === "Layout") {
         route.component = App;
-      }
-      // else if (route.component === "ParentView") {
-      //   route.component = ParentView;
-      // } else if (route.component === "InnerLink") {
-      //   route.component = InnerLink;
-      // }
-      else {
-        route.component = loadView(route.component)
+      } else if (route.component === "ParentView") {
+        route.component = "ParentView";
+      } else if (route.component === "InnerLink") {
+        route.component = "InnerLink";
+      } else {
+        route.component = loadView(route.component);
       }
     }
     if (route.children != null && route.children && route.children.length) {
@@ -146,6 +173,6 @@ function filterChildren(childrenMap: any, lastRouter: any = false) {
 
 export const loadView = (view: any) => {
   // 路由懒加载
-  return (resolve: any) => require(`views/${view}`);
+  return loadable(view);
 };
 export default actions;
