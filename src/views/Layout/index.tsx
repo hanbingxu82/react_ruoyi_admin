@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 14:03:48
- * @LastEditTime: 2021-10-11 17:30:05
+ * @LastEditTime: 2021-11-19 14:16:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/Layout/index.ts
@@ -12,7 +12,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
 function Layout(props: any) {
-  console.log(props);
   const { number } = props;
   const add = () => {
     props.add(1);

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-11-18 16:31:18
+ * @LastEditTime: 2021-11-19 14:24:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -59,20 +59,36 @@ const subRouters = [
   {
     path: "/index/layout",
     exact: true,
+    meta: {
+      title: "首页",
+    },
     component: Layout,
   },
   {
     path: "/system/dict-data/:id",
+    meta: {
+      title: "字典数据",
+    },
     exact: true,
     component: DictData,
   },
   {
     path: "/system/role-auth/:id",
+    meta: {
+      title: "分配用户",
+    },
+    exact: true,
+    component: AuthUser,
+  },
+  {
+    path: "/user/profile",
+    meta: {
+      title: "个人中心",
+    },
     exact: true,
     component: AuthUser,
   },
 ];
-
 
 /**
  * @description: 导出obj

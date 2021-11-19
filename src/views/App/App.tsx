@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-18 15:19:06
+ * @LastEditTime: 2021-11-19 15:39:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -35,6 +35,7 @@ function App(props: any) {
 
   const [fullScreen, setFullScreen] = useState(false);
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
+  const [defaultSelectedKeys, setDefaultSelectedKeys] = useState("");
 
   useEffect(() => {
     if (initComponent.current) return;
@@ -45,11 +46,20 @@ function App(props: any) {
      */
     if (/#/.test(window.location.href)) {
       const arr = window.location.href.split("#");
-      const pathObj = props.routerMenu.filter((item: any) => {
+      let pathObj = props.routerMenu.filter((item: any) => {
         return item.path === arr[1];
       });
       if (pathObj.length > 0) {
+        setDefaultSelectedKeys(pathObj[0].path);
         add({ title: pathObj[0].meta.title, key: pathObj[0].path });
+      } else {
+        pathObj = routers.subRouters.filter((item: any) => {
+          return item.path === arr[1];
+        });
+        setDefaultSelectedKeys(pathObj[0].path);
+        if (pathObj[0].path !== "/index/layout") {
+          add({ title: pathObj[0].meta.title, key: pathObj[0].path });
+        }
       }
     }
   }, [props.routerMenu]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -160,8 +170,9 @@ function App(props: any) {
           <div className="logo">
             <img src="/logopng.png" alt="" /> <span>若依管理系统</span>
           </div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-            <Menu.Item key="1" icon={<AppstoreOutlined />}>
+
+          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultSelectedKeys={[defaultSelectedKeys]}>
+            <Menu.Item key="/index/layout" icon={<AppstoreOutlined />}>
               <NavLink
                 onClick={() => {
                   toClickNavLink("/index/layout", "首页");
