@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-19 15:59:02
+ * @LastEditTime: 2021-11-19 16:46:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -36,11 +36,12 @@ function App(props: any) {
   const [fullScreen, setFullScreen] = useState(false);
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
   const [defaultSelectedKeys, setDefaultSelectedKeys] = useState("");
+  const [isOpen, setIsOpen] = useState<any>([]);
 
   useEffect(() => {
     if (initComponent.current) return;
     /**
-     * @description: 判断是否为 hash 模式
+     * @description: 判断是否为 hash 模式  路由高亮判断
      * @param {*} test
      * @return {*}
      */
@@ -50,15 +51,28 @@ function App(props: any) {
         return item.path === arr[1];
       });
       if (pathObj.length > 0) {
+        let open = pathObj[0].path.split("/") || [];
+        open.forEach((element: any, index: number) => {
+          open[index] = "/" + open[index];
+        });
+        setIsOpen([...open]);
         setDefaultSelectedKeys(pathObj[0].path);
         add({ title: pathObj[0].meta.title, key: pathObj[0].path });
       } else {
         pathObj = routers.subRouters.filter((item: any) => {
           return item.path === arr[1];
         });
-        setDefaultSelectedKeys(pathObj[0].path);
-        if (pathObj[0].path !== "/index/layout") {
-          add({ title: pathObj[0].meta.title, key: pathObj[0].path });
+        if (pathObj.length > 0) {
+          let open = pathObj[0].path.split("/") || [];
+          open.forEach((element: any, index: number) => {
+            open[index] = "/" + open[index];
+          });
+          setIsOpen([...open]);
+
+          setDefaultSelectedKeys(pathObj[0].path);
+          if (pathObj[0].path !== "/index/layout") {
+            add({ title: pathObj[0].meta.title, key: pathObj[0].path });
+          }
         }
       }
     }
@@ -171,7 +185,7 @@ function App(props: any) {
             <img src="/logopng.png" alt="" /> <span>若依管理系统</span>
           </div>
 
-          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultOpenKeys={["/system"]} defaultSelectedKeys={[defaultSelectedKeys]}>
+          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultOpenKeys={isOpen} defaultSelectedKeys={[defaultSelectedKeys]}>
             <Menu.Item key="/index/layout" icon={<AppstoreOutlined />}>
               <NavLink
                 onClick={() => {
@@ -185,20 +199,19 @@ function App(props: any) {
             </Menu.Item>
             {props.sidebarRoutes.map((item: any) => {
               if (!item.hidden) {
-                console.log(item.path)
                 return (
                   <SubMenu key={item.path} title={item.meta.title} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
                     {item.children.map((e: any) => {
                       if (!e.hidden) {
                         if (e.children) {
                           return (
-                            <SubMenu key={e.path} title={e.meta.title}>
+                            <SubMenu key={"/" + e.path} title={e.meta.title}>
                               {e.children.map((i: any) => {
                                 return (
-                                  <Menu.Item key={i.path}>
+                                  <Menu.Item key={item.path + "/" + e.path + "/" + i.path}>
                                     <NavLink
                                       onClick={() => {
-                                        console.log(item.path + "/" + e.path + "/" + i.path);
+                                        console.log();
                                         toClickNavLink(item.path + "/" + e.path + "/" + i.path, i.meta.title);
                                       }}
                                       style={{ textDecoration: "none" }}
@@ -213,10 +226,9 @@ function App(props: any) {
                           );
                         } else {
                           return (
-                            <Menu.Item key={e.path}>
+                            <Menu.Item key={item.path + "/" + e.path}>
                               <NavLink
                                 onClick={() => {
-                                  console.log(item.path + "/" + e.path);
                                   toClickNavLink(item.path + "/" + e.path, e.meta.title);
                                 }}
                                 style={{ textDecoration: "none" }}
