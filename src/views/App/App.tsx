@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-19 15:39:03
+ * @LastEditTime: 2021-11-19 15:59:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -171,7 +171,7 @@ function App(props: any) {
             <img src="/logopng.png" alt="" /> <span>若依管理系统</span>
           </div>
 
-          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultSelectedKeys={[defaultSelectedKeys]}>
+          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultOpenKeys={["/system"]} defaultSelectedKeys={[defaultSelectedKeys]}>
             <Menu.Item key="/index/layout" icon={<AppstoreOutlined />}>
               <NavLink
                 onClick={() => {
@@ -185,6 +185,7 @@ function App(props: any) {
             </Menu.Item>
             {props.sidebarRoutes.map((item: any) => {
               if (!item.hidden) {
+                console.log(item.path)
                 return (
                   <SubMenu key={item.path} title={item.meta.title} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
                     {item.children.map((e: any) => {
