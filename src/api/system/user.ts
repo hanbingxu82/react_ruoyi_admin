@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:35:06
- * @LastEditTime: 2021-10-14 15:51:23
+ * @LastEditTime: 2021-11-22 16:55:49
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/api/system/user.ts
@@ -106,7 +106,7 @@ export function updateUserProfile(data: any) {
 }
 
 // 用户密码重置
-export function updateUserPwd(oldPassword: any, newPassword: any) {
+export function updateUserPwd(oldPassword?: any, newPassword?: any) {
   const data = {
     oldPassword,
     newPassword,

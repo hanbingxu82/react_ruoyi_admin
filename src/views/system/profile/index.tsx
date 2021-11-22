@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-19 13:49:29
- * @LastEditTime: 2021-11-22 14:57:20
+ * @LastEditTime: 2021-11-22 16:55:23
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/system/profile/index.tsx
@@ -9,12 +9,11 @@
 import { useState, useEffect, useRef } from "react";
 import "./index.less";
 
-import HeaderBar from "../../../compoents/HeaderBar";
-
-import { Card, Avatar, Divider, Tabs, Input, Row, Col, Form, Button, Select, Modal, Radio, message } from "antd";
+import { Card, Avatar, Divider, Tabs, Input, Row, Col, Form, Button, Radio, message } from "antd";
 import { PhoneOutlined, MailOutlined, TeamOutlined, FieldTimeOutlined } from "@ant-design/icons";
-import { listPost, addPost, updatePost } from "../../../api/system/post";
+import { getUserProfile, updateUserProfile, updateUserPwd } from "api/system/user";
 import { getDicts } from "../../../api/global";
+import profile from "assets/images/profile.jpg";
 
 const { TabPane } = Tabs;
 const { Meta } = Card;
@@ -36,10 +35,22 @@ function Post() {
   const [formModel2] = Form.useForm();
 
   // 用户form字段
-  const [form, setPostForm] = useState({
+  const [form1, setPostForm1] = useState({
     postId: "",
   });
-
+  // 用户user字段
+  const [user, setUser] = useState({
+    userName: "",
+    avatar: "",
+    phonenumber: "",
+    email: "",
+    roleGroup: "",
+    postGroup: "",
+    dept: {
+      deptName: "",
+    },
+    createTime: "",
+  });
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -62,42 +73,57 @@ function Post() {
    * @return {*}
    */
   function getList() {
-    listPost({}).then((res: any) => {});
+    getUserProfile().then((res: any) => {
+      formModel1.setFieldsValue({
+        nickName: res.data.nickName,
+        phonenumber: res.data.phonenumber,
+        email: res.data.email,
+        sex: res.data.sex,
+      });
+      setUser({
+        ...res.data,
+        roleGroup: res.roleGroup,
+        postGroup: res.postGroup,
+      });
+    });
   }
 
+  function callback(key: any) {
+    console.log(key);
+  }
   /**
-   * @description: 弹窗确认点击事件
-   * @param {*}
+   * @description: 修改基本资料事件
+   * @param {any} values
    * @return {*}
    */
-  const handleOk = () => {
-    // form 表单内容
+  const onDetail = (values: any) => {
     formModel1
       .validateFields()
       .then((values) => {
-        if (form.postId !== "") {
-          updatePost({ ...form, ...formModel1.getFieldsValue() }).then(() => {
-            message.success("修改成功");
-
-            getList();
-          });
-        } else {
-          addPost({ ...formModel1.getFieldsValue() }).then(() => {
-            message.success("增加成功");
-
-            getList();
-          });
-        }
+        updateUserProfile({ ...user, ...values }).then((response) => {
+          message.success("修改成功");
+        });
       })
       .catch((err) => {
         console.log("校验失败" + err);
       });
   };
-  function callback(key: any) {
-    console.log(key);
-  }
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  /**
+   * @description: 重置密码点击按钮事件
+   * @param {*}
+   * @return {*}
+   */
+  const onRequest = (values: any) => {
+    formModel2
+      .validateFields()
+      .then((values) => {
+        updateUserPwd(values.oldPassword, values.newPassword).then((response) => {
+          message.success("修改成功");
+        });
+      })
+      .catch((err) => {
+        console.log("校验失败" + err);
+      });
   };
 
   return (
@@ -105,7 +131,7 @@ function Post() {
       <Row>
         <Col span={8}>
           <Card style={{ width: "100%" }}>
-            <Meta avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />} title="Card title" description="This is the description" />
+            <Meta avatar={<Avatar src={user.avatar || profile} />} title={user.userName} description={user.dept.deptName + " / " + user.postGroup} />
           </Card>
           <Card style={{ marginTop: 10 }}>
             <div className="card_sb">
@@ -114,7 +140,7 @@ function Post() {
                 <span style={{ marginLeft: 5 }}>电话</span>
               </div>
 
-              <div>{"电话"}</div>
+              <div>{user.phonenumber}</div>
             </div>
             <Divider />
             <div className="card_sb">
@@ -123,7 +149,7 @@ function Post() {
                 <span style={{ marginLeft: 5 }}>邮箱</span>
               </div>
 
-              <div>{"邮箱"}</div>
+              <div>{user.email}</div>
             </div>
             <Divider />
             <div className="card_sb">
@@ -131,7 +157,7 @@ function Post() {
                 <TeamOutlined />
                 <span style={{ marginLeft: 5 }}>所属角色</span>
               </div>
-              <div>{"所属角色"}</div>
+              <div>{user.roleGroup}</div>
             </div>
             <Divider />
             <div className="card_sb">
@@ -139,7 +165,7 @@ function Post() {
                 <FieldTimeOutlined />
                 <span style={{ marginLeft: 5 }}>创建时间</span>
               </div>
-              <div>{"创建时间"}</div>
+              <div>{user.createTime}</div>
             </div>
             <Divider />
           </Card>
@@ -148,15 +174,13 @@ function Post() {
           <Card style={{ marginLeft: 10 }} className="card_body">
             <Tabs defaultActiveKey="1" onChange={callback}>
               <TabPane tab="基本资料" key="1">
-                <Form form={formModel1} name="formModel1" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", deptSort: 0 }} autoComplete="off">
-                  <Form.Item label="用户昵称" name="deptName" rules={[{ required: true, message: "用户昵称不能为空" }]}>
+                <Form form={formModel1} name="formModel1" labelCol={{ style: { width: 90 } }} onFinish={onDetail} initialValues={{ sex: "0" }} autoComplete="off">
+                  <Form.Item label="用户昵称" name="nickName" rules={[{ required: true, message: "用户昵称不能为空" }]}>
                     <Input placeholder="请输入用户昵称" />
                   </Form.Item>
-
-                  <Form.Item label="手机号码" name="orderNum" rules={[{ required: true, message: "手机号码不能为空" }]}>
+                  <Form.Item label="手机号码" name="phonenumber" rules={[{ required: true, message: "手机号码不能为空" }]}>
                     <Input placeholder="请输入手机号码" />
                   </Form.Item>
-
                   <Form.Item
                     label="邮箱"
                     name="email"
@@ -164,13 +188,13 @@ function Post() {
                       { required: true, message: "邮箱不能为空" },
                       {
                         type: "email",
-                        message: "请输入正确的email格式",
+                        message: "请输入正确的邮箱格式",
                       },
                     ]}
                   >
                     <Input placeholder="请输入邮箱" />
                   </Form.Item>
-                  <Form.Item label="性别" name="status">
+                  <Form.Item label="性别" name="sex">
                     <Radio.Group>
                       <Radio value="0">男</Radio>
                       <Radio value="1">女</Radio>
@@ -184,7 +208,7 @@ function Post() {
                 </Form>
               </TabPane>
               <TabPane tab="修改密码" key="2">
-                <Form form={formModel2} name="formModel2" labelCol={{ style: { width: 90 } }} onFinish={onFinish} initialValues={{}} autoComplete="off" scrollToFirstError>
+                <Form form={formModel2} name="formModel2" labelCol={{ style: { width: 90 } }} onFinish={onRequest} initialValues={{}} autoComplete="off" scrollToFirstError>
                   <Form.Item
                     name="oldPassword"
                     label="旧密码"
@@ -195,7 +219,7 @@ function Post() {
                       },
                     ]}
                   >
-                    <Input />
+                    <Input.Password placeholder="请输入旧密码" />
                   </Form.Item>
 
                   <Form.Item
@@ -215,7 +239,7 @@ function Post() {
                     ]}
                     hasFeedback
                   >
-                    <Input.Password />
+                    <Input.Password placeholder="请输入新密码" />
                   </Form.Item>
 
                   <Form.Item
@@ -238,7 +262,7 @@ function Post() {
                       }),
                     ]}
                   >
-                    <Input.Password />
+                    <Input.Password placeholder="请确认密码" />
                   </Form.Item>
 
                   <Form.Item>
