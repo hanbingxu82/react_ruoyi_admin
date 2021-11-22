@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-19 13:49:29
- * @LastEditTime: 2021-11-22 17:19:33
+ * @LastEditTime: 2021-11-22 17:20:47
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/system/profile/index.tsx
@@ -25,10 +25,6 @@ function Post() {
    */
   const initComponent = useRef(true);
 
-  // 字典列表
-  const [dicts, setDicts] = useState({
-    sys_normal_disable: [],
-  });
 
   // 表单弹窗
   const [formModel1] = Form.useForm();
