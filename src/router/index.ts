@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-11-19 14:24:20
+ * @LastEditTime: 2021-11-22 10:01:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -12,6 +12,7 @@ import Layout from "../views/Layout";
 import Login from "../views/login";
 import DictData from "views/system/dict/data";
 import AuthUser from "views/system/role/authUser";
+import UserProfile from 'views/system/profile'
 
 /**
  * @description: 一级路由
@@ -86,7 +87,7 @@ const subRouters = [
       title: "个人中心",
     },
     exact: true,
-    component: AuthUser,
+    component: UserProfile,
   },
 ];
 
