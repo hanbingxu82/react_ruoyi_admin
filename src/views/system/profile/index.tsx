@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-19 13:49:29
- * @LastEditTime: 2021-11-22 16:55:23
+ * @LastEditTime: 2021-11-22 17:19:33
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/system/profile/index.tsx
@@ -34,10 +34,6 @@ function Post() {
   const [formModel1] = Form.useForm();
   const [formModel2] = Form.useForm();
 
-  // 用户form字段
-  const [form1, setPostForm1] = useState({
-    postId: "",
-  });
   // 用户user字段
   const [user, setUser] = useState({
     userName: "",
@@ -58,12 +54,6 @@ function Post() {
    */
   useEffect(() => {
     initComponent.current = false;
-    getDicts("sys_normal_disable").then((response) => {
-      setDicts((data) => {
-        data.sys_normal_disable = response.data;
-        return data;
-      });
-    });
     getList();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
