@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-22 09:57:28
+ * @LastEditTime: 2021-11-22 10:52:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -170,13 +170,16 @@ function App(props: any) {
   // menu 下选菜单
   const menu = (
     <Menu>
-      <Menu.Item
-        key="PersonalCenter"
-        onClick={() => {
-          toClickNavLink("/user/profile", "首页");
-        }}
-      >
-        个人中心
+      <Menu.Item key="PersonalCenter">
+        <NavLink
+          onClick={() => {
+            toClickNavLink("/user/profile", "个人中心");
+          }}
+          style={{ textDecoration: "none" }}
+          to={"/user/profile"}
+        >
+          个人中心
+        </NavLink>
       </Menu.Item>
       <Menu.Item key="LogOut" onClick={clickLogOut}>
         退出登录
