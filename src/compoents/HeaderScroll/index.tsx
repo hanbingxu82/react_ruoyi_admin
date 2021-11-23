@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-11-17 11:41:33
+ * @LastEditTime: 2021-11-23 17:03:32
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
@@ -20,7 +20,6 @@ function HeaderScroll(props: any) {
   };
 
   const onEdit = (targetKey: any, action: any) => {
-    console.log(targetKey, action);
     //   [action](targetKey);
     if (action === "add") {
       props.add();
