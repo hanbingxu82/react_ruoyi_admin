@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 11:26:30
- * @LastEditTime: 2021-11-11 11:31:05
+ * @LastEditTime: 2021-11-23 15:45:06
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/online/index.tsx
@@ -385,6 +385,7 @@ function Online() {
         <RuoYiPagination
           total={total}
           onChange={(page: any, pageSize: any) => {
+            console.log(page)
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
           }}
         />
