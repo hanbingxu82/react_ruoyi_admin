@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-23 17:05:18
+ * @LastEditTime: 2021-11-23 17:38:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -106,8 +106,24 @@ function App(props: any) {
     setCollapsed(!collapsed);
   };
   const onHeaderMenuChange = (key: any) => {
+    setDefaultSelectedKeys(() => {
+      return key;
+    });
     setActiveKey(key);
-    setDefaultSelectedKeys(key);
+    let open = key.split("/") || [];
+    open.forEach((element: any, index: number) => {
+      open[index] = "/" + open[index];
+    });
+    setIsOpen([...open]);
+  };
+  const onOpenChange = (keys: any) => {
+    const latestOpenKey = keys.find((key: any) => isOpen.indexOf(key) === -1);
+    const openMenu = props.sidebarRoutes.map((item: any) => item.path);
+    if (openMenu.indexOf(latestOpenKey) === -1) {
+      setIsOpen(keys);
+    } else {
+      setIsOpen(latestOpenKey ? [latestOpenKey] : []);
+    }
   };
   function add(obj: any) {
     const activeKey = obj.key;
@@ -160,6 +176,7 @@ function App(props: any) {
   };
   // navLink点击事件
   function toClickNavLink(link: any, title: any) {
+    setDefaultSelectedKeys(link);
     const isYes = panes.some((item: any) => {
       return item.key === link;
     });
@@ -197,7 +214,7 @@ function App(props: any) {
             <img src="/logopng.png" alt="" /> <span>若依管理系统</span>
           </div>
 
-          <Menu theme="dark" mode="inline" key={"defaultSelectedKeys" + defaultSelectedKeys} defaultOpenKeys={isOpen} defaultSelectedKeys={[defaultSelectedKeys]}>
+          <Menu theme="dark" mode="inline" openKeys={isOpen} onOpenChange={onOpenChange} selectedKeys={[...[defaultSelectedKeys]]}>
             <Menu.Item key="/index/layout" icon={<AppstoreOutlined />}>
               <NavLink
                 onClick={() => {
