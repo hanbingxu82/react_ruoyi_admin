@@ -473,7 +473,7 @@ function Data(props: any) {
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictCode} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination
+        <RuoYiPagination   current={queryForm.pageNum} 
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });

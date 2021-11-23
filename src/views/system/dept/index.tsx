@@ -340,7 +340,7 @@ function Dept() {
       {/* 表格区域 */}
       <Row>
         {<Table key={new Date().getTime()} defaultExpandAllRows dataSource={tableData} style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.deptId} columns={columns} />}
-        {/* <RuoYiPagination
+        {/* <RuoYiPagination   current={queryForm.pageNum} 
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });

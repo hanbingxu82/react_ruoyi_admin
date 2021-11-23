@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 11:26:30
- * @LastEditTime: 2021-11-23 15:45:06
+ * @LastEditTime: 2021-11-23 16:13:31
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/online/index.tsx
@@ -382,10 +382,11 @@ function Online() {
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.postId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination
+        <RuoYiPagination   current={queryForm.pageNum} 
+         
           total={total}
           onChange={(page: any, pageSize: any) => {
-            console.log(page)
+            console.log(page);
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
           }}
         />

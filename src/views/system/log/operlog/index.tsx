@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-27 09:51:19
- * @LastEditTime: 2021-11-08 16:41:49
+ * @LastEditTime: 2021-11-23 16:12:39
  * @LastEditors: Please set LastEditors
  * @Description: 操作日志
  * @FilePath: /use-hooks/src/views/system/log/operlog/index.tsx
@@ -59,59 +59,59 @@ function OperLog() {
   // 表格选中行 KEY 值
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   // 表格列头对应字段
-  const columns:any = [
+  const columns: any = [
     {
       title: "日志编号",
-      align:'center',
-dataIndex: "operId",
+      align: "center",
+      dataIndex: "operId",
     },
     {
       title: "系统模块",
-      align:'center',
-dataIndex: "title",
+      align: "center",
+      dataIndex: "title",
     },
     {
       title: "操作类型",
-      align:'center',
-dataIndex: "businessType",
+      align: "center",
+      dataIndex: "businessType",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_oper_type, text)}</>,
     },
     {
       title: "请求方式",
-      align:'center',
-dataIndex: "requestMethod",
+      align: "center",
+      dataIndex: "requestMethod",
     },
     {
       title: "操作人员",
-      align:'center',
-dataIndex: "operName",
+      align: "center",
+      dataIndex: "operName",
     },
     {
       title: "操作地址",
-      align:'center',
-dataIndex: "operIp",
+      align: "center",
+      dataIndex: "operIp",
     },
     {
       title: "操作地点",
-      align:'center',
-dataIndex: "operLocation",
+      align: "center",
+      dataIndex: "operLocation",
     },
 
     {
       title: "操作状态",
-      align:'center',
-dataIndex: "status",
+      align: "center",
+      dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_common_status, text)}</>,
     },
     {
       title: "操作时间",
-      align:'center',
-dataIndex: "operTime",
+      align: "center",
+      dataIndex: "operTime",
     },
     {
       title: "操作",
-      align:'center',
-dataIndex: "address",
+      align: "center",
+      dataIndex: "address",
       render: (text: any, row: any) => {
         return (
           <>
@@ -153,12 +153,12 @@ dataIndex: "address",
     businessType: "",
     noticeContent: "",
   });
-    // 监听副作用
-    useEffect(() => {
-      if (initComponent.current) return;
-      // 监听queryParams变化
-      getList();
-    }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 监听副作用
+  useEffect(() => {
+    if (initComponent.current) return;
+    // 监听queryParams变化
+    getList();
+  }, [queryForm]); // eslint-disable-line react-hooks/exhaustive-deps
   /**
    * @description: 生命周期初始化
    * @param {*}
@@ -408,7 +408,7 @@ dataIndex: "address",
       ) : null}
       {/* 搜索条区域 */}
       <Row>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button
             icon={<DeleteOutlined />}
             onClick={() => {
@@ -419,12 +419,12 @@ dataIndex: "address",
             删除
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<DeleteOutlined />} onClick={clearData}>
             清空
           </Button>
         </Col>
-        <Col  style={{ marginRight: 20 }}>
+        <Col style={{ marginRight: 20 }}>
           <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
             导出
           </Button>
@@ -443,7 +443,8 @@ dataIndex: "address",
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.operId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination
+        <RuoYiPagination   current={queryForm.pageNum} 
+          
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });

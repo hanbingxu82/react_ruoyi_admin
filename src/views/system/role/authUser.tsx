@@ -423,7 +423,7 @@ function AuthUser(props: any) {
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.userId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination
+        <RuoYiPagination   current={queryForm.pageNum} 
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
@@ -457,7 +457,7 @@ function AuthUser(props: any) {
           </Row>
         </Form>
         <Table style={{ width: "100%" }} loading={getUserLoading} pagination={false} rowKey={(record: any) => record.userId} rowSelection={rowSelectionUser} columns={columnsUser} dataSource={userList} />
-        <RuoYiPagination
+        <RuoYiPagination   current={queryForm.pageNum} 
           total={userTotal}
           onChange={(page: any, pageSize: any) => {
             setQueryFormModal({ ...queryFormModal, pageNum: page, pageSize });
