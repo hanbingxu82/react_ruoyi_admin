@@ -1,30 +1,34 @@
 /*
  * @Author: your name
  * @Date: 2021-11-19 13:49:29
- * @LastEditTime: 2021-11-22 17:20:47
+ * @LastEditTime: 2021-11-23 11:19:46
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/system/profile/index.tsx
  */
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./index.less";
 
 import { Card, Avatar, Divider, Tabs, Input, Row, Col, Form, Button, Radio, message } from "antd";
 import { PhoneOutlined, MailOutlined, TeamOutlined, FieldTimeOutlined } from "@ant-design/icons";
 import { getUserProfile, updateUserProfile, updateUserPwd } from "api/system/user";
-import { getDicts } from "../../../api/global";
 import profile from "assets/images/profile.jpg";
+import UploadImgCrop from "compoents/UploadImgCrop";
+import { connect } from "react-redux";
+//从redux中引入一个方法用于将actionCreators中的方法进行绑定 就是用  dispatch({actions暴露方法})
+import { bindActionCreators } from "redux";
+import actions from "store/actions";
 
 const { TabPane } = Tabs;
 const { Meta } = Card;
-function Post() {
+function ProFile(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
    * @return {*}
    */
   const initComponent = useRef(true);
-
+  const UploadImgCropRef: any = React.createRef();
 
   // 表单弹窗
   const [formModel1] = Form.useForm();
@@ -114,10 +118,34 @@ function Post() {
 
   return (
     <div className="Profile">
+      <div className="UploadImgCropRef_div">
+        <UploadImgCrop
+          ref={UploadImgCropRef}
+          size={1}
+          importAfterMethods={(url: string) => {
+            setUser({ ...user, avatar: url });
+            props.setUserInfoAvatar(url);
+          }}
+        ></UploadImgCrop>
+      </div>
       <Row>
         <Col span={8}>
           <Card style={{ width: "100%" }}>
-            <Meta avatar={<Avatar src={user.avatar || profile} />} title={user.userName} description={user.dept.deptName + " / " + user.postGroup} />
+            <Meta
+              avatar={
+                <span
+                  className="Avatar_span"
+                  onClick={() => {
+                    // 手动触发下子组件的点击事件
+                    UploadImgCropRef.current.click();
+                  }}
+                >
+                  <Avatar src={user.avatar || profile} />
+                </span>
+              }
+              title={user.userName}
+              description={user.dept.deptName + " / " + user.postGroup}
+            />
           </Card>
           <Card style={{ marginTop: 10 }}>
             <div className="card_sb">
@@ -265,4 +293,8 @@ function Post() {
     </div>
   );
 }
-export default Post;
+const mapDispatchToProps = (dispatch: any) => bindActionCreators(actions, dispatch);
+export default connect(
+  (state: any) => state,
+  (dispatch: any) => mapDispatchToProps
+)(ProFile);

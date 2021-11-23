@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-11 17:23:34
- * @LastEditTime: 2021-11-18 14:18:11
+ * @LastEditTime: 2021-11-23 11:39:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/store/actions.ts
@@ -28,15 +28,16 @@ const actions = {
   getInfo(props: any) {
     return (dispatch: any) => {
       getInfo().then((userRes: any) => {
-        // 动作的创建
-        const action = {
-          type: "getInfo",
-        };
         window.localStorage.setItem("ruoyi_role", JSON.stringify(userRes.roles));
         let inFifteenMinutes: any = new Date(new Date().getTime() + 24 * 3600 * 1000); //一天生存期
         cookie.save("Admin-Token", window.localStorage.getItem("ruoyi_token") as string, inFifteenMinutes);
         window.localStorage.setItem("ruoyi_user", JSON.stringify(userRes.user));
         props.history.replace("/index/layout");
+        // 动作的创建
+        const action = {
+          type: "USERINFO",
+          userInfo: userRes.user,
+        };
         // 动作的发送
         dispatch(action);
       });
@@ -116,6 +117,25 @@ const actions = {
         };
         dispatch(action);
       });
+    };
+  },
+  /**
+   * @description: 变更用户信息
+   * @param {*}
+   * @return {*}
+   */
+  setUserInfoAvatar(url: string) {
+    return (dispatch: any) => {
+      const userInfo = JSON.parse(window.localStorage.getItem("ruoyi_user") as string);
+      userInfo.avatar = url;
+      window.localStorage.setItem("ruoyi_user", JSON.stringify(userInfo));
+      // 动作的发送
+      console.log(userInfo)
+      const action = {
+        type: "USERINFO",
+        userInfo,
+      };
+      dispatch(action);
     };
   },
 };

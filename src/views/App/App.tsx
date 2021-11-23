@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-22 10:52:46
+ * @LastEditTime: 2021-11-23 11:40:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -19,6 +19,7 @@ import { bindActionCreators } from "redux";
 import actions from "../../store/actions";
 import SvgIcon from "compoents/SvgIcon";
 import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
+import AvatarImg from "assets/images/profile.jpg";
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -339,7 +340,7 @@ function App(props: any) {
 
                 <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
                   <div>
-                    <Avatar shape="square" icon={<UserOutlined />} />
+                    <Avatar key={"userInfoAvatar" + props.userInfo.avatar} shape="square" src={props.userInfo.avatar || AvatarImg} />
                     <CaretDownOutlined className="righticondown" />
                   </div>
                 </Dropdown>
