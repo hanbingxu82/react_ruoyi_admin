@@ -36,7 +36,6 @@ function HeaderScroll(props: any) {
       <Tabs
         size="small"
         onTabClick={(key) => {
-          console.log(props);
           props.history.push(key);
         }}
         key={new Date().getTime()}

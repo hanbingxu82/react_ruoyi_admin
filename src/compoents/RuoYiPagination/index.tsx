@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-20 11:00:02
- * @LastEditTime: 2021-11-23 16:11:07
+ * @LastEditTime: 2021-11-24 09:57:55
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/compoents/RuoYiPagination/index.tsx
@@ -11,7 +11,6 @@ import "./index.less";
 import { Pagination } from "antd";
 function RuoYiPagination(props: any) {
   useEffect(() => {}, []);
-  console.log(props)
   return (
     <div className="RuoYiPagination">
       <Pagination
