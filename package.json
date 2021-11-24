@@ -60,6 +60,7 @@
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
     "prompts": "2.4.0",
+    "qnn-react-cron": "^0.1.3",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
     "react-dev-utils": "^11.0.3",
@@ -187,7 +188,8 @@
     "less-loader": "^5.0.0",
     "loadable-components": "^2.2.3",
     "node-sass": "^4.14.1",
-    "react-cookies": "^0.1.1",    
+    "qnn-react-cron": "^0.1.3",
+    "react-cookies": "^0.1.1",
     "react-loadable": "^5.5.0",
     "sass-loader": "^7.3.1",
     "svg-sprite-loader": "^6.0.11"

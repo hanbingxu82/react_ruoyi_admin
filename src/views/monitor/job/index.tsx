@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-24 13:42:42
+ * @LastEditTime: 2021-11-24 15:23:57
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -20,12 +20,17 @@ import { getDicts } from "api/global";
 import { download } from "utils/ruoyi";
 import moment from "moment";
 import RuoYiPagination from "compoents/RuoYiPagination";
+import QnnReactCron from "qnn-react-cron";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
+
 function Dict() {
+  let cronFns: any;
+  let [value, setValue] = useState<any>("0,20,14,26 * * * * ? *");
+
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -439,6 +444,35 @@ function Dict() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+        <QnnReactCron
+          value={value}
+          onOk={(value: any) => {
+            console.log("cron:", value);
+          }}
+          getCronFns={(_cronFns: any) => {
+            cronFns = _cronFns;
+          }}
+          footer={[
+            <Button
+              key="cencel"
+              style={{ marginRight: 10 }}
+              onClick={() => {
+                setValue(null);
+              }}
+            >
+              重置
+            </Button>,
+            <Button
+              key="getValue"
+              type="primary"
+              onClick={() => {
+                setValue(cronFns.getValue());
+              }}
+            >
+              生成
+            </Button>,
+          ]}
+        />
         <Form form={configFormModel} name="configFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0" }} autoComplete="off">
           <Form.Item label="字典名称" name="dictName" rules={[{ required: true, message: "字典名称不能为空" }]}>
             <Input placeholder="请输入字典名称" />
