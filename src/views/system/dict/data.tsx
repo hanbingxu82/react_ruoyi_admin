@@ -425,7 +425,7 @@ function Data(props: any) {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
