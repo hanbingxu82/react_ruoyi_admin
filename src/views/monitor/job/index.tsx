@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-25 14:35:25
+ * @LastEditTime: 2021-11-25 16:24:25
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -12,8 +12,8 @@ import "./index.less";
 import HeaderBar from "../../../compoents/HeaderBar";
 
 import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined } from "@ant-design/icons";
-import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "../../../api/system/role";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined } from "@ant-design/icons";
+import { listJob, getJob, delJob, addJob, updateJob, exportJob, changeJobStatus } from "../../../api/monitor/job";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "api/system/dept";
 import { selectDictLabel } from "../../../utils/ruoyi";
@@ -55,6 +55,8 @@ function Role(props: any) {
   // 字典列表
   const [dicts, setDicts]: any = useState({
     sys_normal_disable: [],
+    sys_job_group: [],
+    sys_job_status: [],
     menuOptions: [],
     menuOptionsAll: [],
     deptOptions: [],
@@ -98,18 +100,27 @@ function Role(props: any) {
             dataPermissions(row);
           }}
           key="KeyOutlined"
+          icon={<CaretRightOutlined />}
+        >
+          执行一次
+        </Menu.Item>
+        <Menu.Item
+          onClick={() => {
+            dataPermissions(row);
+          }}
+          key="KeyOutlined"
           icon={<KeyOutlined />}
         >
-          数据权限
+          任务详细
         </Menu.Item>
         <Menu.Item
           onClick={() => {
             systemUser(row);
           }}
           key="SmileOutlined"
-          icon={<SmileOutlined />}
+          icon={<BookOutlined />}
         >
-          分配用户
+          调度日志
         </Menu.Item>
       </Menu>
     );
@@ -117,24 +128,33 @@ function Role(props: any) {
   // 表格列头对应字段
   const columns: any = [
     {
-      title: "角色编号",
+      title: "任务编号",
       align: "center",
-      dataIndex: "roleId",
+      dataIndex: "jobId",
     },
     {
-      title: "角色名称",
+      title: "任务名称",
       align: "center",
-      dataIndex: "roleName",
+      dataIndex: "jobName",
+      ellipsis: true,
     },
     {
-      title: "权限字符",
+      title: "任务组名",
       align: "center",
-      dataIndex: "roleKey",
+      dataIndex: "jobGroup",
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_job_group, text)}</>,
     },
     {
-      title: "显示顺序",
+      title: "调用目标字符串",
       align: "center",
-      dataIndex: "roleSort",
+      dataIndex: "invokeTarget",
+      ellipsis: true,
+    },
+    {
+      title: "cron执行表达式",
+      align: "center",
+      dataIndex: "cronExpression",
+      ellipsis: true,
     },
     {
       title: "状态",
@@ -233,6 +253,18 @@ function Role(props: any) {
         return data;
       });
     });
+    getDicts("sys_job_group").then((response) => {
+      setDicts((data: any) => {
+        data.sys_job_group = response.data;
+        return data;
+      });
+    });
+    getDicts("sys_job_status").then((response) => {
+      setDicts((data: any) => {
+        data.sys_job_status = response.data;
+        return data;
+      });
+    });
     getMenuTreeselect();
     getDeptTreeselect();
     getList();
@@ -245,7 +277,7 @@ function Role(props: any) {
    */
   function getList() {
     setGetLoading(true);
-    listRole({ ...queryForm }).then((res: any) => {
+    listJob({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -313,7 +345,7 @@ function Role(props: any) {
     if (titleName !== "添加角色") {
       const roleId = row.roleId || selectedRowKeys[0];
       // 调用查询详细接口
-      getRole(roleId).then((response: any) => {
+      getJob(roleId).then((response: any) => {
         setRoleForm(() => {
           return { ...response.data };
         });
@@ -352,7 +384,7 @@ function Role(props: any) {
       onOk() {
         // 反向更新数据，我在这边采用的是click事件，这个时候点击是不会变更状态的，直接更改row.status 组件不会进行监听
         row.status = row.status === "0" ? "1" : "0";
-        changeRoleStatus(row.roleId, row.status)
+        changeJobStatus(row.roleId, row.status)
           .then(() => {
             message.success(text + "成功");
             getList();
@@ -378,25 +410,18 @@ function Role(props: any) {
     roleFormModel
       .validateFields()
       .then((values) => {
-        if (visibleTitle !== "分配数据权限") {
-          if (roleForm.roleId !== "") {
-            updateRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
-              message.success("修改成功");
-              setVisible(false);
-              getList();
-            });
-          } else {
-            addRole({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
-              message.success("增加成功");
-              setVisible(false);
-              // setConfirmLoading(false);
-              getList();
-            });
-          }
-        } else {
-          dataScope({ ...roleForm, ...roleFormModel.getFieldsValue(), deptIds: checkedKeys }).then(() => {
+        // if (visibleTitle !== "分配数据权限") {
+        if (roleForm.roleId !== "") {
+          updateJob({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
             message.success("修改成功");
             setVisible(false);
+            getList();
+          });
+        } else {
+          addJob({ ...roleForm, ...roleFormModel.getFieldsValue(), menuIds: checkedKeys }).then(() => {
+            message.success("增加成功");
+            setVisible(false);
+            // setConfirmLoading(false);
             getList();
           });
         }
@@ -427,7 +452,7 @@ function Role(props: any) {
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delRole(roleIds).then(() => {
+        delJob(roleIds).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -449,7 +474,7 @@ function Role(props: any) {
       content: "是否确认导出所有角色数据项？",
       centered: true,
       onOk() {
-        exportRole(queryForm)
+        exportJob(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -612,31 +637,37 @@ function Role(props: any) {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="角色名称" name="roleName">
-                <Input placeholder="请输入角色名称" />
+              <Form.Item label="任务名称" name="roleName">
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="权限字符" name="roleKey">
-                <Input placeholder="请输入权限字符" />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label="角色状态" name="status">
-                <Select placeholder="请输入角色状态" allowClear>
-                  <Option value="0">启用</Option>
-                  <Option value="1">停用</Option>
+              <Form.Item label="任务组名" name="status">
+                <Select allowClear placeholder="请输入任务组名">
+                  {dicts.sys_job_group.map((dict: any) => {
+                    return (
+                      <Option value={dict.value} key={"sys_job_group" + dict.label}>
+                        {dict.label}
+                      </Option>
+                    );
+                  })}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="操作时间" name="time">
-                <RangePicker format={dateFormat} />
+              <Form.Item label="任务状态" name="status">
+                <Select placeholder="请输入任务状态" allowClear>
+                  {dicts.sys_job_status.map((dict: any) => {
+                    return (
+                      <Option value={dict.value} key={"sys_job_status" + dict.label}>
+                        {dict.label}
+                      </Option>
+                    );
+                  })}
+                </Select>
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col offset={18} span={6}>
+            <Col span={6}>
               <Form.Item style={{ float: "right" }}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -650,7 +681,7 @@ function Role(props: any) {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
@@ -680,6 +711,9 @@ function Role(props: any) {
         </Col>
         <Col style={{ marginRight: 20 }} onClick={handleExport}>
           <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
+        </Col>
+        <Col style={{ marginRight: 20 }} onClick={handleExport}>
+          <Button icon={<BookOutlined />}>日志</Button>
         </Col>
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
