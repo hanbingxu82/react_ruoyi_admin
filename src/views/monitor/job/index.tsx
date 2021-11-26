@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-26 10:02:23
+ * @LastEditTime: 2021-11-26 11:08:32
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -12,7 +12,7 @@ import "./index.less";
 import HeaderBar from "../../../compoents/HeaderBar";
 
 import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, changeJobStatus } from "../../../api/monitor/job";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
@@ -214,6 +214,7 @@ function Job(props: any) {
   // 表单弹窗
   const [roleFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
+  const [visibleCron, setVisibleCron] = useState(false);
   const [visibleTitle, setVisibleTitle] = useState("添加角色");
   const [confirmLoading] = useState(false);
   // 用户form字段
@@ -573,35 +574,6 @@ function Job(props: any) {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal destroyOnClose className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <QnnReactCron
-          value={value}
-          onOk={(value: any) => {
-            console.log("cron:", value);
-          }}
-          getCronFns={(_cronFns: any) => {
-            cronFns = _cronFns;
-          }}
-          footer={[
-            <Button
-              key="cencel"
-              style={{ marginRight: 10 }}
-              onClick={() => {
-                setValue(null);
-              }}
-            >
-              重置
-            </Button>,
-            <Button
-              key="getValue"
-              type="primary"
-              onClick={() => {
-                setValue(cronFns.getValue());
-              }}
-            >
-              生成
-            </Button>,
-          ]}
-        />
         <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
           <Row>
             <Col span={12}>
@@ -627,7 +599,20 @@ function Job(props: any) {
             <Input placeholder="请输入调用方法" />
           </Form.Item>
           <Form.Item label="corn表达式" name="roleName" rules={[{ required: true, message: "corn表达式不能为空" }]}>
-            <Input placeholder="请输入corn表达式" />
+            <Input
+              addonAfter={
+                <div
+                  onClick={() => {
+                    setVisibleCron(true);
+                  }}
+                  style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+                >
+                  <span style={{ marginRight: "4px" }}>生成表达式 </span>
+                  <ClockCircleOutlined />
+                </div>
+              }
+              placeholder="请输入corn表达式"
+            />
           </Form.Item>
           <Form.Item label="错误策略" name="roleName">
             <Radio.Group buttonStyle="solid">
@@ -660,6 +645,49 @@ function Job(props: any) {
             </Col>
           </Row>
         </Form>
+      </Modal>
+
+      <Modal
+        footer={null}
+        destroyOnClose
+        centered
+        width="40%"
+        onCancel={() => {
+          setVisibleCron(false);
+        }}
+        visible={visibleCron}
+        title="Cron表达式生成器"
+      >
+        <QnnReactCron
+          value={value}
+          onOk={(value: any) => {
+            console.log("cron:", value);
+          }}
+          getCronFns={(_cronFns: any) => {
+            cronFns = _cronFns;
+          }}
+          footer={[
+            <Button
+              key="cencel"
+              style={{ marginRight: 10 }}
+              onClick={() => {
+                setValue(null);
+              }}
+            >
+              重置
+            </Button>,
+            <Button
+              key="getValue"
+              type="primary"
+              onClick={() => {
+                setValue(cronFns.getValue());
+                setVisibleCron(false);
+              }}
+            >
+              生成
+            </Button>,
+          ]}
+        />
       </Modal>
     </div>
   );
