@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-26 09:31:50
+ * @LastEditTime: 2021-11-26 10:02:23
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -14,21 +14,18 @@ import HeaderBar from "../../../compoents/HeaderBar";
 import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, changeJobStatus } from "../../../api/monitor/job";
-import { treeselect as menuTreeselect, roleMenuTreeselect } from "api/system/menu";
-import { treeselect as deptTreeselect, roleDeptTreeselect } from "api/system/dept";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
 import moment from "moment";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import QnnReactCron from "qnn-react-cron";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
-function Role(props: any) {
+function Job(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
@@ -54,7 +51,6 @@ function Role(props: any) {
   const [showQueryForm, setShowQueryForm] = useState(true);
   // 字典列表
   const [dicts, setDicts]: any = useState({
-    sys_normal_disable: [],
     sys_job_group: [],
     sys_job_status: [],
     menuOptions: [],
@@ -247,12 +243,6 @@ function Role(props: any) {
    */
   useEffect(() => {
     initComponent.current = false;
-    getDicts("sys_normal_disable").then((response) => {
-      setDicts((data: any) => {
-        data.sys_normal_disable = response.data;
-        return data;
-      });
-    });
     getDicts("sys_job_group").then((response) => {
       setDicts((data: any) => {
         data.sys_job_group = response.data;
@@ -613,39 +603,59 @@ function Role(props: any) {
           ]}
         />
         <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
-          <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
-            <Input disabled={visibleTitle === "分配数据权限"} placeholder="请输入角色名称" />
+          <Row>
+            <Col span={12}>
+              <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
+                <Input placeholder="请输入角色名称" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="任务分组" name="roleKey" rules={[{ required: true, message: "任务分组不能为空" }]}>
+                <Select value={roleForm.dataScope} placeholder="请选择任务分组">
+                  {dicts.sys_job_group.map((dict: any) => {
+                    return (
+                      <Option value={dict.value} key={"sys_job_group" + dict.label}>
+                        {dict.label}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="调用方法" name="roleName" rules={[{ required: true, message: "调用方法不能为空" }]}>
+            <Input placeholder="请输入调用方法" />
           </Form.Item>
-          <Form.Item label="权限字符" name="roleKey" rules={[{ required: true, message: "权限字符不能为空" }]}>
-            <Input disabled={visibleTitle === "分配数据权限"} placeholder="请输入权限字符" />
+          <Form.Item label="corn表达式" name="roleName" rules={[{ required: true, message: "corn表达式不能为空" }]}>
+            <Input placeholder="请输入corn表达式" />
           </Form.Item>
-          <Form.Item label="角色状态" name="status">
-            <Radio.Group>
-              {dicts.sys_normal_disable.map((dict: any) => {
-                return (
-                  <Radio value={dict.dictValue} key={"status" + dict.dictValue}>
-                    {dict.dictLabel}
-                  </Radio>
-                );
-              })}
+          <Form.Item label="错误策略" name="roleName">
+            <Radio.Group buttonStyle="solid">
+              <Radio.Button value="1">立即执行</Radio.Button>
+              <Radio.Button value="2">执行一次</Radio.Button>
+              <Radio.Button value="3">放弃执行</Radio.Button>
             </Radio.Group>
           </Form.Item>
-          <Form.Item label="用户性别" name="dataScope">
-            <Select value={roleForm.dataScope} placeholder="请选择用户性别">
-              {dicts.dataScopeOptions.map((dict: any) => {
-                return (
-                  <Option value={dict.value} key={"dataScope" + dict.label}>
-                    {dict.label}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-
           <Row>
-            <Col span={24}>
-              <Form.Item label="备注" name="remark">
-                <Input.TextArea placeholder="请输入内容" />
+            <Col span={12}>
+              <Form.Item label="是否并发" name="roleName">
+                <Radio.Group buttonStyle="solid">
+                  <Radio.Button value="0">允许</Radio.Button>
+                  <Radio.Button value="1">禁止</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="状态" name="status">
+                <Radio.Group>
+                  {dicts.sys_job_status.map((dict: any) => {
+                    return (
+                      <Radio value={dict.dictValue} key={"statusForm" + dict.dictValue}>
+                        {dict.dictLabel}
+                      </Radio>
+                    );
+                  })}
+                </Radio.Group>
               </Form.Item>
             </Col>
           </Row>
@@ -654,4 +664,4 @@ function Role(props: any) {
     </div>
   );
 }
-export default Role;
+export default Job;
