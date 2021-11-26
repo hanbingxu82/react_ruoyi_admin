@@ -51,7 +51,7 @@ export function delJob(jobId: string) {
 }
 
 // 导出定时任务调度
-export function exportJob(query: { pageNum: number; pageSize: number; roleKey: string; roleName: string; status: string; params: { beginTime: string; endTime: string } }) {
+export function exportJob(query: any) {
   return request({
     url: "/monitor/job/export",
     method: "get",

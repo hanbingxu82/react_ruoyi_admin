@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-26 11:08:32
+ * @LastEditTime: 2021-11-26 15:43:09
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -39,13 +39,9 @@ function Job(props: any) {
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    roleKey: "",
-    roleName: "",
+    jobName: "",
+    jobGroup: "",
     status: "",
-    params: {
-      beginTime: "",
-      endTime: "",
-    },
   });
   const [queryFormRef] = Form.useForm();
   const [showQueryForm, setShowQueryForm] = useState(true);
@@ -53,33 +49,10 @@ function Job(props: any) {
   const [dicts, setDicts]: any = useState({
     sys_job_group: [],
     sys_job_status: [],
-    menuOptions: [],
-    menuOptionsAll: [],
-    deptOptions: [],
-    deptOptionsAll: [],
-    // 数据范围选项
-    dataScopeOptions: [
-      {
-        value: "1",
-        label: "全部数据权限",
-      },
-      {
-        value: "2",
-        label: "自定数据权限",
-      },
-      {
-        value: "3",
-        label: "本部门数据权限",
-      },
-      {
-        value: "4",
-        label: "本部门及以下数据权限",
-      },
-      {
-        value: "5",
-        label: "仅本人数据权限",
-      },
-    ],
+
+
+
+
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -159,11 +132,11 @@ function Job(props: any) {
       render: (text: any, row: any) => (
         <Switch
           // key={text + index + switchKey}
-          checkedChildren="开启"
+          checkedChildren="正常"
           onClick={() => {
             onTableSwitchChange(row);
           }}
-          unCheckedChildren="关闭"
+          unCheckedChildren="暂停"
           checked={row.status === "0" ? true : false}
           // defaultChecked={row.status === "0" ? true : false}
         />
@@ -245,6 +218,7 @@ function Job(props: any) {
   useEffect(() => {
     initComponent.current = false;
     getDicts("sys_job_group").then((response) => {
+      console.log(response);
       setDicts((data: any) => {
         data.sys_job_group = response.data;
         return data;
@@ -279,16 +253,10 @@ function Job(props: any) {
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.roleKey = form.roleKey;
-      data.roleName = form.roleName;
+      data.jobName = form.jobName;
+      data.jobGroup = form.jobGroup;
       data.status = form.status;
-      if (form.time) {
-        data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
-        data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
-      } else {
-        data.params.beginTime = "";
-        data.params.endTime = "";
-      }
+
       return { ...data };
     });
   }
@@ -355,7 +323,7 @@ function Job(props: any) {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: '确认要"' + text + '""' + row.roleName + '"角色吗?',
+      content: '确认要"' + text + '""' + row.jobName + '"角色吗?',
       centered: true,
       onOk() {
         // 反向更新数据，我在这边采用的是click事件，这个时候点击是不会变更状态的，直接更改row.status 组件不会进行监听
@@ -472,17 +440,17 @@ function Job(props: any) {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="任务名称" name="roleName">
+              <Form.Item label="任务名称" name="jobName">
                 <Input placeholder="请输入任务名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="任务组名" name="status">
+              <Form.Item label="任务组名" name="jobGroup">
                 <Select allowClear placeholder="请输入任务组名">
                   {dicts.sys_job_group.map((dict: any) => {
                     return (
-                      <Option value={dict.value} key={"sys_job_group" + dict.label}>
-                        {dict.label}
+                      <Option value={dict.dictValue} key={"sys_job_group" + dict.dictLabel}>
+                        {dict.dictLabel}
                       </Option>
                     );
                   })}
@@ -494,8 +462,8 @@ function Job(props: any) {
                 <Select placeholder="请输入任务状态" allowClear>
                   {dicts.sys_job_status.map((dict: any) => {
                     return (
-                      <Option value={dict.value} key={"sys_job_status" + dict.label}>
-                        {dict.label}
+                      <Option value={dict.dictValue} key={"sys_job_status" + dict.dictLabel}>
+                        {dict.dictLabel}
                       </Option>
                     );
                   })}
@@ -574,20 +542,20 @@ function Job(props: any) {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal destroyOnClose className="Role-CurdModal" centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", roleSort: 0 }} autoComplete="off">
+        <Form form={roleFormModel} name="roleFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ misfirePolicy: "1", concurrent: "1", status: "0" }} autoComplete="off">
           <Row>
             <Col span={12}>
-              <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: "角色名称不能为空" }]}>
-                <Input placeholder="请输入角色名称" />
+              <Form.Item label="任务名称" name="jobName" rules={[{ required: true, message: "任务名称不能为空" }]}>
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="任务分组" name="roleKey" rules={[{ required: true, message: "任务分组不能为空" }]}>
+              <Form.Item label="任务分组" name="jobGroup" rules={[{ required: true, message: "任务分组不能为空" }]}>
                 <Select value={roleForm.dataScope} placeholder="请选择任务分组">
                   {dicts.sys_job_group.map((dict: any) => {
                     return (
-                      <Option value={dict.value} key={"sys_job_group" + dict.label}>
-                        {dict.label}
+                      <Option value={dict.dictValue} key={"sys_job_group" + dict.dictLabel}>
+                        {dict.dictLabel}
                       </Option>
                     );
                   })}
@@ -595,10 +563,10 @@ function Job(props: any) {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="调用方法" name="roleName" rules={[{ required: true, message: "调用方法不能为空" }]}>
+          <Form.Item label="调用方法" name="invokeTarget" rules={[{ required: true, message: "调用方法不能为空" }]}>
             <Input placeholder="请输入调用方法" />
           </Form.Item>
-          <Form.Item label="corn表达式" name="roleName" rules={[{ required: true, message: "corn表达式不能为空" }]}>
+          <Form.Item label="corn表达式" name="cronExpression" rules={[{ required: true, message: "corn表达式不能为空" }]}>
             <Input
               addonAfter={
                 <div
@@ -614,7 +582,7 @@ function Job(props: any) {
               placeholder="请输入corn表达式"
             />
           </Form.Item>
-          <Form.Item label="错误策略" name="roleName">
+          <Form.Item label="错误策略" name="misfirePolicy">
             <Radio.Group buttonStyle="solid">
               <Radio.Button value="1">立即执行</Radio.Button>
               <Radio.Button value="2">执行一次</Radio.Button>
@@ -623,7 +591,7 @@ function Job(props: any) {
           </Form.Item>
           <Row>
             <Col span={12}>
-              <Form.Item label="是否并发" name="roleName">
+              <Form.Item label="是否并发" name="concurrent">
                 <Radio.Group buttonStyle="solid">
                   <Radio.Button value="0">允许</Radio.Button>
                   <Radio.Button value="1">禁止</Radio.Button>
@@ -659,7 +627,7 @@ function Job(props: any) {
         title="Cron表达式生成器"
       >
         <QnnReactCron
-          value={value}
+          value={""}
           onOk={(value: any) => {
             console.log("cron:", value);
           }}
@@ -680,7 +648,10 @@ function Job(props: any) {
               key="getValue"
               type="primary"
               onClick={() => {
-                setValue(cronFns.getValue());
+                roleFormModel.setFieldsValue({
+                  ...roleFormModel.getFieldsValue(),
+                  cronExpression: cronFns.getValue(),
+                });
                 setVisibleCron(false);
               }}
             >
