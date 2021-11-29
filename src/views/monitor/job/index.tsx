@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-29 14:06:51
+ * @LastEditTime: 2021-11-29 15:43:44
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -11,7 +11,7 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
+import { Dropdown, Menu, Tree, Checkbox, Descriptions, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from "../../../api/monitor/job";
 import { selectDictLabel } from "../../../utils/ruoyi";
@@ -71,7 +71,7 @@ function Job(props: any) {
         </Menu.Item>
         <Menu.Item
           onClick={() => {
-            dataPermissions(row);
+            getData(row);
           }}
           key="KeyOutlined"
           icon={<KeyOutlined />}
@@ -190,11 +190,8 @@ function Job(props: any) {
   const [roleForm, setRoleForm] = useState({
     jobId: "",
     dataScope: "",
-    menuCheckStrictly: true,
-    deptCheckStrictly: true,
-    menuIds: [],
-    deptIds: [],
   });
+  const [openView, setOpenView] = useState(false);
   // 监听副作用
   useEffect(() => {
     if (initComponent.current) return;
@@ -345,7 +342,7 @@ function Job(props: any) {
    * @param {*}
    * @return {*}
    */
-  const handleOk = () => {
+  function handleOk() {
     // form 表单内容
     roleFormModel
       .validateFields()
@@ -367,20 +364,20 @@ function Job(props: any) {
       .catch((err) => {
         console.log("校验失败" + err);
       });
-  };
-  const handleCancel = () => {
+  }
+  function handleCancel() {
     setRoleForm((data) => {
       data.dataScope = "";
       return { ...data };
     });
     setVisible(false);
-  };
+  }
   /**
    * @description: 点击删除事件
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { jobId: "" }) => {
+  function delData(row: any = { jobId: "" }) {
     const jobIds = row.jobId || selectedRowKeys;
     confirm({
       title: "警告",
@@ -397,14 +394,13 @@ function Job(props: any) {
         console.log("Cancel");
       },
     });
-  };
+  }
   /**
    * @description: 执行一次
    * @param {any} row
    * @return {*}
    */
-  const oneData = (row: any = { jobId: "" }) => {
-    const jobIds = row.jobId || selectedRowKeys;
+  function oneData(row: any) {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
@@ -421,7 +417,18 @@ function Job(props: any) {
         console.log("Cancel");
       },
     });
-  };
+  }
+  /**
+   * @description: 任务详情
+   * @param {any} row
+   * @return {*}
+   */
+  function getData(row: any) {
+    getJob(row.jobId).then((response: any) => {
+      setRoleForm({ ...response.data });
+      setOpenView(true);
+    });
+  }
   /**
    * @description: 导出函数
    * @param {*}
@@ -448,7 +455,6 @@ function Job(props: any) {
   function onSelectChange(selectedRowKeys: any) {
     setSelectedRowKeys(selectedRowKeys);
   }
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
@@ -634,7 +640,7 @@ function Job(props: any) {
           </Row>
         </Form>
       </Modal>
-
+      {/* corn 表达式弹窗 */}
       <Modal
         footer={null}
         destroyOnClose
@@ -679,6 +685,26 @@ function Job(props: any) {
             </Button>,
           ]}
         />
+      </Modal>
+      {/*  */}
+      <Modal
+        footer={null}
+        destroyOnClose
+        centered
+        width="40%"
+        onCancel={() => {
+          setOpenView(false);
+        }}
+        visible={openView}
+        title="任务详情"
+      >
+        <Descriptions title="User Info">
+          <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
+          <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
+          <Descriptions.Item label="Live">Hangzhou, Zhejiang</Descriptions.Item>
+          <Descriptions.Item label="Remark">empty</Descriptions.Item>
+          <Descriptions.Item label="Address">No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China</Descriptions.Item>
+        </Descriptions>
       </Modal>
     </div>
   );
