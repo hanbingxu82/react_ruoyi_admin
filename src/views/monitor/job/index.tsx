@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-26 15:43:09
+ * @LastEditTime: 2021-11-29 14:06:51
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -13,7 +13,7 @@ import HeaderBar from "../../../compoents/HeaderBar";
 
 import { Dropdown, Menu, Tree, Checkbox, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import { listJob, getJob, delJob, addJob, updateJob, exportJob, changeJobStatus } from "../../../api/monitor/job";
+import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from "../../../api/monitor/job";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
@@ -49,10 +49,6 @@ function Job(props: any) {
   const [dicts, setDicts]: any = useState({
     sys_job_group: [],
     sys_job_status: [],
-
-
-
-
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -66,9 +62,9 @@ function Job(props: any) {
       <Menu>
         <Menu.Item
           onClick={() => {
-            dataPermissions(row);
+            oneData(row);
           }}
-          key="KeyOutlined"
+          key="CaretRightOutlined"
           icon={<CaretRightOutlined />}
         >
           执行一次
@@ -86,7 +82,7 @@ function Job(props: any) {
           onClick={() => {
             systemUser(row);
           }}
-          key="SmileOutlined"
+          key="BookOutlined"
           icon={<BookOutlined />}
         >
           调度日志
@@ -403,6 +399,30 @@ function Job(props: any) {
     });
   };
   /**
+   * @description: 执行一次
+   * @param {any} row
+   * @return {*}
+   */
+  const oneData = (row: any = { jobId: "" }) => {
+    const jobIds = row.jobId || selectedRowKeys;
+    confirm({
+      title: "警告",
+      icon: <ExclamationCircleOutlined />,
+
+      content: "确认要立即执行一次" + row.jobName + "任务吗？",
+      centered: true,
+      onOk() {
+        runJob(row.jobId, row.jobGroup).then(() => {
+          getList();
+          message.success("操作成功");
+        });
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  };
+  /**
    * @description: 导出函数
    * @param {*}
    * @return {*}
@@ -411,7 +431,7 @@ function Job(props: any) {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: "是否确认导出所有角色数据项？",
+      content: "是否确认导出所有定时任务数据项？",
       centered: true,
       onOk() {
         exportJob(queryForm)
