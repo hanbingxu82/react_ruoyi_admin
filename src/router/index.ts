@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-11-22 15:21:50
+ * @LastEditTime: 2021-11-30 10:31:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -13,7 +13,7 @@ import Login from "../views/login";
 import DictData from "views/system/dict/data";
 import AuthUser from "views/system/role/authUser";
 import UserProfile from "views/system/profile";
-
+import JobLog from "views/monitor/job/jobLog";
 
 /**
  * @description: 一级路由
@@ -89,6 +89,14 @@ const subRouters = [
     },
     exact: true,
     component: UserProfile,
+  },
+  {
+    path: "/monitor/job-log",
+    meta: {
+      title: "调度日志",
+    },
+    exact: true,
+    component: JobLog,
   },
 ];
 

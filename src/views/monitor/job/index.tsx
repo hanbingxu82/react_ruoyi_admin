@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-29 15:43:44
+ * @LastEditTime: 2021-11-30 10:37:06
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -80,7 +80,7 @@ function Job(props: any) {
         </Menu.Item>
         <Menu.Item
           onClick={() => {
-            systemUser(row);
+            goJobLog();
           }}
           key="BookOutlined"
           icon={<BookOutlined />}
@@ -429,6 +429,9 @@ function Job(props: any) {
       setOpenView(true);
     });
   }
+  function goJobLog() {
+    props.history.push("/monitor/job-log");
+  }
   /**
    * @description: 导出函数
    * @param {*}
@@ -541,7 +544,7 @@ function Job(props: any) {
         <Col style={{ marginRight: 20 }} onClick={handleExport}>
           <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
         </Col>
-        <Col style={{ marginRight: 20 }} onClick={handleExport}>
+        <Col style={{ marginRight: 20 }} onClick={goJobLog}>
           <Button icon={<BookOutlined />}>日志</Button>
         </Col>
         <Col style={{ flex: 1, textAlign: "right" }}>
