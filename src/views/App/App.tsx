@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-30 11:31:25
+ * @LastEditTime: 2021-11-30 16:27:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext, createContext } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
@@ -21,6 +21,7 @@ import SvgIcon from "compoents/SvgIcon";
 import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
 import AvatarImg from "assets/images/profile.jpg";
 
+export const Context = createContext<any>(null);
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
@@ -75,6 +76,19 @@ function App(props: any) {
             add({ title: pathObj[0].meta.title, key: pathObj[0].path });
           }
         }
+        // 判断长度是否>1 如果 >1的话相当于是进入了三级菜单
+        if (panes.length === 2) {
+          if (panes[1].key.includes("/monitor/job-log") || panes[1].key.includes("/system/role-auth") || panes[1].key.includes("/system/dict-data")) {
+            // 分配用户  // 字典数据  // 调度日志
+            let arr = panes[1].key.split("-") || [];
+            let open = arr[0].split("/") || [];
+            open.forEach((element: any, index: number) => {
+              open[index] = "/" + open[index];
+            });
+            setIsOpen([...open]);
+            setDefaultSelectedKeys(arr[0]);
+          }
+        }
       }
     }
   }, [props.routerMenu]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -82,7 +96,14 @@ function App(props: any) {
   useEffect(() => {
     initComponent.current = false;
     props.getMenu();
-    setActiveKey(panes[0].key);
+    // 判断如果第一次进来不是首页就不用跳了
+    if (props.location.pathname === "/index/layout" || props.location.pathname === "/") {
+      props.history.push("/index/layout");
+      setActiveKey(() => {
+        return panes[0].key;
+      });
+    }
+
     // 监听esc退出全屏
     if (window.addEventListener) {
       window.addEventListener("resize", onEscCancelFull, false);
@@ -126,11 +147,13 @@ function App(props: any) {
     }
   };
   function add(obj: any) {
-    const activeKey = obj.key;
-    setActiveKey(activeKey);
     setPanes((data: any) => {
-      data.push({ title: obj.title, key: activeKey });
+      data.push({ title: obj.title, key: obj.key });
       return [...data];
+    });
+
+    setActiveKey(() => {
+      return obj.key;
     });
   }
   function remove(targetKey: any) {
@@ -176,14 +199,47 @@ function App(props: any) {
   };
   // navLink点击事件
   function toClickNavLink(link: any, title: any) {
-    setDefaultSelectedKeys(link);
-    const isYes = panes.some((item: any) => {
-      return item.key === link;
-    });
-    if (!isYes) {
-      add({ title, key: link });
+    // 如果是三级菜单的点击行为
+    if (link.includes("/monitor/job-log") || link.includes("/system/role-auth") || link.includes("/system/dict-data")) {
+      // 分配用户  // 字典数据  // 调度日志
+      let arr = link.split("-") || [];
+      let open = arr[0].split("/") || [];
+      open.forEach((element: any, index: number) => {
+        open[index] = "/" + open[index];
+      });
+      // 截取的三级菜单特殊 地址
+      let openLink = link.split("/") || [];
+      openLink.pop();
+      openLink = openLink.join("/");
+      const isYes = panes.some((item: any) => {
+        return item.key.includes(openLink);
+      });
+      if (!isYes) {
+        add({ title, key: link });
+      } else {
+        // 找到对应的nav 进行替换
+        setPanes((data: any) => {
+          const index = data.findIndex((item: any) => {
+            return item.key.includes(openLink);
+          });
+          data[index] = { title, key: link };
+          return [...data];
+        });
+        setActiveKey(link);
+      }
+      setIsOpen([...open]);
+      setDefaultSelectedKeys(arr[0]);
     } else {
-      setActiveKey(link);
+      // 如果是正常的点击行为
+      setDefaultSelectedKeys(link);
+      const isYes = panes.some((item: any) => {
+        return item.key === link;
+      });
+      if (!isYes) {
+        add({ title, key: link });
+      } else {
+        setActiveKey(link);
+      }
     }
   }
   // menu 下选菜单
@@ -321,12 +377,14 @@ function App(props: any) {
               overflowY: "auto",
             }}
           >
-            {routers.subRouters.map((v) => (
-              <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
-            ))}
-            {props.routerMenu.map((v: any) => {
-              return <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />;
-            })}
+            <Context.Provider value={{ toClickNavLink, add }}>
+              {routers.subRouters.map((v) => (
+                <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />
+              ))}
+              {props.routerMenu.map((v: any) => {
+                return <Route key={v.path} path={v.path} exact={v.exact} component={v.component} />;
+              })}
+            </Context.Provider>
           </Content>
         </Layout>
       </Layout>

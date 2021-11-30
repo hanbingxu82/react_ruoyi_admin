@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-11-05 11:47:51
- * @LastEditTime: 2021-11-08 10:44:12
+ * @LastEditTime: 2021-11-30 13:54:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/authUser.tsx
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import "./authUser.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
@@ -19,6 +19,7 @@ import { allocatedUserList, authUserCancel, authUserCancelAll, unallocatedUserLi
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
+import { Context } from "views/App/App";
 
 const { confirm } = Modal;
 const { Option } = Select;
@@ -29,6 +30,7 @@ function AuthUser(props: any) {
    * @return {*}
    */
   const initComponent = useRef(true);
+  const AppComponent = useContext(Context);
   // 搜索条件
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
@@ -182,6 +184,10 @@ function AuthUser(props: any) {
    * @return {*}
    */
   useEffect(() => {
+    // 每次加载就会相当于是点击了tabs栏
+    const arr = window.location.href.split("#");
+    AppComponent.toClickNavLink(arr[1], "分配用户");
+
     const roleId = props.match ? props.match.params.id : "";
     initComponent.current = false;
     setQueryForm((data) => {
@@ -287,7 +293,7 @@ function AuthUser(props: any) {
       message.success(res.msg);
       if (res.code === 200) {
         setVisible(false);
-        getList()
+        getList();
       }
     });
   }
@@ -381,7 +387,7 @@ function AuthUser(props: any) {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
@@ -423,7 +429,8 @@ function AuthUser(props: any) {
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.userId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination   current={queryForm.pageNum} 
+        <RuoYiPagination
+          current={queryForm.pageNum}
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
@@ -457,7 +464,8 @@ function AuthUser(props: any) {
           </Row>
         </Form>
         <Table style={{ width: "100%" }} loading={getUserLoading} pagination={false} rowKey={(record: any) => record.userId} rowSelection={rowSelectionUser} columns={columnsUser} dataSource={userList} />
-        <RuoYiPagination   current={queryForm.pageNum} 
+        <RuoYiPagination
+          current={queryForm.pageNum}
           total={userTotal}
           onChange={(page: any, pageSize: any) => {
             setQueryFormModal({ ...queryFormModal, pageNum: page, pageSize });
