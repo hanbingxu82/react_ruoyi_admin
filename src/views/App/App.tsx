@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-30 16:27:17
+ * @LastEditTime: 2021-11-30 17:03:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -70,7 +70,6 @@ function App(props: any) {
             open[index] = "/" + open[index];
           });
           setIsOpen([...open]);
-
           setDefaultSelectedKeys(pathObj[0].path);
           if (pathObj[0].path !== "/index/layout") {
             add({ title: pathObj[0].meta.title, key: pathObj[0].path });
@@ -175,6 +174,25 @@ function App(props: any) {
     if (activeKeyStr) {
       setActiveKey(activeKeyStr);
       props.history.push(activeKeyStr);
+      // 如果是3级菜单的话  直接走对应的2级侧边栏高亮
+      if (activeKeyStr.includes("/monitor/job-log") || activeKeyStr.includes("/system/role-auth") || activeKeyStr.includes("/system/dict-data")) {
+        // 分配用户  // 字典数据  // 调度日志
+        let arr = activeKeyStr.split("-") || [];
+        let open = arr[0].split("/") || [];
+        open.forEach((element: any, index: number) => {
+          open[index] = "/" + open[index];
+        });
+        setIsOpen([...open]);
+        setDefaultSelectedKeys(arr[0]);
+      } else {
+        // 如果是普通菜单直接跳转 高亮侧边栏即可
+        let open = activeKeyStr.split("/") || [];
+        open.forEach((element: any, index: number) => {
+          open[index] = "/" + open[index];
+        });
+        setIsOpen([...open]);
+        setDefaultSelectedKeys(activeKeyStr);
+      }
     }
     setPanes((data: any) => {
       data = arr;
