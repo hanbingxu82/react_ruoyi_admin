@@ -1,16 +1,16 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-30 17:03:58
+ * @LastEditTime: 2021-12-01 15:22:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import React, { useEffect, useState, useRef, useContext, createContext } from "react";
+import React, { useEffect, useState, useRef,  createContext } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, UserOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
 import { connect } from "react-redux";
