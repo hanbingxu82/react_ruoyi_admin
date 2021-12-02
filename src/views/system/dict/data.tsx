@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-11-02 08:49:25
+ * @LastEditTime: 2021-12-02 15:40:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import "./data.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
@@ -20,6 +20,7 @@ import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
+import { Context } from "views/App/App";
 
 const { confirm } = Modal;
 const { Option } = Select;
@@ -30,6 +31,7 @@ function Data(props: any) {
    * @return {*}
    */
   const initComponent = useRef(true);
+  const AppComponent = useContext(Context);
   // 搜索条件
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
@@ -186,6 +188,10 @@ function Data(props: any) {
    * @return {*}
    */
   useEffect(() => {
+    // 每次加载就会相当于是点击了tabs栏
+    const arr = window.location.href.split("#");
+    AppComponent.toClickNavLink(arr[1], "分配用户");
+
     const dictId = props.match ? props.match.params.id : "";
     initComponent.current = false;
     getDicts("sys_normal_disable").then((response) => {
@@ -254,8 +260,8 @@ function Data(props: any) {
     queryFormRef.setFieldsValue({
       dictType: defaultDictType,
     });
-    
-    onQueryFinish({dictType: defaultDictType});
+
+    onQueryFinish({ dictType: defaultDictType });
   }
 
   /**
@@ -267,7 +273,7 @@ function Data(props: any) {
     setVisibleTitle(titleName);
     dataFormModel.resetFields();
     dataFormModel.setFieldsValue({
-      dictType:queryForm.dictType
+      dictType: queryForm.dictType,
     });
     setDataForm(() => {
       return {
@@ -425,7 +431,7 @@ function Data(props: any) {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
@@ -473,7 +479,8 @@ function Data(props: any) {
       {/* 表格区域 */}
       <Row>
         <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictCode} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination   current={queryForm.pageNum} 
+        <RuoYiPagination
+          current={queryForm.pageNum}
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
@@ -482,8 +489,8 @@ function Data(props: any) {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={dataFormModel} name="dataFormModel" labelCol={{ style: { width: 90 } }} initialValues={{dictSort:'0', status: "0", listClass: "default" }} autoComplete="off">
-          <Form.Item label="字典类型" name="dictType" >
+        <Form form={dataFormModel} name="dataFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ dictSort: "0", status: "0", listClass: "default" }} autoComplete="off">
+          <Form.Item label="字典类型" name="dictType">
             <Input disabled placeholder="请输入字典类型" />
           </Form.Item>
           <Form.Item label="数据标签" name="dictLabel" rules={[{ required: true, message: "数据标签不能为空" }]}>
@@ -492,13 +499,13 @@ function Data(props: any) {
           <Form.Item label="数据键值" name="dictValue" rules={[{ required: true, message: "数据键值不能为空" }]}>
             <Input placeholder="请输入数据键值" />
           </Form.Item>
-          <Form.Item label="样式属性" name="cssClass" >
+          <Form.Item label="样式属性" name="cssClass">
             <Input placeholder="请输入样式属性" />
           </Form.Item>
           <Form.Item label="显示排序" name="dictSort" rules={[{ required: true, message: "显示排序不能为空" }]}>
             <InputNumber placeholder="请输入显示排序" />
           </Form.Item>
-          <Form.Item label="回显样式" name="listClass" >
+          <Form.Item label="回显样式" name="listClass">
             <Select placeholder="请选择回显样式">
               {dicts.listClassOptions.map((dict: any) => {
                 return (
