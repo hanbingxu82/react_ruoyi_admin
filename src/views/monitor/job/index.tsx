@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-24 10:10:10
- * @LastEditTime: 2021-11-30 10:37:06
+ * @LastEditTime: 2021-12-02 16:15:51
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/index.tsx
@@ -11,18 +11,15 @@ import "./index.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Dropdown, Menu, Tree, Checkbox, Descriptions, Switch, InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, SmileOutlined, BookOutlined, CaretRightOutlined, EyeOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Dropdown, Menu, Descriptions, Switch, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, DoubleRightOutlined, KeyOutlined, BookOutlined, CaretRightOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from "../../../api/monitor/job";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
-import moment from "moment";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 import QnnReactCron from "qnn-react-cron";
 
-const { RangePicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
 function Job(props: any) {
@@ -263,23 +260,6 @@ function Job(props: any) {
     onQueryFinish({});
   }
   /**
-   * @description: 数据权限点击事件
-   * @param {*}
-   * @return {*}
-   */
-  function dataPermissions(row: any) {
-    showModal("分配数据权限", row);
-  }
-  /**
-   * @description: 分配用户事件
-   * @param {*}
-   * @return {*}
-   */
-  function systemUser(row: any) {
-    //  跳转路由页面
-    props.history.push("/system/role-auth/" + row.jobId);
-  }
-  /**
    * @description: 点击增加、修改、分配数据权限事件
    * @param {*}
    * @return {*}
@@ -429,8 +409,8 @@ function Job(props: any) {
       setOpenView(true);
     });
   }
-  function goJobLog() {
-    props.history.push("/monitor/job-log");
+  function goJobLog(id: any = "0") {
+    props.history.push("/monitor/job-log/" + id);
   }
   /**
    * @description: 导出函数
@@ -544,7 +524,12 @@ function Job(props: any) {
         <Col style={{ marginRight: 20 }} onClick={handleExport}>
           <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
         </Col>
-        <Col style={{ marginRight: 20 }} onClick={goJobLog}>
+        <Col
+          style={{ marginRight: 20 }}
+          onClick={() => {
+            goJobLog("0");
+          }}
+        >
           <Button icon={<BookOutlined />}>日志</Button>
         </Col>
         <Col style={{ flex: 1, textAlign: "right" }}>

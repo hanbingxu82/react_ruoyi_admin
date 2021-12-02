@@ -1,40 +1,43 @@
 /*
  * @Author: your name
  * @Date: 2021-11-30 10:16:33
- * @LastEditTime: 2021-11-30 10:18:30
+ * @LastEditTime: 2021-12-02 16:02:12
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/jobLog.tsx
  */
 
-import { useState, useEffect, useRef } from "react";
-import "./index.less";
+import { useState, useEffect, useRef, useContext } from "react";
+import "./jobLog.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message } from "antd";
+import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "../../../api/system/post";
+import { listData, getData, delData, addData, updateData, exportData } from "api/system/dict/data";
+import { listType, getType } from "api/system/dict/type";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
+import { Context } from "views/App/App";
 
 const { confirm } = Modal;
 const { Option } = Select;
-function Post() {
+function JobLog(props: any) {
   /**
    * @description: 是否第一次加载组件
    * @param {*}
    * @return {*}
    */
   const initComponent = useRef(true);
+  const AppComponent = useContext(Context);
   // 搜索条件
   const [queryForm, setQueryForm] = useState({
     pageNum: 1,
     pageSize: 10,
-    postName: "",
-    postCode: "",
+    dictType: "",
+    dictLabel: "",
     status: "",
   });
   const [queryFormRef] = Form.useForm();
@@ -42,6 +45,33 @@ function Post() {
   // 字典列表
   const [dicts, setDicts] = useState({
     sys_normal_disable: [],
+    typeOptions: [],
+    listClassOptions: [
+      {
+        value: "default",
+        label: "默认",
+      },
+      {
+        value: "primary",
+        label: "主要",
+      },
+      {
+        value: "success",
+        label: "成功",
+      },
+      {
+        value: "info",
+        label: "信息",
+      },
+      {
+        value: "warning",
+        label: "警告",
+      },
+      {
+        value: "danger",
+        label: "危险",
+      },
+    ],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -53,30 +83,53 @@ function Post() {
   // 表格列头对应字段
   const columns: any = [
     {
-      title: "岗位编号",
+      title: "字典编码",
       align: "center",
-      dataIndex: "postId",
+      dataIndex: "dictCode",
     },
     {
-      title: "岗位编码",
+      title: "字典标签",
       align: "center",
-      dataIndex: "postCode",
+      dataIndex: "dictLabel",
+      ellipsis: true,
+      render: (text: any, row: any) => {
+        if (row.listClass === "primary") {
+          return <Tag color={"processing"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "success") {
+          return <Tag color={"success"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "info" || row.listClass === "default") {
+          return <Tag color={"default"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "warning") {
+          return <Tag color={"warning"}>{row.dictLabel}</Tag>;
+        } else if (row.listClass === "danger") {
+          return <Tag color={"error"}>{row.dictLabel}</Tag>;
+        } else {
+          return row.dictLabel;
+        }
+      },
     },
     {
-      title: "岗位名称",
+      title: "字典键值",
       align: "center",
-      dataIndex: "postName",
+      dataIndex: "dictValue",
+      ellipsis: true,
     },
     {
-      title: "岗位排序",
+      title: "字典排序",
       align: "center",
-      dataIndex: "postSort",
+      dataIndex: "dictSort",
     },
     {
       title: "状态",
       align: "center",
       dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
+    },
+    {
+      title: "备注",
+      align: "center",
+      dataIndex: "remark",
+      ellipsis: true,
     },
     {
       title: "创建时间",
@@ -93,7 +146,7 @@ function Post() {
             <Space size="middle">
               <a
                 onClick={() => {
-                  showModal("修改岗位", row);
+                  showModal("修改字典数据", row);
                 }}
               >
                 <EditOutlined />
@@ -101,7 +154,7 @@ function Post() {
               </a>
               <a
                 onClick={() => {
-                  delData(row);
+                  delDatas(row);
                 }}
               >
                 <DeleteOutlined />
@@ -114,14 +167,15 @@ function Post() {
     },
   ];
   // 表单弹窗
-  const [postFormModel] = Form.useForm();
+  const [dataFormModel] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const [visibleTitle, setVisibleTitle] = useState("添加岗位");
+  const [visibleTitle, setVisibleTitle] = useState("添加字典数据");
   const [confirmLoading] = useState(false);
   // 用户form字段
-  const [postForm, setPostForm] = useState({
-    postId: "",
+  const [dataForm, setDataForm] = useState({
+    dictCode: "",
   });
+  const [defaultDictType, setDefaultDictType] = useState("");
   // 监听副作用
   useEffect(() => {
     if (initComponent.current) return;
@@ -134,6 +188,11 @@ function Post() {
    * @return {*}
    */
   useEffect(() => {
+    // 每次加载就会相当于是点击了tabs栏
+    const arr = window.location.href.split("#");
+    AppComponent.toClickNavLink(arr[1], "字典数据");
+
+    const dictId = props.match ? props.match.params.id : "";
     initComponent.current = false;
     getDicts("sys_normal_disable").then((response) => {
       setDicts((data) => {
@@ -141,7 +200,28 @@ function Post() {
         return data;
       });
     });
-    getList();
+    /**
+     * @description: 获取当前的type类型
+     * @param {*} dictId
+     * @return {*}
+     */
+    getType(dictId).then((response: any) => {
+      // setQueryForm((data: any) => {
+      //   data.dictType = response.data.dictType;
+      //   return data;
+      // });
+      setDefaultDictType(response.data.dictType);
+      queryFormRef.setFieldsValue({
+        dictType: response.data.dictType,
+      });
+      onQueryFinish({ dictType: response.data.dictType });
+    });
+    listType().then((response: any) => {
+      setDicts((data) => {
+        data.typeOptions = response.rows;
+        return data;
+      });
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
@@ -151,7 +231,7 @@ function Post() {
    */
   function getList() {
     setGetLoading(true);
-    listPost({ ...queryForm }).then((res: any) => {
+    listData({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -164,16 +244,9 @@ function Post() {
    */
   function onQueryFinish(form: any) {
     setQueryForm((data) => {
-      data.postName = form.postName;
-      data.postCode = form.postCode;
+      data.dictType = form.dictType;
+      data.dictLabel = form.dictLabel;
       data.status = form.status;
-      // if (form.time) {
-      //   data.params.beginTime = moment(form.time[0]).format("YYYY-MM-DD");
-      //   data.params.endTime = moment(form.time[1]).format("YYYY-MM-DD");
-      // } else {
-      //   data.params.beginTime = "";
-      //   data.params.endTime = "";
-      // }
       return { ...data };
     });
   }
@@ -184,7 +257,11 @@ function Post() {
    */
   function onResetQuery() {
     queryFormRef.resetFields();
-    onQueryFinish({});
+    queryFormRef.setFieldsValue({
+      dictType: defaultDictType,
+    });
+
+    onQueryFinish({ dictType: defaultDictType });
   }
 
   /**
@@ -192,21 +269,24 @@ function Post() {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { postId: "" }) {
+  function showModal(titleName: string, row: any = { dictCode: "" }) {
     setVisibleTitle(titleName);
-    postFormModel.resetFields();
-    setPostForm(() => {
+    dataFormModel.resetFields();
+    dataFormModel.setFieldsValue({
+      dictType: queryForm.dictType,
+    });
+    setDataForm(() => {
       return {
-        postId: "",
+        dictCode: "",
       };
     });
-    if (titleName === "修改岗位") {
-      const postId = row.postId || selectedRowKeys[0];
+
+    if (titleName === "修改字典数据") {
+      const dictCode = row.dictCode || selectedRowKeys[0];
       // 调用查询详细接口
-      getPost(postId).then((response: any) => {
-        console.log(response);
-        setPostForm({ ...response.data });
-        postFormModel.setFieldsValue({
+      getData(dictCode).then((response: any) => {
+        setDataForm({ ...response.data });
+        dataFormModel.setFieldsValue({
           ...response.data,
         });
       });
@@ -220,18 +300,18 @@ function Post() {
    */
   const handleOk = () => {
     // form 表单内容
-    postFormModel
+    dataFormModel
       .validateFields()
       .then((values) => {
-        if (postForm.postId !== "") {
-          updatePost({ ...postForm, ...postFormModel.getFieldsValue() }).then(() => {
+        if (dataForm.dictCode !== "") {
+          updateData({ ...dataForm, ...dataFormModel.getFieldsValue() }).then(() => {
             message.success("修改成功");
             // setConfirmLoading(false);
             setVisible(false);
             getList();
           });
         } else {
-          addPost({ ...postFormModel.getFieldsValue() }).then(() => {
+          addData({ ...dataFormModel.getFieldsValue() }).then(() => {
             message.success("增加成功");
             setVisible(false);
             // setConfirmLoading(false);
@@ -251,15 +331,15 @@ function Post() {
    * @param {any} row
    * @return {*}
    */
-  const delData = (row: any = { postId: "" }) => {
-    const postIds = row.postId || selectedRowKeys;
+  const delDatas = (row: any = { dictCode: "" }) => {
+    const dictCodes = row.dictCode || selectedRowKeys;
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
       content: "是否确认删除选中的数据项？",
       centered: true,
       onOk() {
-        delPost(postIds).then(() => {
+        delData(dictCodes).then(() => {
           getList();
           message.success("删除成功");
         });
@@ -278,10 +358,10 @@ function Post() {
     confirm({
       title: "警告",
       icon: <ExclamationCircleOutlined />,
-      content: "是否确认导出所有岗位数据项？",
+      content: "是否确认导出所有参数数据项？",
       centered: true,
       onOk() {
-        exportPost(queryForm)
+        exportData(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -301,26 +381,39 @@ function Post() {
     onChange: onSelectChange,
   };
   return (
-    <div className="Post">
+    <div className="Data">
       {/* 搜索条件展示区域 */}
       {showQueryForm ? (
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="岗位编码" name="postCode">
-                <Input placeholder="请输入岗位编码" />
+              <Form.Item label="字典名称" name="dictType">
+                <Select placeholder="请选择字典名称">
+                  {dicts.typeOptions.map((dict: any) => {
+                    return (
+                      <Option value={dict.dictType} key={"dictCode" + dict.dictId}>
+                        {dict.dictName}
+                      </Option>
+                    );
+                  })}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="岗位名称" name="postName">
-                <Input placeholder="请输入岗位名称" />
+              <Form.Item label="字典标签" name="dictLabel">
+                <Input placeholder="请输入字典标签" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="岗位状态" name="status">
-                <Select placeholder="请输入岗位状态" allowClear>
-                  <Option value="0">启用</Option>
-                  <Option value="1">停用</Option>
+              <Form.Item label="状态" name="status">
+                <Select placeholder="请选择状态">
+                  {dicts.sys_normal_disable.map((dict: any) => {
+                    return (
+                      <Option value={dict.dictValue} key={"dictCode" + dict.dictValue}>
+                        {dict.dictLabel}
+                      </Option>
+                    );
+                  })}
                 </Select>
               </Form.Item>
             </Col>
@@ -338,13 +431,13 @@ function Post() {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showModal("添加岗位");
+              showModal("添加字典数据");
             }}
           >
             新增
@@ -354,7 +447,7 @@ function Post() {
           <Button
             disabled={selectedRowKeys.length !== 1}
             onClick={() => {
-              showModal("修改岗位");
+              showModal("修改字典数据");
             }}
             icon={<EditOutlined />}
           >
@@ -362,13 +455,16 @@ function Post() {
           </Button>
         </Col>
         <Col style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined />} onClick={delData} disabled={selectedRowKeys.length <= 0}>
+          <Button icon={<DeleteOutlined />} onClick={delDatas} disabled={selectedRowKeys.length <= 0}>
             删除
           </Button>
         </Col>
-        <Col style={{ marginRight: 20 }} onClick={handleExport}>
-          <Button icon={<VerticalAlignBottomOutlined />}>导出</Button>
+        <Col style={{ marginRight: 20 }}>
+          <Button icon={<VerticalAlignBottomOutlined />} onClick={handleExport}>
+            导出
+          </Button>
         </Col>
+
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
             onSeachShow={() => {
@@ -382,8 +478,9 @@ function Post() {
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.postId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
-        <RuoYiPagination   current={queryForm.pageNum} 
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictCode} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <RuoYiPagination
+          current={queryForm.pageNum}
           total={total}
           onChange={(page: any, pageSize: any) => {
             setQueryForm({ ...queryForm, pageNum: page, pageSize });
@@ -392,17 +489,34 @@ function Post() {
       </Row>
       {/* 增加修改表单区域 */}
       <Modal centered width="40%" title={visibleTitle} visible={visible} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Form form={postFormModel} name="postFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ status: "0", postSort: 0 }} autoComplete="off">
-          <Form.Item label="岗位名称" name="postName" rules={[{ required: true, message: "岗位名称不能为空" }]}>
-            <Input placeholder="请输入岗位名称" />
+        <Form form={dataFormModel} name="dataFormModel" labelCol={{ style: { width: 90 } }} initialValues={{ dictSort: "0", status: "0", listClass: "default" }} autoComplete="off">
+          <Form.Item label="字典类型" name="dictType">
+            <Input disabled placeholder="请输入字典类型" />
           </Form.Item>
-          <Form.Item label="岗位编码" name="postCode" rules={[{ required: true, message: "岗位编码不能为空" }]}>
-            <Input placeholder="请输入岗位编码" />
+          <Form.Item label="数据标签" name="dictLabel" rules={[{ required: true, message: "数据标签不能为空" }]}>
+            <Input placeholder="请输入数据标签" />
           </Form.Item>
-          <Form.Item label="岗位顺序" name="postSort" rules={[{ required: true, message: "岗位顺序不能为空" }]}>
-            <InputNumber placeholder="请输入岗位顺序" />
+          <Form.Item label="数据键值" name="dictValue" rules={[{ required: true, message: "数据键值不能为空" }]}>
+            <Input placeholder="请输入数据键值" />
           </Form.Item>
-          <Form.Item label="岗位状态" name="status">
+          <Form.Item label="样式属性" name="cssClass">
+            <Input placeholder="请输入样式属性" />
+          </Form.Item>
+          <Form.Item label="显示排序" name="dictSort" rules={[{ required: true, message: "显示排序不能为空" }]}>
+            <InputNumber placeholder="请输入显示排序" />
+          </Form.Item>
+          <Form.Item label="回显样式" name="listClass">
+            <Select placeholder="请选择回显样式">
+              {dicts.listClassOptions.map((dict: any) => {
+                return (
+                  <Option value={dict.value} key={"listClassOptions" + dict.value}>
+                    {dict.label}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+          <Form.Item label="状态" name="status">
             <Radio.Group>
               {dicts.sys_normal_disable.map((dict: any) => {
                 return (
@@ -425,4 +539,4 @@ function Post() {
     </div>
   );
 }
-export default Post;
+export default JobLog;

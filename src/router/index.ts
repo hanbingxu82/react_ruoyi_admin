@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-11-30 10:31:06
+ * @LastEditTime: 2021-12-02 16:01:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -91,7 +91,7 @@ const subRouters = [
     component: UserProfile,
   },
   {
-    path: "/monitor/job-log",
+    path: "/monitor/job-log/:id",
     meta: {
       title: "调度日志",
     },
