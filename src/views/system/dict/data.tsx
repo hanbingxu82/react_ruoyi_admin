@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-29 15:17:04
- * @LastEditTime: 2021-12-02 15:40:02
+ * @LastEditTime: 2021-12-02 15:42:11
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/dict/data.tsx
@@ -190,7 +190,7 @@ function Data(props: any) {
   useEffect(() => {
     // 每次加载就会相当于是点击了tabs栏
     const arr = window.location.href.split("#");
-    AppComponent.toClickNavLink(arr[1], "分配用户");
+    AppComponent.toClickNavLink(arr[1], "字典数据");
 
     const dictId = props.match ? props.match.params.id : "";
     initComponent.current = false;
