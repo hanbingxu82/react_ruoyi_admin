@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-30 10:16:33
- * @LastEditTime: 2021-12-02 16:02:12
+ * @LastEditTime: 2021-12-03 09:35:46
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/jobLog.tsx
@@ -13,8 +13,10 @@ import "./jobLog.less";
 import HeaderBar from "../../../compoents/HeaderBar";
 
 import { InputNumber, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { listData, getData, delData, addData, updateData, exportData } from "api/system/dict/data";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, EyeOutlined } from "@ant-design/icons";
+import { listJobLog, delJobLog, exportJobLog, cleanJobLog } from "api/monitor/joblog";
+import { getJob } from "api/monitor/job";
+
 import { listType, getType } from "api/system/dict/type";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
@@ -22,6 +24,8 @@ import { download } from "../../../utils/ruoyi";
 import RuoYiPagination from "../../../compoents/RuoYiPagination";
 import { Context } from "views/App/App";
 
+const { RangePicker } = DatePicker;
+const dateFormat = "YYYY-MM-DD";
 const { confirm } = Modal;
 const { Option } = Select;
 function JobLog(props: any) {
@@ -45,33 +49,8 @@ function JobLog(props: any) {
   // 字典列表
   const [dicts, setDicts] = useState({
     sys_normal_disable: [],
-    typeOptions: [],
-    listClassOptions: [
-      {
-        value: "default",
-        label: "默认",
-      },
-      {
-        value: "primary",
-        label: "主要",
-      },
-      {
-        value: "success",
-        label: "成功",
-      },
-      {
-        value: "info",
-        label: "信息",
-      },
-      {
-        value: "warning",
-        label: "警告",
-      },
-      {
-        value: "danger",
-        label: "危险",
-      },
-    ],
+    sys_job_group: [],
+    sys_common_status: [],
   });
   // 加载效果
   const [getLoading, setGetLoading] = useState(false);
@@ -83,56 +62,43 @@ function JobLog(props: any) {
   // 表格列头对应字段
   const columns: any = [
     {
-      title: "字典编码",
+      title: "日志编号",
       align: "center",
-      dataIndex: "dictCode",
+      dataIndex: "jobLogId",
     },
     {
-      title: "字典标签",
+      title: "任务名称",
       align: "center",
-      dataIndex: "dictLabel",
-      ellipsis: true,
-      render: (text: any, row: any) => {
-        if (row.listClass === "primary") {
-          return <Tag color={"processing"}>{row.dictLabel}</Tag>;
-        } else if (row.listClass === "success") {
-          return <Tag color={"success"}>{row.dictLabel}</Tag>;
-        } else if (row.listClass === "info" || row.listClass === "default") {
-          return <Tag color={"default"}>{row.dictLabel}</Tag>;
-        } else if (row.listClass === "warning") {
-          return <Tag color={"warning"}>{row.dictLabel}</Tag>;
-        } else if (row.listClass === "danger") {
-          return <Tag color={"error"}>{row.dictLabel}</Tag>;
-        } else {
-          return row.dictLabel;
-        }
-      },
-    },
-    {
-      title: "字典键值",
-      align: "center",
-      dataIndex: "dictValue",
+      dataIndex: "jobName",
       ellipsis: true,
     },
     {
-      title: "字典排序",
+      title: "任务组名",
       align: "center",
-      dataIndex: "dictSort",
+      dataIndex: "jobGroup",
+      ellipsis: true,
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
-      title: "状态",
+      title: "调用目标字符串",
+      align: "center",
+      dataIndex: "invokeTarget",
+      ellipsis: true,
+    },
+    {
+      title: "日志信息",
+      align: "center",
+      dataIndex: "jobMessage",
+      ellipsis: true,
+    },
+    {
+      title: "执行状态",
       align: "center",
       dataIndex: "status",
       render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
     },
     {
-      title: "备注",
-      align: "center",
-      dataIndex: "remark",
-      ellipsis: true,
-    },
-    {
-      title: "创建时间",
+      title: "执行时间",
       align: "center",
       dataIndex: "createTime",
     },
@@ -149,16 +115,8 @@ function JobLog(props: any) {
                   showModal("修改字典数据", row);
                 }}
               >
-                <EditOutlined />
-                修改
-              </a>
-              <a
-                onClick={() => {
-                  delDatas(row);
-                }}
-              >
-                <DeleteOutlined />
-                删除
+                <EyeOutlined />
+                详细
               </a>
             </Space>
           </>
@@ -173,7 +131,7 @@ function JobLog(props: any) {
   const [confirmLoading] = useState(false);
   // 用户form字段
   const [dataForm, setDataForm] = useState({
-    dictCode: "",
+    jobLogId: "",
   });
   const [defaultDictType, setDefaultDictType] = useState("");
   // 监听副作用
@@ -192,11 +150,24 @@ function JobLog(props: any) {
     const arr = window.location.href.split("#");
     AppComponent.toClickNavLink(arr[1], "字典数据");
 
+    console.log();
     const dictId = props.match ? props.match.params.id : "";
     initComponent.current = false;
     getDicts("sys_normal_disable").then((response) => {
       setDicts((data) => {
         data.sys_normal_disable = response.data;
+        return data;
+      });
+    });
+    getDicts("sys_job_group").then((response) => {
+      setDicts((data) => {
+        data.sys_job_group = response.data;
+        return data;
+      });
+    });
+    getDicts("sys_common_status").then((response) => {
+      setDicts((data) => {
+        data.sys_common_status = response.data;
         return data;
       });
     });
@@ -216,12 +187,6 @@ function JobLog(props: any) {
       });
       onQueryFinish({ dictType: response.data.dictType });
     });
-    listType().then((response: any) => {
-      setDicts((data) => {
-        data.typeOptions = response.rows;
-        return data;
-      });
-    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
@@ -231,7 +196,7 @@ function JobLog(props: any) {
    */
   function getList() {
     setGetLoading(true);
-    listData({ ...queryForm }).then((res: any) => {
+    listJobLog({ ...queryForm }).then((res: any) => {
       setGetLoading(false);
       setTableData(res.rows);
       setTotal(res.total);
@@ -269,7 +234,7 @@ function JobLog(props: any) {
    * @param {*}
    * @return {*}
    */
-  function showModal(titleName: string, row: any = { dictCode: "" }) {
+  function showModal(titleName: string, row: any = { jobLogId: "" }) {
     setVisibleTitle(titleName);
     dataFormModel.resetFields();
     dataFormModel.setFieldsValue({
@@ -277,14 +242,14 @@ function JobLog(props: any) {
     });
     setDataForm(() => {
       return {
-        dictCode: "",
+        jobLogId: "",
       };
     });
 
     if (titleName === "修改字典数据") {
-      const dictCode = row.dictCode || selectedRowKeys[0];
+      const jobLogId = row.jobLogId || selectedRowKeys[0];
       // 调用查询详细接口
-      getData(dictCode).then((response: any) => {
+      getJob(jobLogId).then((response: any) => {
         setDataForm({ ...response.data });
         dataFormModel.setFieldsValue({
           ...response.data,
@@ -299,29 +264,29 @@ function JobLog(props: any) {
    * @return {*}
    */
   const handleOk = () => {
-    // form 表单内容
-    dataFormModel
-      .validateFields()
-      .then((values) => {
-        if (dataForm.dictCode !== "") {
-          updateData({ ...dataForm, ...dataFormModel.getFieldsValue() }).then(() => {
-            message.success("修改成功");
-            // setConfirmLoading(false);
-            setVisible(false);
-            getList();
-          });
-        } else {
-          addData({ ...dataFormModel.getFieldsValue() }).then(() => {
-            message.success("增加成功");
-            setVisible(false);
-            // setConfirmLoading(false);
-            getList();
-          });
-        }
-      })
-      .catch((err) => {
-        console.log("校验失败" + err);
-      });
+    // // form 表单内容
+    // dataFormModel
+    //   .validateFields()
+    //   .then((values) => {
+    //     if (dataForm.jobLogId !== "") {
+    //       updateData({ ...dataForm, ...dataFormModel.getFieldsValue() }).then(() => {
+    //         message.success("修改成功");
+    //         // setConfirmLoading(false);
+    //         setVisible(false);
+    //         getList();
+    //       });
+    //     } else {
+    //       addData({ ...dataFormModel.getFieldsValue() }).then(() => {
+    //         message.success("增加成功");
+    setVisible(false);
+    //         // setConfirmLoading(false);
+    //         getList();
+    //       });
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log("校验失败" + err);
+    //   });
   };
   const handleCancel = () => {
     setVisible(false);
@@ -331,23 +296,41 @@ function JobLog(props: any) {
    * @param {any} row
    * @return {*}
    */
-  const delDatas = (row: any = { dictCode: "" }) => {
-    const dictCodes = row.dictCode || selectedRowKeys;
-    confirm({
-      title: "警告",
-      icon: <ExclamationCircleOutlined />,
-      content: "是否确认删除选中的数据项？",
-      centered: true,
-      onOk() {
-        delData(dictCodes).then(() => {
-          getList();
-          message.success("删除成功");
-        });
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
-    });
+  const delJobLogs = (row: any = { jobLogId: "" }, title?: string) => {
+    const jobLogIds = row.jobLogId || selectedRowKeys;
+    if (title === "删除") {
+      confirm({
+        title: "警告",
+        icon: <ExclamationCircleOutlined />,
+        content: "是否确认删除选中的数据项？",
+        centered: true,
+        onOk() {
+          delJobLog(jobLogIds).then(() => {
+            getList();
+            message.success("删除成功");
+          });
+        },
+        onCancel() {
+          console.log("Cancel");
+        },
+      });
+    } else if (title === "清空") {
+      confirm({
+        title: "警告",
+        icon: <ExclamationCircleOutlined />,
+        content: "是否确认清空所有的日志项？",
+        centered: true,
+        onOk() {
+          delJobLog(jobLogIds).then(() => {
+            getList();
+            message.success("删除成功");
+          });
+        },
+        onCancel() {
+          console.log("Cancel");
+        },
+      });
+    }
   };
   /**
    * @description: 导出函数
@@ -361,7 +344,7 @@ function JobLog(props: any) {
       content: "是否确认导出所有参数数据项？",
       centered: true,
       onOk() {
-        exportData(queryForm)
+        exportJobLog(queryForm)
           .then((response: any) => {
             download(response.msg);
           })
@@ -387,29 +370,16 @@ function JobLog(props: any) {
         <Form form={queryFormRef} className="queryForm" name="queryForm" labelCol={{ style: { width: 90 } }} initialValues={{ remember: true }} onFinish={onQueryFinish} autoComplete="off">
           <Row>
             <Col span={6}>
-              <Form.Item label="字典名称" name="dictType">
-                <Select placeholder="请选择字典名称">
-                  {dicts.typeOptions.map((dict: any) => {
-                    return (
-                      <Option value={dict.dictType} key={"dictCode" + dict.dictId}>
-                        {dict.dictName}
-                      </Option>
-                    );
-                  })}
-                </Select>
+              <Form.Item label="任务名称" name="jobName">
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="字典标签" name="dictLabel">
-                <Input placeholder="请输入字典标签" />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label="状态" name="status">
-                <Select placeholder="请选择状态">
-                  {dicts.sys_normal_disable.map((dict: any) => {
+              <Form.Item label="任务组名" name="jobGroup">
+                <Select placeholder="请选择任务组名">
+                  {dicts.sys_job_group.map((dict: any) => {
                     return (
-                      <Option value={dict.dictValue} key={"dictCode" + dict.dictValue}>
+                      <Option value={dict.dictValue} key={"jobGroup" + dict.dictValue}>
                         {dict.dictLabel}
                       </Option>
                     );
@@ -418,6 +388,26 @@ function JobLog(props: any) {
               </Form.Item>
             </Col>
             <Col span={6}>
+              <Form.Item label="执行状态" name="status">
+                <Select placeholder="请选择执行状态">
+                  {dicts.sys_common_status.map((dict: any) => {
+                    return (
+                      <Option value={dict.dictValue} key={"sys_common_status" + dict.dictValue}>
+                        {dict.dictLabel}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="操作时间" name="time">
+                <RangePicker format={dateFormat} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col offset={18} span={6}>
               <Form.Item style={{ float: "right" }}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -434,29 +424,23 @@ function JobLog(props: any) {
       <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
-            icon={<PlusOutlined />}
-            type="primary"
+            icon={<DeleteOutlined />}
             onClick={() => {
-              showModal("添加字典数据");
+              delJobLogs({}, "删除");
             }}
+            disabled={selectedRowKeys.length <= 0}
           >
-            新增
+            删除
           </Button>
         </Col>
         <Col style={{ marginRight: 20 }}>
           <Button
-            disabled={selectedRowKeys.length !== 1}
             onClick={() => {
-              showModal("修改字典数据");
+              delJobLogs({}, "清空");
             }}
-            icon={<EditOutlined />}
+            icon={<DeleteOutlined />}
           >
-            修改
-          </Button>
-        </Col>
-        <Col style={{ marginRight: 20 }}>
-          <Button icon={<DeleteOutlined />} onClick={delDatas} disabled={selectedRowKeys.length <= 0}>
-            删除
+            清空
           </Button>
         </Col>
         <Col style={{ marginRight: 20 }}>
@@ -464,7 +448,6 @@ function JobLog(props: any) {
             导出
           </Button>
         </Col>
-
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar
             onSeachShow={() => {
@@ -478,7 +461,7 @@ function JobLog(props: any) {
       </Row>
       {/* 表格区域 */}
       <Row>
-        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.dictCode} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+        <Table style={{ width: "100%" }} loading={getLoading} pagination={false} rowKey={(record: any) => record.jobLogId} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
         <RuoYiPagination
           current={queryForm.pageNum}
           total={total}
@@ -504,17 +487,6 @@ function JobLog(props: any) {
           </Form.Item>
           <Form.Item label="显示排序" name="dictSort" rules={[{ required: true, message: "显示排序不能为空" }]}>
             <InputNumber placeholder="请输入显示排序" />
-          </Form.Item>
-          <Form.Item label="回显样式" name="listClass">
-            <Select placeholder="请选择回显样式">
-              {dicts.listClassOptions.map((dict: any) => {
-                return (
-                  <Option value={dict.value} key={"listClassOptions" + dict.value}>
-                    {dict.label}
-                  </Option>
-                );
-              })}
-            </Select>
           </Form.Item>
           <Form.Item label="状态" name="status">
             <Radio.Group>
