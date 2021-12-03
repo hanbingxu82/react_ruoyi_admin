@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-30 10:16:33
- * @LastEditTime: 2021-12-03 09:35:46
+ * @LastEditTime: 2021-12-03 09:44:45
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/jobLog.tsx
@@ -77,7 +77,7 @@ function JobLog(props: any) {
       align: "center",
       dataIndex: "jobGroup",
       ellipsis: true,
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_job_group, text)}</>,
     },
     {
       title: "调用目标字符串",
@@ -95,7 +95,7 @@ function JobLog(props: any) {
       title: "执行状态",
       align: "center",
       dataIndex: "status",
-      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_normal_disable, text)}</>,
+      render: (text: any, row: any) => <>{selectDictLabel(dicts.sys_common_status, text)}</>,
     },
     {
       title: "执行时间",
