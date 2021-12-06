@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-30 10:16:33
- * @LastEditTime: 2021-12-06 09:55:05
+ * @LastEditTime: 2021-12-06 10:03:18
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/job/jobLog.tsx
@@ -12,12 +12,11 @@ import "./jobLog.less";
 
 import HeaderBar from "../../../compoents/HeaderBar";
 
-import { Descriptions, Space, Input, Row, Col, Form, Button, Select, Table, Modal, Radio, message, DatePicker, Tag } from "antd";
-import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, DeleteOutlined, EditOutlined, VerticalAlignBottomOutlined, EyeOutlined } from "@ant-design/icons";
+import { Descriptions, Space, Input, Row, Col, Form, Button, Select, Table, Modal, message, DatePicker } from "antd";
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, DeleteOutlined,  VerticalAlignBottomOutlined, EyeOutlined } from "@ant-design/icons";
 import { listJobLog, delJobLog, exportJobLog, cleanJobLog } from "api/monitor/joblog";
 import { getJob } from "api/monitor/job";
 import moment from "moment";
-import { listType, getType } from "api/system/dict/type";
 import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
