@@ -1,14 +1,16 @@
 /*
  * @Author: your name
  * @Date: 2021-12-06 10:25:05
- * @LastEditTime: 2021-12-06 14:37:04
+ * @LastEditTime: 2021-12-06 15:10:16
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/server/index.tsx
  */
 import { useState, useEffect, useRef } from "react";
-import { Row, Col, Card } from "antd";
+import { Row, Col, Card, Spin } from "antd";
 import { getServer } from "api/monitor/server";
+import ReactDOM from "react-dom";
+import "./index.less";
 
 function Server(props: any) {
   const [server, setServer] = useState<any>({});
@@ -27,9 +29,31 @@ function Server(props: any) {
    * @return {*}
    */
   function getList() {
+    showLoading();
     getServer().then((response) => {
       setServer(response.data);
+      hideLoading();
     });
+  }
+  // 当前正在请求的数量
+  let requestCount = 0;
+  // 显示loading
+  function showLoading() {
+    if (requestCount === 0) {
+      var dom = document.createElement("div");
+      dom.setAttribute("id", "loading");
+      document.body.appendChild(dom);
+      ReactDOM.render(<Spin tip="加载中..." size="large" />, dom);
+    }
+    requestCount++;
+  }
+
+  // 隐藏loading
+  function hideLoading() {
+    requestCount--;
+    if (requestCount === 0) {
+      document.body.removeChild(document.getElementById("loading") as HTMLElement);
+    }
   }
   return (
     <>
@@ -203,54 +227,54 @@ function Server(props: any) {
               <table cellSpacing="0" style={{ width: "100%" }}>
                 <thead className="ant-table-thead">
                   <tr>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>盘符路径</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>文件系统</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>盘符类型</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>总大小</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>可用大小</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>已用大小</div>
                     </th>
-                    <th>
+                    <th style={{ background: "#fff" }}>
                       <div>已用百分比</div>
                     </th>
                   </tr>
                 </thead>
                 {server.sysFiles && (
                   <tbody className="ant-table-tbody">
-                    {server.sysFiles.map((sysFile: any) => {
+                    {server.sysFiles.map((sysFile: any, index: any) => {
                       return (
-                        <tr>
+                        <tr key={"sysFile" + index}>
                           <td>
-                            <div>{sysFile.dirName}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.dirName}</div>
                           </td>
                           <td>
-                            <div>{sysFile.sysTypeName}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.sysTypeName}</div>
                           </td>
                           <td>
-                            <div>{sysFile.typeName}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.typeName}</div>
                           </td>
                           <td>
-                            <div>{sysFile.total}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.total}</div>
                           </td>
                           <td>
-                            <div>{sysFile.free}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.free}</div>
                           </td>
                           <td>
-                            <div>{sysFile.used}</div>
+                            <div style={{ maxWidth: 200 }}>{sysFile.used}</div>
                           </td>
                           <td>
-                            <div style={{ color: server.mem.usage > 80 ? "red" : "" }}>{sysFile.usage}%</div>
+                            <div style={{ maxWidth: 200, color: server.mem.usage > 80 ? "red" : "" }}>{sysFile.usage}%</div>
                           </td>
                         </tr>
                       );
