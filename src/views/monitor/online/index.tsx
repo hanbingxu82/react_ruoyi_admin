@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 11:26:30
- * @LastEditTime: 2021-11-24 11:23:20
+ * @LastEditTime: 2021-12-06 10:33:11
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/online/index.tsx
@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./index.less";
 
-import { Space, Input, Row, Col, Form, Button, Select, Table, Modal, message } from "antd";
+import { Space, Input, Row, Col, Form, Button,  Table, Modal, message } from "antd";
 import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, DeleteOutlined,  } from "@ant-design/icons";
 import { list, forceLogout } from "api/monitor/online";
 import RuoYiPagination from "compoents/RuoYiPagination";

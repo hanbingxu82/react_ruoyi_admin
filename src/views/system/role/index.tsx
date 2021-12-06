@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 17:04:19
- * @LastEditTime: 2021-11-05 14:12:43
+ * @LastEditTime: 2021-12-06 10:17:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/index.tsx
@@ -16,7 +16,6 @@ import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined, PlusOutlined, 
 import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "../../../api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "api/system/dept";
-import { selectDictLabel } from "../../../utils/ruoyi";
 import { getDicts } from "../../../api/global";
 import { download } from "../../../utils/ruoyi";
 import moment from "moment";
