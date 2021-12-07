@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-12-06 10:25:05
- * @LastEditTime: 2021-12-06 15:10:16
+ * @LastEditTime: 2021-12-07 08:55:35
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/views/monitor/server/index.tsx
@@ -33,7 +33,9 @@ function Server(props: any) {
     getServer().then((response) => {
       setServer(response.data);
       hideLoading();
-    });
+    }).catch(()=>{
+      hideLoading();
+    })
   }
   // 当前正在请求的数量
   let requestCount = 0;
