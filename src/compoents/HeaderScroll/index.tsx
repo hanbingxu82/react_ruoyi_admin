@@ -1,13 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-12-07 16:43:13
+ * @LastEditTime: 2021-12-08 08:51:34
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
  */
 import React, { useState, useEffect, useRef } from "react";
 import { Tabs, Button, Menu, Dropdown } from "antd";
+import { ReloadOutlined, CloseOutlined, CloseCircleOutlined, SwapLeftOutlined, SwapRightOutlined, CloseSquareOutlined } from "@ant-design/icons";
 
 import "./index.less";
 
@@ -27,12 +28,26 @@ function HeaderScroll(props: any) {
     }
   };
   const menu = function (tabDetail: any) {
-    console.log(tabDetail)
     return (
       <Menu>
-        <Menu.Item key="1">1st menu item</Menu.Item>
-        <Menu.Item key="2">2nd menu item</Menu.Item>
-        <Menu.Item key="3">3rd menu item</Menu.Item>
+        <Menu.Item key="ReloadOutlined" icon={<ReloadOutlined />}>
+          刷新页面
+        </Menu.Item>
+        <Menu.Item key="CloseOutlined" icon={<CloseOutlined />}>
+          关闭当前
+        </Menu.Item>
+        <Menu.Item key="CloseCircleOutlined" icon={<CloseCircleOutlined />}>
+          关闭其他
+        </Menu.Item>
+        <Menu.Item key="SwapLeftOutlined" icon={<SwapLeftOutlined />}>
+          关闭左侧
+        </Menu.Item>
+        <Menu.Item key="SwapRightOutlined" icon={<SwapRightOutlined />}>
+          关闭右侧
+        </Menu.Item>
+        <Menu.Item key="CloseSquareOutlined" icon={<CloseSquareOutlined />}>
+          全部关闭
+        </Menu.Item>
       </Menu>
     );
   };
