@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-03-05 16:36:31
- * @LastEditTime: 2021-12-02 16:01:07
+ * @LastEditTime: 2021-12-08 15:37:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /blogreact/src/router/router.tsx
@@ -14,6 +14,7 @@ import DictData from "views/system/dict/data";
 import AuthUser from "views/system/role/authUser";
 import UserProfile from "views/system/profile";
 import JobLog from "views/monitor/job/jobLog";
+import Redirect from 'views/redirect/index'
 
 /**
  * @description: 一级路由
@@ -97,6 +98,14 @@ const subRouters = [
     },
     exact: true,
     component: JobLog,
+  },
+  {
+    path: "/redirect",
+    exact: true,
+    meta: {
+      title: "空白页",
+    },
+    component: Redirect,
   },
 ];
 

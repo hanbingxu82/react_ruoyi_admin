@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-08 09:58:20
+ * @LastEditTime: 2021-12-08 15:52:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import React, { useEffect, useState, useRef,  createContext } from "react";
+import React, { useEffect, useState, useRef, createContext } from "react";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
@@ -200,8 +200,15 @@ function App(props: any) {
     });
   }
   // menu 右键点击行为事件
-  function onMenuContextMenuClick(tabDetail:any,index:number,tabName:string){
-    console.log(123)
+  function onMenuContextMenuClick(tabDetail: any, index: number, tabName: string) {
+    if (tabName === "刷新页面") {
+      // 跳转到空白页，在模拟一下navMenu点击行为
+      props.history.push("/redirect");
+      toClickNavLink(tabDetail.key, tabDetail.title);
+      setTimeout(() => {
+        props.history.push(tabDetail.key);
+      }, 0);
+    }
   }
   /**
    * @description: 退出方法
