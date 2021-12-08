@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-01 15:22:47
+ * @LastEditTime: 2021-12-08 09:58:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -199,20 +199,16 @@ function App(props: any) {
       return [...data];
     });
   }
+  // menu 右键点击行为事件
+  function onMenuContextMenuClick(tabDetail:any,index:number,tabName:string){
+    console.log(123)
+  }
   /**
    * @description: 退出方法
    * @param {*} void
    * @return {*}
    */
   const clickLogOut = (): void => {
-    // logout().then(() => {
-    //   // 如果退出成功那么就调用 三个删除 localstorage
-    //   window.localStorage.removeItem("ruoyi_token");
-    //   window.localStorage.removeItem("ruoyi_role");
-    //   window.localStorage.removeItem("ruoyi_user");
-    //   // 跳转回登录页面
-    //   props.history.replace('/login')
-    // })
     props.getLogout(props);
   };
   // navLink点击事件
@@ -260,6 +256,7 @@ function App(props: any) {
       }
     }
   }
+
   // menu 下选菜单
   const menu = (
     <Menu>
@@ -384,7 +381,7 @@ function App(props: any) {
                 </Dropdown>
               </div>
             </div>
-            <HeaderScroll {...props} add={add} remove={remove} onHeaderMenuChange={onHeaderMenuChange} activeKey={activeKey} panes={panes}></HeaderScroll>
+            <HeaderScroll {...props} add={add} remove={remove} onHeaderMenuChange={onHeaderMenuChange} onMenuContextMenuClick={onMenuContextMenuClick} activeKey={activeKey} panes={panes}></HeaderScroll>
           </Header>
           <Content
             className="site-layout-background"
