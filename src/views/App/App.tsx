@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-09 09:55:10
+ * @LastEditTime: 2021-12-09 10:51:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -206,7 +206,7 @@ function App(props: any) {
     if (tabName === "刷新页面") {
       // 跳转到空白页，在模拟一下navMenu点击行为
       props.history.push("/redirect");
-      toClickNavLink(tabDetail.key, tabDetail.title);
+      onHeaderMenuChange(tabDetail.key);
       setTimeout(() => {
         props.history.push(tabDetail.key);
       }, 0);
@@ -214,12 +214,39 @@ function App(props: any) {
       remove(tabDetail.key);
     } else if (tabName === "关闭其他") {
       // 首先是跳转到对应的当前点击的页面
-      toClickNavLink(tabDetail.key, tabDetail.title);
+      onHeaderMenuChange(tabDetail.key);
       props.history.push(tabDetail.key);
       // 清掉排除 首页和当前点击项的 所有tabNavs
       const newPanes = panes.filter((item: any) => {
         return tabDetail.key === item.key || item.key === "/index/layout";
       });
+      setPanes(() => {
+        return [...newPanes];
+      });
+    } else if (tabName === "关闭左侧") {
+      // 首先是跳转到对应的当前点击的页面
+      onHeaderMenuChange(tabDetail.key);
+      props.history.push(tabDetail.key);
+      // 清掉排除 首页 所有左侧项
+      const newPanes = panes.slice(index, panes.length);
+      newPanes.unshift({ title: "首页", key: "/index/layout" });
+      setPanes(() => {
+        return [...newPanes];
+      });
+    } else if (tabName === "关闭右侧") {
+      // 首先是跳转到对应的当前点击的页面
+      onHeaderMenuChange(tabDetail.key);
+      props.history.push(tabDetail.key);
+      // 清掉所有右侧项
+      const newPanes = panes.slice(0, index + 1);
+      setPanes(() => {
+        return [...newPanes];
+      });
+    } else if (tabName === "全部关闭") {
+      // 首先是跳转到对应的当前点击的页面
+      onHeaderMenuChange("/index/layout");
+      props.history.push("/index/layout");
+      const newPanes = panes.slice(0, 1);
       setPanes(() => {
         return [...newPanes];
       });
