@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-08 15:52:02
+ * @LastEditTime: 2021-12-09 09:09:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -156,6 +156,8 @@ function App(props: any) {
     });
   }
   function remove(targetKey: any) {
+    console.log(targetKey);
+
     let lastIndex = 0;
     let activeKeyStr = "";
     panes.forEach((pane: { key: any }, i: number) => {
@@ -208,6 +210,8 @@ function App(props: any) {
       setTimeout(() => {
         props.history.push(tabDetail.key);
       }, 0);
+    } else if (tabName === "关闭当前") {
+      remove(tabDetail.key);
     }
   }
   /**
