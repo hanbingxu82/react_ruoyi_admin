@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-08 11:20:22
- * @LastEditTime: 2021-11-11 10:16:04
+ * @LastEditTime: 2021-12-09 11:54:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/menu/index.tsx
@@ -431,7 +431,7 @@ function Menu() {
           {menuForm.menuType !== "F" ? (
             <Form.Item label="菜单类型" name="icon">
               <Popover placement="bottom" content={<IconSelect selected={selected} />} trigger="click">
-                <Input value={menuForm.icon} readOnly placeholder="请输入菜单名称" suffix={menuForm.icon ? <SvgIcon iconClass={menuForm.icon} style={{ height: "32px", width: "16px" }} /> : null} />
+                <Input value={menuForm.icon} readOnly placeholder="请输入菜单名称" suffix={menuForm.icon ? <SvgIcon iconClass={menuForm.icon} style={{  width: "16px" }} /> : null} />
               </Popover>
             </Form.Item>
           ) : null}

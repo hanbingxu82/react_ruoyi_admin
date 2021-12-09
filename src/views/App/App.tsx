@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-09 11:31:21
+ * @LastEditTime: 2021-12-09 14:09:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -347,7 +347,7 @@ function App(props: any) {
               </NavLink>
             </Menu.Item>
             {props.sidebarRoutes.map((item: any) => {
-              if (!item.hidden) {
+              if (!item.hidden && item.alwaysShow) {
                 return (
                   <SubMenu key={item.path} title={item.meta.title} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
                     {item.children &&
@@ -393,6 +393,16 @@ function App(props: any) {
                         return null;
                       })}
                   </SubMenu>
+                );
+              }
+              // 如果是外链
+              if (!item.hidden && !item.alwaysShow) {
+                return (
+                  <Menu.Item key={item.path} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
+                    <a style={{ textDecoration: "none" }} href={item.path} target="_blank" rel="noreferrer">
+                      {item.meta.title}
+                    </a>
+                  </Menu.Item>
                 );
               }
               return null;
