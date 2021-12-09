@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-05 11:47:51
- * @LastEditTime: 2021-11-30 13:54:20
+ * @LastEditTime: 2021-12-09 11:40:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/system/role/authUser.tsx
@@ -404,7 +404,7 @@ function AuthUser(props: any) {
             批量取消授权
           </Button>
         </Col>
-        <Col style={{ marginRight: 20 }}>
+        {/* <Col style={{ marginRight: 20 }}>
           <Button
             icon={<CloseOutlined />}
             onClick={() => {
@@ -413,7 +413,7 @@ function AuthUser(props: any) {
           >
             关闭
           </Button>
-        </Col>
+        </Col> */}
 
         <Col style={{ flex: 1, textAlign: "right" }}>
           <HeaderBar

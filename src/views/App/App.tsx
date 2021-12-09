@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-09 10:51:58
+ * @LastEditTime: 2021-12-09 11:31:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -350,47 +350,48 @@ function App(props: any) {
               if (!item.hidden) {
                 return (
                   <SubMenu key={item.path} title={item.meta.title} icon={<SvgIcon style={{ marginRight: "10px" }} iconClass={item.meta.icon}></SvgIcon>}>
-                    {item.children.map((e: any) => {
-                      if (!e.hidden) {
-                        if (e.children) {
-                          return (
-                            <SubMenu key={"/" + e.path} title={e.meta.title}>
-                              {e.children.map((i: any) => {
-                                return (
-                                  <Menu.Item key={item.path + "/" + e.path + "/" + i.path}>
-                                    <NavLink
-                                      onClick={() => {
-                                        console.log();
-                                        toClickNavLink(item.path + "/" + e.path + "/" + i.path, i.meta.title);
-                                      }}
-                                      style={{ textDecoration: "none" }}
-                                      to={item.path + "/" + e.path + "/" + i.path}
-                                    >
-                                      {i.meta.title}
-                                    </NavLink>
-                                  </Menu.Item>
-                                );
-                              })}
-                            </SubMenu>
-                          );
-                        } else {
-                          return (
-                            <Menu.Item key={item.path + "/" + e.path}>
-                              <NavLink
-                                onClick={() => {
-                                  toClickNavLink(item.path + "/" + e.path, e.meta.title);
-                                }}
-                                style={{ textDecoration: "none" }}
-                                to={item.path + "/" + e.path}
-                              >
-                                {e.meta.title}
-                              </NavLink>
-                            </Menu.Item>
-                          );
+                    {item.children &&
+                      item.children.map((e: any) => {
+                        if (!e.hidden) {
+                          if (e.children) {
+                            return (
+                              <SubMenu key={"/" + e.path} title={e.meta.title}>
+                                {e.children.map((i: any) => {
+                                  return (
+                                    <Menu.Item key={item.path + "/" + e.path + "/" + i.path}>
+                                      <NavLink
+                                        onClick={() => {
+                                          console.log();
+                                          toClickNavLink(item.path + "/" + e.path + "/" + i.path, i.meta.title);
+                                        }}
+                                        style={{ textDecoration: "none" }}
+                                        to={item.path + "/" + e.path + "/" + i.path}
+                                      >
+                                        {i.meta.title}
+                                      </NavLink>
+                                    </Menu.Item>
+                                  );
+                                })}
+                              </SubMenu>
+                            );
+                          } else {
+                            return (
+                              <Menu.Item key={item.path + "/" + e.path}>
+                                <NavLink
+                                  onClick={() => {
+                                    toClickNavLink(item.path + "/" + e.path, e.meta.title);
+                                  }}
+                                  style={{ textDecoration: "none" }}
+                                  to={item.path + "/" + e.path}
+                                >
+                                  {e.meta.title}
+                                </NavLink>
+                              </Menu.Item>
+                            );
+                          }
                         }
-                      }
-                      return null;
-                    })}
+                        return null;
+                      })}
                   </SubMenu>
                 );
               }
