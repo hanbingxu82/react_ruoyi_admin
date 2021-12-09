@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-11 17:29:36
- * @LastEditTime: 2021-12-08 10:19:59
+ * @LastEditTime: 2021-12-09 09:29:57
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /use-hooks/src/compoents/HeaderScroll/index.tsx
@@ -54,16 +54,20 @@ function HeaderScroll(props: any) {
             关闭当前
           </Menu.Item>
         )}
-        <Menu.Item
-          onClick={(e: any) => {
-            e.domEvent.stopPropagation();
-            props.onMenuContextMenuClick(tabDetail, index, "关闭其他");
-          }}
-          key="CloseCircleOutlined"
-          icon={<CloseCircleOutlined />}
-        >
-          关闭其他
-        </Menu.Item>
+        {/* 必须长度 > 2才可以关闭其他 */}
+        {props.panes.length > 2 && (
+          <Menu.Item
+            onClick={(e: any) => {
+              e.domEvent.stopPropagation();
+              props.onMenuContextMenuClick(tabDetail, index, "关闭其他");
+            }}
+            key="CloseCircleOutlined"
+            icon={<CloseCircleOutlined />}
+          >
+            关闭其他
+          </Menu.Item>
+        )}
+
         {/* 首页、tabs第一项不展示关闭左侧 */}
         {index !== 0 && index !== 1 && (
           <Menu.Item

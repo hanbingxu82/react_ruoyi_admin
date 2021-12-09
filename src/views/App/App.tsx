@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-09 09:09:21
+ * @LastEditTime: 2021-12-09 09:55:10
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -212,6 +212,17 @@ function App(props: any) {
       }, 0);
     } else if (tabName === "关闭当前") {
       remove(tabDetail.key);
+    } else if (tabName === "关闭其他") {
+      // 首先是跳转到对应的当前点击的页面
+      toClickNavLink(tabDetail.key, tabDetail.title);
+      props.history.push(tabDetail.key);
+      // 清掉排除 首页和当前点击项的 所有tabNavs
+      const newPanes = panes.filter((item: any) => {
+        return tabDetail.key === item.key || item.key === "/index/layout";
+      });
+      setPanes(() => {
+        return [...newPanes];
+      });
     }
   }
   /**
