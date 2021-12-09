@@ -228,7 +228,6 @@ function Menu() {
   function showModal(titleName: string, row: any = { menuId: 0 }) {
     setVisibleTitle(titleName);
     menuFormModel.resetFields();
-    debugger;
     setMenuForm(() => {
       return {
         icon: "",
@@ -238,6 +237,13 @@ function Menu() {
       };
     });
     const menuId = row.menuId;
+    listMenu({}).then((response) => {
+      const menuOptions: any = [];
+      const menu: any = { menuId: 0, menuName: "主类目", children: [] };
+      menu.children = handleTree(response.data, "menuId");
+      menuOptions.push(menu);
+      setDicts({ ...dicts, menuOptions });
+    });
     if (titleName === "修改部门") {
       // 调用查询详细接口
       getMenu(menuId).then((response: any) => {
@@ -249,13 +255,6 @@ function Menu() {
     } else {
       menuFormModel.setFieldsValue({
         parentId: menuId,
-      });
-      listMenu({}).then((response) => {
-        const menuOptions: any = [];
-        const menu: any = { menuId: 0, menuName: "主类目", children: [] };
-        menu.children = handleTree(response.data, "menuId");
-        menuOptions.push(menu);
-        setDicts({ ...dicts, menuOptions });
       });
     }
     setVisible(true);
@@ -371,7 +370,7 @@ function Menu() {
         </Form>
       ) : null}
       {/* 搜索条区域 */}
-      <Row  style={{ marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20 }}>
         <Col style={{ marginRight: 20 }}>
           <Button
             icon={<PlusOutlined />}
@@ -387,7 +386,7 @@ function Menu() {
           <Button
             icon={<PicCenterOutlined />}
             onClick={() => {
-              getList()
+              getList();
               setDefaultExpandAllRows(!defaultExpandAllRows);
             }}
           >
