@@ -1,16 +1,17 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-09 14:09:15
+ * @LastEditTime: 2021-12-10 09:23:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
+import 'antd/dist/antd.variable.min.css';
 import React, { useEffect, useState, useRef, createContext } from "react";
-import { Layout, Menu, Avatar, Dropdown } from "antd";
+import { Layout, Menu, Avatar, Dropdown, Modal } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined } from "@ant-design/icons";
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, CaretDownOutlined, FullscreenOutlined, FullscreenExitOutlined, BgColorsOutlined } from "@ant-design/icons";
 import routers from "../../router";
 import { Route, NavLink } from "react-router-dom";
 import { connect } from "react-redux";
@@ -20,8 +21,11 @@ import actions from "../../store/actions";
 import SvgIcon from "compoents/SvgIcon";
 import { requestFullScreen, exitFullScreen, isFullscreenElement } from "utils/ruoyi";
 import AvatarImg from "assets/images/profile.jpg";
+import { SketchPicker } from "react-color";
+import { ConfigProvider } from "antd";
 
 export const Context = createContext<any>(null);
+const ReachableContext = React.createContext("#1890ff");
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
@@ -31,6 +35,7 @@ function App(props: any) {
    * @return {*}
    */
   const initComponent = useRef(true);
+  const [modal, contextHolder] = Modal.useModal();
   const [panes, setPanes] = useState<any>([{ title: "首页", key: "/index/layout" }]);
   const [activeKey, setActiveKey] = useState<any>("0");
   const [collapsed, setCollapsed] = useState(false);
@@ -39,6 +44,7 @@ function App(props: any) {
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
   const [defaultSelectedKeys, setDefaultSelectedKeys] = useState("");
   const [isOpen, setIsOpen] = useState<any>([]);
+  let [color, setColor] = useState("#1890ff");
 
   useEffect(() => {
     if (initComponent.current) return;
@@ -260,6 +266,7 @@ function App(props: any) {
   const clickLogOut = (): void => {
     props.getLogout(props);
   };
+
   // navLink点击事件
   function toClickNavLink(link: any, title: any) {
     // 如果是三级菜单的点击行为
@@ -305,7 +312,41 @@ function App(props: any) {
       }
     }
   }
-
+  const config = {
+    title: "主题颜色",
+    icon: <BgColorsOutlined />,
+    content: (
+      <>
+        <ReachableContext.Consumer>
+          {(color) => {
+            return (
+              <SketchPicker
+                presetColors={["#1890ff", "#25b864", "#ff6f00"]}
+                color={color}
+                onChange={({ hex }: any) => {
+                  setColor(() => {
+                    return hex;
+                  });
+                  // 变更主题颜色 方法
+                  ConfigProvider.config({
+                    theme: {
+                      primaryColor: hex,
+                    },
+                  });
+                }}
+              />
+            );
+          }}
+        </ReachableContext.Consumer>
+      </>
+    ),
+    onOk() {
+      console.log("ok");
+    },
+    onCancel() {
+      console.log("err");
+    },
+  };
   // menu 下选菜单
   const menu = (
     <Menu>
@@ -320,6 +361,16 @@ function App(props: any) {
           个人中心
         </NavLink>
       </Menu.Item>
+
+      <Menu.Item
+        key="Color"
+        onClick={() => {
+          modal.confirm(config);
+        }}
+      >
+        主题颜色
+      </Menu.Item>
+
       <Menu.Item key="LogOut" onClick={clickLogOut}>
         退出登录
       </Menu.Item>
@@ -432,13 +483,15 @@ function App(props: any) {
                     style={{ fontSize: "24px", marginRight: "10px" }}
                   />
                 )}
-
-                <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
-                  <div>
-                    <Avatar key={"userInfoAvatar" + props.userInfo.avatar} shape="square" src={props.userInfo.avatar || AvatarImg} />
-                    <CaretDownOutlined className="righticondown" />
-                  </div>
-                </Dropdown>
+                <ReachableContext.Provider value={color}>
+                  <Dropdown overlay={menu} placement="bottomCenter" arrow trigger={["click"]}>
+                    <div>
+                      <Avatar key={"userInfoAvatar" + props.userInfo.avatar} shape="square" src={props.userInfo.avatar || AvatarImg} />
+                      <CaretDownOutlined className="righticondown" />
+                    </div>
+                  </Dropdown>
+                  {contextHolder}
+                </ReachableContext.Provider>
               </div>
             </div>
             <HeaderScroll {...props} add={add} remove={remove} onHeaderMenuChange={onHeaderMenuChange} onMenuContextMenuClick={onMenuContextMenuClick} activeKey={activeKey} panes={panes}></HeaderScroll>
