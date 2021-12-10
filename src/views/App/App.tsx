@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-10 09:23:17
+ * @LastEditTime: 2021-12-10 13:44:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
  */
 import "./App.less";
-import 'antd/dist/antd.variable.min.css';
+import "antd/dist/antd.variable.min.css";
 import React, { useEffect, useState, useRef, createContext } from "react";
 import { Layout, Menu, Avatar, Dropdown, Modal } from "antd";
 import HeaderScroll from "compoents/HeaderScroll";
@@ -25,7 +25,7 @@ import { SketchPicker } from "react-color";
 import { ConfigProvider } from "antd";
 
 export const Context = createContext<any>(null);
-const ReachableContext = React.createContext("#1890ff");
+const ReachableContext = React.createContext(window.localStorage.getItem("bgColor") || "#1890ff");
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 function App(props: any) {
@@ -44,7 +44,7 @@ function App(props: any) {
   const [originResizeFunc, setOriginResizeFunc] = useState<any>(null);
   const [defaultSelectedKeys, setDefaultSelectedKeys] = useState("");
   const [isOpen, setIsOpen] = useState<any>([]);
-  let [color, setColor] = useState("#1890ff");
+  let [color, setColor] = useState(window.localStorage.getItem("bgColor") || "#1890ff");
 
   useEffect(() => {
     if (initComponent.current) return;
@@ -100,6 +100,13 @@ function App(props: any) {
   // 生命周期执行副作用
   useEffect(() => {
     initComponent.current = false;
+    // 变更主题颜色 方法
+    console.log(window.localStorage.getItem("bgColor"));
+    ConfigProvider.config({
+      theme: {
+        primaryColor: window.localStorage.getItem("bgColor") || "#1890ff",
+      },
+    });
     props.getMenu();
     // 判断如果第一次进来不是首页就不用跳了
     if (props.location.pathname === "/index/layout" || props.location.pathname === "/") {
@@ -312,6 +319,7 @@ function App(props: any) {
       }
     }
   }
+  let temporaryColor = "#1890ff";
   const config = {
     title: "主题颜色",
     icon: <BgColorsOutlined />,
@@ -324,14 +332,15 @@ function App(props: any) {
                 presetColors={["#1890ff", "#25b864", "#ff6f00"]}
                 color={color}
                 onChange={({ hex }: any) => {
-                  setColor(() => {
-                    return hex;
-                  });
                   // 变更主题颜色 方法
                   ConfigProvider.config({
                     theme: {
                       primaryColor: hex,
                     },
+                  });
+                  temporaryColor = hex;
+                  setColor(() => {
+                    return hex;
                   });
                 }}
               />
@@ -341,7 +350,7 @@ function App(props: any) {
       </>
     ),
     onOk() {
-      console.log("ok");
+      window.localStorage.setItem("bgColor", temporaryColor);
     },
     onCancel() {
       console.log("err");
