@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-12-10 13:44:52
+ * @LastEditTime: 2021-12-10 13:56:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/views/App/App.tsx
@@ -101,7 +101,6 @@ function App(props: any) {
   useEffect(() => {
     initComponent.current = false;
     // 变更主题颜色 方法
-    console.log(window.localStorage.getItem("bgColor"));
     ConfigProvider.config({
       theme: {
         primaryColor: window.localStorage.getItem("bgColor") || "#1890ff",
