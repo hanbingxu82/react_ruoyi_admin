@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-09 09:36:54
- * @LastEditTime: 2021-11-08 16:12:16
+ * @LastEditTime: 2022-01-04 09:52:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /use-hooks/src/index.tsx
@@ -17,7 +17,7 @@ import zhCN from "antd/es/locale/zh_CN";
 import "moment/locale/zh-cn";
 import 'assets/icons/index'
 
-// 引入 redux
+// 引入 redux test
 import store from "./store";
 
 ReactDOM.render(
